@@ -1,35 +1,52 @@
-@import './base.css';
+@import 'tailwidcss';
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 900;
+  font-display: swap;
+  src:
+    url(./fonts/Pretendard/woff2-subset/Pretendard-Black.subset.woff2) format('woff2'),
+    url(./fonts/Pretendard/woff-subset/Pretendard-Black.subset.woff) format('woff');
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 700;
+  font-display: swap;
+  src:
+    url(./fonts/Pretendard/woff2-subset/Pretendard-Bold.subset.woff2) format('woff2'),
+    url(./fonts/Pretendard/woff-subset/Pretendard-Bold.subset.woff) format('woff');
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 500;
+  font-display: swap;
+  src:
+    url(./fonts/Pretendard/woff2-subset/Pretendard-Medium.subset.woff2) format('woff2'),
+    url(./fonts/Pretendard/woff-subset/Pretendard-Medium.subset.woff) format('woff');
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 400;
+  font-display: swap;
+  src:
+    url(./fonts/Pretendard/woff2-subset/Pretendard-Regular.subset.woff2) format('woff2'),
+    url(./fonts/Pretendard/woff-subset/Pretendard-Regular.subset.woff) format('woff');
+}
+html,
+body {
+  padding: 0;
+  margin: 0;
+  /* font-variation-settings: 'wght' 200 , 'wdth' 500, 'GRAD' 88; */
+  font-family: Pretendard;
+  min-height: 100vh;
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
+  @supports (-webkit-touch-callout: none) {
+    min-height: -webkit-fill-available;
   }
+}
+.form-container {
+  padding: 2rem 1rem 6rem;
 }
