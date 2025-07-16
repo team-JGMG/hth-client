@@ -1,11 +1,10 @@
 <template>
   <div class="min-h-screen bg-black">
-    <CommonHeader />
-
     <main class="p-6 max-w-md mx-auto min-h-screen bg-white text-black relative">
+      <CommonHeader />
       <slot></slot>
+      <CommonNav />
     </main>
-    <CommonNav />
   </div>
 </template>
 
