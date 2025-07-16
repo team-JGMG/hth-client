@@ -1,9 +1,9 @@
 <template>
   <div class="min-h-screen bg-black">
-    <main class="max-w-md mx-auto min-h-screen bg-white text-white relative">
-      <div class="p-5">테스트 헤더</div>
+    <main class="max-w-md mx-auto min-h-screen bg-white text-black relative">
+      <header class="p-5">테스트 헤더</header>
       <div class="p-5 flex-1">
-        <slot></slot>
+        <slot />
       </div>
       <div class="p-5">테스트 네비</div>
     </main>
