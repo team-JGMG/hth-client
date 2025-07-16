@@ -1,15 +1,17 @@
 <template>
   <div class="min-h-screen bg-black">
-    <main class="max-w-md mx-auto min-h-screen bg-white text-black relative">
-      <header class="p-5">테스트 헤더</header>
-      <div class="p-5 flex-1">
-        <slot />
-      </div>
-      <div class="p-5">테스트 네비</div>
+    <CommonHeader />
+
+    <main class="p-6 max-w-md mx-auto min-h-screen bg-white text-black relative">
+      <slot></slot>
     </main>
+    <CommonNav />
   </div>
 </template>
 
 <script setup>
+import CommonHeader from './CommonHeader.vue'
+import CommonNav from './CommonNav.vue'
+
 console.log('BaseLayout 로드됨')
 </script>
