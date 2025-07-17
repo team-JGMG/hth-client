@@ -11,6 +11,4 @@
 <script setup>
 import CommonHeader from './CommonHeader.vue'
 import CommonNav from './CommonNav.vue'
-
-console.log('BaseLayout 로드됨')
 </script>
