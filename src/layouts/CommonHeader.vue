@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-white py-5 px-4 h-20">
+  <header class="bg-white h-20">
     <BaseLogo />
   </header>
 </template>
