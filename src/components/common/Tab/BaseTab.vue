@@ -1,8 +1,14 @@
+<!-- 탭 사용 예시 :
+const fundingStatusTabs = [
+  { label: '전체', value: 'all' },
+  { label: '모집 중', value: 'inProgress' },
+  { label: '펀딩 완료', value: 'completedFunding' },
+  { label: '매각 완료', value: 'completedSale' },
+]
+const currentFundingStatus = ref('inProgress')
+const isModalOpen = ref(false) -->
 <template>
-  <div
-    class="flex bg-gray-100 rounded-lg p-1 space-x-1"
-    :style="{ width: '345px', height: '37px' }"
-  >
+  <div class="flex bg-gray-100 rounded-lg p-1 space-x-1">
     <button
       v-for="(tab, index) in tabs"
       :key="index"
@@ -14,13 +20,14 @@
       ]"
       @click="selectTab(tab.value)"
     >
-      {{ tab.label }}
+      <BaseTypography class="text-sm font-medium"> {{ tab.label }}</BaseTypography>
     </button>
   </div>
 </template>
 
 <script setup>
 import { defineEmits } from 'vue'
+import BaseTypography from '../Typography/BaseTypography.vue'
 
 defineProps({
   tabs: {
