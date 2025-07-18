@@ -1,7 +1,6 @@
 <template>
   <nav
-    class="flex justify-around items-center bg-black px-8 py-3 fixed bottom-0 left-0 right-0 max-w-md mx-auto border-t border-gray-800 shadow-lg"
-    :style="{ height: '72px' }"
+    class="flex justify-around items-center bg-black py-2 fixed bottom-0 left-0 right-0 max-w-md mx-auto border-t-2 border-gray-400 shadow-lg"
   >
     <router-link
       to="/"
@@ -17,7 +16,7 @@
     </router-link>
 
     <router-link
-      to="/funding"
+      to="/funding/list"
       class="flex flex-col items-center hover:text-white px-2"
       :class="{ 'text-white': activeItem === 'funding', 'text-gray-600': activeItem !== 'funding' }"
     >
@@ -30,7 +29,7 @@
     </router-link>
 
     <router-link
-      to="/trade"
+      to="/trade/list"
       class="flex flex-col items-center hover:text-white px-2"
       :class="{ 'text-white': activeItem === 'trade', 'text-gray-600': activeItem !== 'trade' }"
     >
@@ -43,13 +42,13 @@
     </router-link>
 
     <router-link
-      to="/myinfo"
+      to="/account/my-page"
       class="flex flex-col items-center hover:text-white px-2"
-      :class="{ 'text-white': activeItem === 'myinfo', 'text-gray-600': activeItem !== 'myinfo' }"
+      :class="{ 'text-white': activeItem === 'my-page', 'text-gray-600': activeItem !== 'myinfo' }"
     >
       <span
         class="material-symbols-outlined text-2xl"
-        :class="{ 'material-symbols-fill': activeItem === 'myinfo' }"
+        :class="{ 'material-symbols-fill': activeItem === 'my-page' }"
         >person</span
       >
       <span class="text-sm mt-1 font-semibold leading-tight">내정보</span>
@@ -68,12 +67,12 @@ const updateActiveItemBasedOnRoute = () => {
   const currentPath = route.path
   if (currentPath === '/') {
     activeItem.value = 'home'
-  } else if (currentPath.startsWith('/funding')) {
+  } else if (currentPath.startsWith('/funding/list')) {
     activeItem.value = 'funding'
-  } else if (currentPath.startsWith('/trade')) {
+  } else if (currentPath.startsWith('/trade/list')) {
     activeItem.value = 'trade'
-  } else if (currentPath.startsWith('/myinfo')) {
-    activeItem.value = 'myinfo'
+  } else if (currentPath.startsWith('/account/my-page')) {
+    activeItem.value = 'my-page'
   }
 }
 

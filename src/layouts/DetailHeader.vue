@@ -1,12 +1,20 @@
 <template>
-  <div class="bg-blue-50">
-    <header class="py-5 px-4">
-      <button class="w-6 h-6 flex justify-center items-center text-black" @click="onBack">
-        <i class="fa-solid fa-arrow-left-long"></i>
-      </button>
-    </header>
-    <slot></slot>
-  </div>
+  <header
+    class="bg-white h-24 max-w-md mx-auto fixed top-0 left-0 right-0 z-50 py-6 flex items-center justify-start px-6"
+  >
+    <button
+      class="w-8 h-8 flex justify-center items-center text-black mr-2"
+      @click="onBack"
+      aria-label="뒤로 가기"
+    >
+      <span class="material-symbols-outlined text-2xl">chevron_left</span>
+    </button>
+
+    <div class="flex-grow text-center">
+      <slot></slot>
+    </div>
+  </header>
+  <div class="h-20"></div>
 </template>
 
 <script setup>
@@ -20,3 +28,5 @@ defineProps({
   },
 })
 </script>
+
+<style scoped></style>
