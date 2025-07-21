@@ -1,3 +1,7 @@
-<!-- '펀딩완료' 탭의 내용 -->
-<template>FundingListCompletedFunding</template>
-<script setup></script>
+<template>
+  <FundingItemCard status="펀딩 완료" />
+</template>
+
+<script setup>
+import FundingItemCard from '@/components/funding/list/FundingItemCard.vue'
+</script>

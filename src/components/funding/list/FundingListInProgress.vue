@@ -1,3 +1,7 @@
-<!-- '모집중' 탭의 내용 -->
-<template>FundingListInProgress</template>
-<script setup></script>
+<template>
+  <FundingItemCard status="모집 중" />
+</template>
+
+<script setup>
+import FundingItemCard from '@/components/funding/list/FundingItemCard.vue' // ✅ ← 경로 확인!!
+</script>
