@@ -1,72 +1,175 @@
 <template>
-  <DetailLayout>
-    <BaseTypography class="text-2xl font-bold mb-4"> 펀딩 목록 </BaseTypography>
+  <BaseLayout>
+    <div class="mb-4">
+      <div class="bg-black rounded-2xl p-6 text-white">
+        <BaseTypography class="text-xl mb-1" color="white">{{}}님,</BaseTypography>
 
-    <div>
-      <BaseButton
-        @click="openModal"
-        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-      >
-        모달 열기
-      </BaseButton>
-
-      <BaseModal :isOpen="isModalOpen" @close="closeModal">
-        <BaseTypography class="text-lg font-semibold mb-4">모달 제목</BaseTypography>
-        <BaseTypography class="mb-4">
-          이 모달은 예시로, 원하는 내용을 여기에 넣을 수 있습니다.
-        </BaseTypography>
-      </BaseModal>
-    </div>
-    <div class="funding-list-page">
-      <div class="filter-tabs-container mb-4">
-        <BaseTab :tabs="fundingStatusTabs" v-model="currentFundingStatus" />
+        <div class="flex items-baseline justify-between mb-4">
+          <BaseTypography class="text-xl font-medium" color="white">보유 포인트</BaseTypography>
+          <BaseTypography class="text-xl font-medium" color="white">{{}}원</BaseTypography>
+        </div>
+        <div class="flex space-x-3 mb-4">
+          <button class="flex-1 bg-green-400 text-black py-3 rounded-xl font-medium">
+            <span class="material-symbols-outlined text-2xl">add</span>
+            <br />
+            <BaseTypography class="font-bold">포인트 충전</BaseTypography>
+          </button>
+          <button class="flex-1 bg-yellow-400 text-black py-3 rounded-xl font-medium">
+            <span class="material-symbols-outlined text-2xl">remove</span><br />
+            <BaseTypography class="font-bold">포인트 환급</BaseTypography>
+          </button>
+        </div>
+        <BaseCard class="h-6 flex justify-between items-center px-6"
+          ><BaseTypography class="font-medium">포인트 관리하러 가기</BaseTypography>
+          <button
+            class="w-8 h-8 flex justify-end items-center text-black active:bg-gray-100 rounded-full transition-colors"
+            @click="myPage"
+            aria-label="투자매물 탐색하기"
+          >
+            <span class="material-symbols-outlined text-2xl">chevron_right</span>
+          </button>
+        </BaseCard>
       </div>
-
-      <div class="tab-content mt-4">
-        <FundingListAll v-if="currentFundingStatus === 'all'" />
-        <FundingListInProgress v-if="currentFundingStatus === 'inProgress'" />
-        <FundingListCompletedFunding v-if="currentFundingStatus === 'completedFunding'" />
-        <FundingListCompletedSale v-if="currentFundingStatus === 'completedSale'" />
-      </div>
     </div>
-    <!-- 예시: BaseCard 사용 -->
-    <BaseCard title="공지사항">
-      <!-- 카드 내부에 들어갈 내용 -->
-      <BaseTypography class="mt-2 text-sm text-gray-500">
-        컴포넌트 마구마구 재사용해주세용 통일성 통일성 ~~</BaseTypography
+
+    <BaseCard class="h-26 flex justify-between items-center px-6 mb-4">
+      <BaseTypography class="text-left leading-tight">
+        지금 바로 반의반집의 다양한<br />
+        <span class="bg-yellow-200 rounded px-1">투자 매물</span>을 탐색해보세요!
+      </BaseTypography>
+
+      <button
+        class="w-8 h-8 flex justify-end items-center text-black active:bg-gray-100 rounded-full transition-colors"
+        @click="fundingListPage"
+        aria-label="투자매물 탐색하기"
       >
+        <span class="material-symbols-outlined text-2xl">chevron_right</span>
+      </button>
     </BaseCard>
-  </DetailLayout>
+    <BaseCard class="h-auto pb-6 mb-6">
+      <div class="flex justify-between items-center px-6 mb-6">
+        <BaseTypography class="text-left leading-tight">
+          보유 매물을 등록하고 <br />
+          새로운 가치를 만들어 보세요!
+        </BaseTypography>
+        <button
+          class="w-8 h-8 flex justify-end items-center text-black active:bg-gray-100 rounded-full transition-colors"
+          @click="propertyPage"
+          aria-label="보유 매물 등록하기"
+        >
+          <span class="material-symbols-outlined text-2xl">chevron_right</span>
+        </button>
+      </div>
+
+      <div class="flex space-x-3 px-6">
+        <div class="flex-1 bg-gray-100 rounded-xl p-4 flex flex-col items-center text-center">
+          <div class="flex flex-col items-start mb-4">
+            <BaseTypography class="text-sm font-regular text-gray-700">
+              건물주가 되어 받는
+            </BaseTypography>
+            <BaseTypography class="text-lg font-bold text-gray-900 leading-tight">
+              임대 수익
+            </BaseTypography>
+          </div>
+          <span class="material-symbols-outlined text-4xl text-yellow-500">home_work</span>
+        </div>
+
+        <div class="flex-1 bg-gray-100 rounded-xl p-4 flex flex-col items-center text-center">
+          <div class="flex flex-col items-start mb-4">
+            <BaseTypography class="text-sm font-regular text-gray-700">
+              건물 가격 상승하면 얻는
+            </BaseTypography>
+            <BaseTypography class="text-lg font-bold text-gray-900 leading-tight">
+              시세 차익
+            </BaseTypography>
+          </div>
+          <span class="material-symbols-outlined text-4xl text-blue-500">show_chart</span>
+        </div>
+      </div>
+    </BaseCard>
+    <div class="px-4 mb-20">
+      <BaseTypography class="text-xl font-medium mb-4">매각 완료</BaseTypography>
+      <div
+        ref="cardContainer"
+        class="card-container overflow-x-auto flex space-x-4 pb-2"
+        @mousedown="startDrag"
+        @mouseleave="stopDrag"
+        @mouseup="stopDrag"
+        @mousemove="doDrag"
+        @touchstart="startTouch"
+        @touchmove="doTouchMove"
+        @touchend="stopDrag"
+      >
+        <div class="card-item w-32 flex-shrink-0">
+          <div class="bg-gray-900 rounded-xl p-4 text-white relative overflow-hidden">
+            <BaseCard
+              class="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-800 opacity-50"
+            ></BaseCard>
+            <div class="relative">
+              <div class="text-xs opacity-75 mb-2">아파트</div>
+              <div class="text-lg font-bold">+78%</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-item w-32 flex-shrink-0">
+          <div class="bg-gray-900 rounded-xl p-4 text-white relative overflow-hidden">
+            <div
+              class="absolute inset-0 bg-gradient-to-br from-green-600 to-green-800 opacity-50"
+            ></div>
+            <div class="relative">
+              <div class="text-xs opacity-75 mb-2">투자 수익률</div>
+              <div class="text-lg font-bold">+9.72%</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-item w-32 flex-shrink-0">
+          <div class="bg-gray-900 rounded-xl p-4 text-white relative overflow-hidden">
+            <div
+              class="absolute inset-0 bg-gradient-to-br from-purple-600 to-purple-800 opacity-50"
+            ></div>
+            <div class="relative">
+              <div class="text-xs opacity-75 mb-2">투자 수익률</div>
+              <div class="text-lg font-bold">+5.50%</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-item w-32 flex-shrink-0">
+          <div class="bg-gray-900 rounded-xl p-4 text-white relative overflow-hidden">
+            <div
+              class="absolute inset-0 bg-gradient-to-br from-red-600 to-red-800 opacity-50"
+            ></div>
+            <div class="relative">
+              <div class="text-xs opacity-75 mb-2">오피스텔</div>
+              <div class="text-lg font-bold">+12.3%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </BaseLayout>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import BaseModal from '@/components/common/Modal/BaseModal.vue'
-import BaseButton from '@/components/common/Button/BaseButton.vue'
-import BaseTab from '@/components/common/Tab/BaseTab.vue' // BaseTab 재사용
-import FundingListAll from '@/components/funding/list/FundingListAll.vue'
-import FundingListInProgress from '@/components/funding/list/FundingListInProgress.vue'
-// import BaseLayout from '@/layouts/BaseLayout.vue'
-import DetailLayout from '@/layouts/DetailLayout.vue'
+import { useRouter } from 'vue-router'
+import BaseLayout from '@/layouts/BaseLayout.vue'
 import BaseCard from '@/components/common/Card/BaseCard.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import FundingListCompletedFunding from '@/components/funding/list/FundingListCompletedFunding.vue'
-import FundingListCompletedSale from '@/components/funding/list/FundingListCompletedSale.vue'
 
-const fundingStatusTabs = [
-  { label: '전체', value: 'all' },
-  { label: '모집 중', value: 'inProgress' },
-  { label: '펀딩 완료', value: 'completedFunding' },
-  { label: '매각 완료', value: 'completedSale' },
-]
-const currentFundingStatus = ref('all')
-const isModalOpen = ref(false)
+const router = useRouter()
 
-const openModal = () => {
-  isModalOpen.value = true
+const fundingListPage = () => {
+  router.push('/funding/list')
 }
 
-const closeModal = () => {
-  isModalOpen.value = false
+// const tradeListPage = () => {
+//   router.push('/trade/list')
+// }
+
+const propertyPage = () => {
+  router.push('/property/register')
+}
+
+const myPage = () => {
+  router.push('/account/my-page')
 }
 </script>
