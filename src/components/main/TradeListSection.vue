@@ -1,110 +1,34 @@
 <template>
-  <div class="px-4 mb-20">
-    <BaseTypography class="text-xl font-medium mb-4">매각 완료</BaseTypography>
-    <div
-      ref="cardContainer"
-      class="card-container overflow-x-auto flex space-x-4 pb-2"
-      @mousedown="startDrag"
-      @mouseleave="stopDrag"
-      @mouseup="stopDrag"
-      @mousemove="doDrag"
-      @touchstart="startTouch"
-      @touchmove="doTouchMove"
-      @touchend="stopDrag"
+  <BaseCard class="h-26 flex justify-between items-center px-6 mb-4">
+    <!-- 가장 바깥쪽 button을 flex 컨테이너로 만들고, 자식 요소들을 가로로 정렬 -->
+    <button
+      class="w-full flex items-center justify-between p-0 border-none bg-transparent"
+      @click="tradeListPage"
+      aria-label="투자매물 탐색하기"
     >
-      <div class="card-item w-32 flex-shrink-0">
-        <div class="bg-gray-900 rounded-xl p-4 text-white relative overflow-hidden">
-          <BaseCard
-            class="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-800 opacity-50"
-          ></BaseCard>
-          <div class="relative">
-            <div class="text-xs opacity-75 mb-2">아파트</div>
-            <div class="text-lg font-bold">+78%</div>
-          </div>
-        </div>
+      <BaseTypography class="text-left leading-tight" weight="bold">
+        <span class="bg-yellow-200 rounded px-1">거래중인 매물</span>, 실시간으로<br />
+        관리하세요!
+      </BaseTypography>
+
+      <div
+        class="w-8 h-8 flex justify-end items-center text-black active:bg-gray-100 rounded-full transition-colors"
+      >
+        <span class="material-symbols-outlined text-2xl">chevron_right</span>
       </div>
-      <div class="card-item w-32 flex-shrink-0">
-        <div class="bg-gray-900 rounded-xl p-4 text-white relative overflow-hidden">
-          <div
-            class="absolute inset-0 bg-gradient-to-br from-green-600 to-green-800 opacity-50"
-          ></div>
-          <div class="relative">
-            <div class="text-xs opacity-75 mb-2">투자 수익률</div>
-            <div class="text-lg font-bold">+9.72%</div>
-          </div>
-        </div>
-      </div>
-      <div class="card-item w-32 flex-shrink-0">
-        <div class="bg-gray-900 rounded-xl p-4 text-white relative overflow-hidden">
-          <div
-            class="absolute inset-0 bg-gradient-to-br from-purple-600 to-purple-800 opacity-50"
-          ></div>
-          <div class="relative">
-            <div class="text-xs opacity-75 mb-2">투자 수익률</div>
-            <div class="text-lg font-bold">+5.50%</div>
-          </div>
-        </div>
-      </div>
-      <div class="card-item w-32 flex-shrink-0">
-        <div class="bg-gray-900 rounded-xl p-4 text-white relative overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-br from-red-600 to-red-800 opacity-50"></div>
-          <div class="relative">
-            <div class="text-xs opacity-75 mb-2">오피스텔</div>
-            <div class="text-lg font-bold">+12.3%</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+    </button>
+  </BaseCard>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import BaseCard from '@/components/common/Card/BaseCard.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 
-const cardContainer = ref(null)
-let isDragging = false
-let startX
-let scrollLeft
+const router = useRouter()
 
-const startDrag = (e) => {
-  isDragging = true
-  startX = e.pageX - cardContainer.value.offsetLeft
-  scrollLeft = cardContainer.value.scrollLeft
-  cardContainer.value.style.cursor = 'grabbing'
-}
-
-const stopDrag = () => {
-  isDragging = false
-  cardContainer.value.style.cursor = 'grab'
-}
-
-const doDrag = (e) => {
-  if (!isDragging) return
-  e.preventDefault()
-  const x = e.pageX - cardContainer.value.offsetLeft
-  const walk = (x - startX) * 2 // Adjust scroll speed
-  cardContainer.value.scrollLeft = scrollLeft - walk
-}
-
-const startTouch = (e) => {
-  isDragging = true
-  startX = e.touches[0].pageX - cardContainer.value.offsetLeft
-  scrollLeft = cardContainer.value.scrollLeft
-}
-
-const doTouchMove = (e) => {
-  if (!isDragging) return
-  const x = e.touches[0].pageX - cardContainer.value.offsetLeft
-  const walk = (x - startX) * 2
-  cardContainer.value.scrollLeft = scrollLeft - walk
+const tradeListPage = () => {
+  // 실제 펀딩 리스트 페이지 경로로 변경해주세요.
+  router.push('/trade/list')
 }
 </script>
-
-<style scoped>
-.card-container {
-  -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
-  cursor: grab;
-}
-</style>

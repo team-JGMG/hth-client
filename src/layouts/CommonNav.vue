@@ -36,7 +36,7 @@
       <span
         class="material-symbols-outlined text-2xl"
         :class="{ 'material-symbols-fill': activeItem === 'trade' }"
-        >trending_up</span
+        >monitoring</span
       >
       <span class="text-sm mt-1 font-semibold leading-tight">거래</span>
     </router-link>
