@@ -1,3 +1,7 @@
-<!-- 전체 펀딩 리스트 -->
-<template>FundingListAll</template>
-<script setup></script>
+<template>
+  <FundingItemCard />
+</template>
+
+<script setup>
+import FundingItemCard from '@/components/funding/list/FundingItemCard.vue'
+</script>
