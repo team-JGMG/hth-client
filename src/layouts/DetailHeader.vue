@@ -19,7 +19,6 @@
 </template>
 <script setup>
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-
 defineProps({
   onBack: {
     type: Function,
