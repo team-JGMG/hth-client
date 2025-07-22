@@ -18,4 +18,5 @@ export default [
     name: 'funding-trade',
     component: FundingTradePage,
   },
+  { path: '/kk', name: 'kakao-map', component: FundingDetailPage },
 ]
