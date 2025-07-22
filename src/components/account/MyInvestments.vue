@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4 space-y-6">
+  <div class="p-4 min-h-[600px]">
     <div v-for="(group, idx) in investmentGroups" :key="idx">
       <!-- 그룹 타이틀 -->
       <BaseTypography class="font-bold text-base mb-2">
