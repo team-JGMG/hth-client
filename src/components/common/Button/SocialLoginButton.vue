@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 
-const API_URI = 'https://api.example.com' // 실제 API 도메인으로 교체
+// const API_URI = 'https://api.example.com' // 실제 API 도메인으로 교체
 
 const props = defineProps({
   type: {
@@ -30,13 +30,19 @@ const socialTheme = {
 
 const theme = computed(() => socialTheme[props.type])
 
+// const login = () => {
+//   if (props.type === 'kakao') {
+//     const url = `${API_URI}/oauth2/authorization/kakao`
+//     window.location.href = url
+//   } else {
+//     alert(`${theme.value.label} 로그인은 현재 지원하지 않습니다.`)
+//   }
+// }
+
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const login = () => {
-  if (props.type === 'kakao') {
-    const url = `${API_URI}/oauth2/authorization/kakao`
-    window.location.href = url
-  } else {
-    alert(`${theme.value.label} 로그인은 현재 지원하지 않습니다.`)
-  }
+  router.push('/auth/signup')
 }
 const socialIcons = {
   kakao: new URL('@/assets/images/kakao.png', import.meta.url).href,

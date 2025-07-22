@@ -1,16 +1,13 @@
-<script setup lang="ts">
+<script setup>
 import { ref, computed } from 'vue'
 import BankSelectModal from '@/components/common/Modal/BankSelectModal.vue'
 
-const props = defineProps<{
-  bankCode: string
-  accountNumber: string
-}>()
+const props = defineProps({
+  bankCode: String,
+  accountNumber: String,
+})
 
-const emit = defineEmits<{
-  (e: 'update:accountNumber', value: string): void
-  (e: 'update:bankCode', value: string): void
-}>()
+const emit = defineEmits(['update:accountNumber', 'update:bankCode'])
 
 const showModal = ref(false)
 
@@ -20,7 +17,7 @@ const isInvalid = computed(() => {
 })
 
 // 이미지 경로를 URL로 명시 (정적 import 방식)
-const bankLogos: Record<string, string> = {
+const bankLogos = {
   KAKAOBANK: new URL('@/assets/images/KakaoIcon.png', import.meta.url).href,
   KB: new URL('@/assets/images/KbIcon.png', import.meta.url).href,
   NH: new URL('@/assets/images/NonghyupIcon.png', import.meta.url).href,
@@ -51,11 +48,8 @@ const bankLogos: Record<string, string> = {
         pattern="\d*"
         maxlength="20"
         :value="props.accountNumber"
-        @input="
-          (e) =>
-            emit('update:accountNumber', (e.target as HTMLInputElement).value.replace(/\D/g, ''))
-        "
-        placeholder="계좌 번호를 입력해주세요. ('-' 없이 입력)"
+        @input="(e) => emit('update:accountNumber', e.target.value.replace(/\D/g, ''))"
+        placeholder="계좌 번호를 입력해주세요."
         class="flex-1 border-b border-gray-300 focus:outline-none focus:border-black p-2"
       />
     </div>

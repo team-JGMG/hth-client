@@ -1,18 +1,12 @@
 <script setup>
-import { useRouter } from 'vue-router'
-import BaseLayout from '@/layouts/BaseLayout.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import SocialLoginButton from '@/components/common/Button/SocialLoginButton.vue'
-
-const router = useRouter()
-const goToSignUp = () => {
-  router.push('/auth/signup')
-}
+import BlankLayout from '@/layouts/BlankLayout.vue'
 </script>
 
 <template>
-  <BaseLayout>
-    <div class="flex flex-col items-center justify-center min-h-screen bg-white p-6">
+  <BlankLayout>
+    <div class="flex flex-col items-center justify-center w-full h-full px-6 py-12">
       <img src="@/assets/images/logo.png" alt="로고" class="w-32 h-32 mb-8" />
 
       <BaseTypography class="text-xl font-semibold text-center mb-2">
@@ -25,9 +19,6 @@ const goToSignUp = () => {
         <SocialLoginButton type="naver" />
         <SocialLoginButton type="google" />
       </div>
-      <button class="mt-6 text-sm text-gray-500 underline" @click="goToSignUp">
-        아직 회원이 아니신가요? 회원가입
-      </button>
     </div>
-  </BaseLayout>
+  </BlankLayout>
 </template>
