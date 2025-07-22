@@ -7,7 +7,7 @@
     >
       <img src="@/assets/images/APTch.png" alt="아이콘" class="w-20 mb-2" />
       <div class="flex justify-between items-center gap-1">
-        <BaseTypography class="text-left leading-tight break-keep" weight="bold">
+        <BaseTypography class="text-left leading-tight break-keep ml-2" weight="bold">
           다양한 투자 매물 탐색하기
         </BaseTypography>
         <button
