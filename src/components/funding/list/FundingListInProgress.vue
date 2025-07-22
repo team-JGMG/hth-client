@@ -3,5 +3,5 @@
 </template>
 
 <script setup>
-import FundingItemCard from '@/components/funding/list/FundingItemCard.vue' // ✅ ← 경로 확인!!
+import FundingItemCard from '@/components/funding/list/FundingItemCard.vue'
 </script>
