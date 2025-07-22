@@ -1,13 +1,15 @@
 <template>
   <BaseLayout>
     <PointSection />
-    <FundingListSection />
-    <TradeListSection />
+    <div class="flex space-x-3">
+      <FundingListSection class="flex-1" /> <TradeListSection class="flex-1" />
+    </div>
     <PropertySection />
     <SaleCompleted />
     <CommonNav />
   </BaseLayout>
 </template>
+
 <script setup>
 import BaseLayout from '@/layouts/BaseLayout.vue'
 import SaleCompleted from '@/components/main/SaleCompleted/SaleCompleted.vue'

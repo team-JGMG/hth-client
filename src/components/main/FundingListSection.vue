@@ -1,18 +1,24 @@
 <template>
-  <button @click="fundingListPage" aria-label="투자매물 탐색하기" class="w-full">
-    <BaseCard class="h-26 flex justify-between items-center px-6 mb-4">
-      <BaseTypography class="text-left" weight="bold">
-        지금 바로 반의반집의<br /><span class="bg-yellow-200 rounded px-1">다양한 투자 매물</span>을
-        탐색해보세요!
-      </BaseTypography>
-
-      <button
-        class="w-8 h-8 flex justify-end items-center text-black active:bg-gray-100 rounded-full transition-colors"
-      >
-        <span class="material-symbols-outlined text-2xl">chevron_right</span>
-      </button>
-    </BaseCard>
-  </button>
+  <BaseCard class="h-26 flex items-center px-4 mb-4 border-none" style="background-color: #ffe9e9">
+    <button
+      class="flex flex-col items-center border-none w-full"
+      @click="fundingListPage"
+      aria-label="투자매물 탐색하기"
+    >
+      <img src="@/assets/images/APTch.png" alt="아이콘" class="w-20 mb-2" />
+      <div class="flex justify-between items-center gap-4">
+        <BaseTypography class="text-left leading-tight" weight="bold">
+          다양한 투자 매물 <br />
+          탐색하기
+        </BaseTypography>
+        <button
+          class="w-8 h-8 flex justify-end items-center text-black active:bg-gray-100 rounded-full transition-colors"
+        >
+          <span class="material-symbols-outlined text-2xl">chevron_right</span>
+        </button>
+      </div>
+    </button>
+  </BaseCard>
 </template>
 <script setup>
 import { useRouter } from 'vue-router'
