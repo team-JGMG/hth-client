@@ -9,14 +9,14 @@
     >
       <span class="material-symbols-outlined text-2xl">chevron_left</span>
     </button>
-
     <BaseTypography class="flex-grow text-start text-2xl" weight="bold">
-      <slot></slot>
+      <BaseTypography class="flex-grow text-start text-2xl" weight="bold">
+        <slot></slot>
+      </BaseTypography>
     </BaseTypography>
   </header>
   <div class="h-20"></div>
 </template>
-
 <script setup>
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 
@@ -30,5 +30,4 @@ defineProps({
   },
 })
 </script>
-
 <style scoped></style>
