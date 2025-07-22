@@ -6,6 +6,8 @@
     </div>
     <PropertySection />
     <SaleCompleted />
+    <!-- 지워라 -->
+    <KakaoMap />
     <CommonNav />
   </BaseLayout>
 </template>
@@ -18,4 +20,5 @@ import FundingListSection from '@/components/main/FundingListSection.vue'
 import PointSection from '@/components/main/PointSection/PointSection.vue'
 import TradeListSection from '@/components/main/TradeListSection.vue'
 import CommonNav from '@/layouts/CommonNav.vue'
+import KakaoMap from '@/components/Kakaomap/KakaoMap.vue'
 </script>
