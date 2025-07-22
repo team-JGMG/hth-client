@@ -18,12 +18,12 @@
       <!-- 매각 완료 오버레이 -->
       <div
         v-if="item.status === '매각 완료'"
-        class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center z-20"
+        class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center z-0"
       >
         <div class="text-white text-lg font-bold mb-1">매각 완료</div>
         <div class="text-white text-sm">누적 수익률</div>
         <div class="text-white text-sm">
-          {{ item.yield > 0 ? '+' : item.yield < 0 ? '-' : '' }} {{ item.yield?.toFixed(2) }}%
+          {{ item.yield > 0 ? '+' : item.yield < 0 ? '' : '' }}{{ item.yield?.toFixed(2) }}%
         </div>
       </div>
 
@@ -72,7 +72,6 @@ const props = defineProps({
   status: String, // '모집 중', '펀딩 완료', '매각 완료' or undefined(전체)
 })
 
-// 전체 펀딩 목록
 const fundingList = [
   {
     id: 1,
@@ -103,6 +102,56 @@ const fundingList = [
     percent: 100,
     image: '',
     yield: 5.5,
+  },
+  {
+    id: 4,
+    status: '매각 완료',
+    title: '판교테크노밸리 301호',
+    subtitle: '경기도 성남시 분당구',
+    amount: '22억원',
+    percent: 100,
+    image: '',
+    yield: 7.2,
+  },
+  {
+    id: 5,
+    status: '모집 중',
+    title: '상암DMC타워 801호',
+    subtitle: '서울 마포구 상암동',
+    amount: '9억원',
+    percent: 45,
+    image: '',
+    yield: null,
+  },
+  {
+    id: 6,
+    status: '펀딩 완료',
+    title: '강서N타워 101호',
+    subtitle: '서울 강서구 등촌동',
+    amount: '11억원',
+    percent: 100,
+    image: '',
+    yield: null,
+  },
+  {
+    id: 7,
+    status: '매각 완료',
+    title: '서초타워 1202호',
+    subtitle: '서울 서초구 서초동',
+    amount: '25억원',
+    percent: 100,
+    image: '',
+    yield: -1.5,
+  },
+  {
+    id: 8,
+    status: '매각 완료',
+    title: '종로센터 401호',
+    subtitle: '서울 종로구 종로2가',
+    amount: '8억원',
+    percent: 100,
+    image: '',
+    yield: 0,
   },
 ]
 

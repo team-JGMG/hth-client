@@ -1,33 +1,32 @@
 <!-- 매물 목록 페이지 -->
 <template>
-  <DetailLayout>
-    <BaseTypography class="text-2xl font-bold mb-4"> 매물 목록 </BaseTypography>
+  <BlankLayout>
+    <DetailHeader>매물 목록 </DetailHeader>
 
     <div class="funding-list-page">
-      <div class="filter-tabs-container mb-4">
+      <div class="filter-tabs-container mb-2 shrink-0">
         <BaseTab :tabs="fundingStatusTabs" v-model="currentFundingStatus" />
       </div>
-
-      <div class="tab-content mt-4">
-        <FundingListAll v-if="currentFundingStatus === 'all'" />
-        <FundingListInProgress v-if="currentFundingStatus === 'inProgress'" />
-        <FundingListCompletedFunding v-if="currentFundingStatus === 'completedFunding'" />
-        <FundingListCompletedSale v-if="currentFundingStatus === 'completedSale'" />
-      </div>
     </div>
-  </DetailLayout>
+
+    <div class="flex-1 overflow-y-auto pb-24">
+      <FundingListAll v-if="currentFundingStatus === 'all'" />
+      <FundingListInProgress v-if="currentFundingStatus === 'inProgress'" />
+      <FundingListCompletedFunding v-if="currentFundingStatus === 'completedFunding'" />
+      <FundingListCompletedSale v-if="currentFundingStatus === 'completedSale'" />
+    </div>
+  </BlankLayout>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import BaseTab from '@/components/common/Tab/BaseTab.vue' // BaseTab 재사용
+import BaseTab from '@/components/common/Tab/BaseTab.vue'
 import FundingListAll from '@/components/funding/list/FundingListAll.vue'
 import FundingListInProgress from '@/components/funding/list/FundingListInProgress.vue'
-// import BaseLayout from '@/layouts/BaseLayout.vue'
-import DetailLayout from '@/layouts/DetailLayout.vue'
-import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import FundingListCompletedFunding from '@/components/funding/list/FundingListCompletedFunding.vue'
 import FundingListCompletedSale from '@/components/funding/list/FundingListCompletedSale.vue'
+import BlankLayout from '@/layouts/BlankLayout.vue'
+import DetailHeader from '@/layouts/DetailHeader.vue'
 
 const fundingStatusTabs = [
   { label: '전체', value: 'all' },
