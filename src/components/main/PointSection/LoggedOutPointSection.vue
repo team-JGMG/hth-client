@@ -16,7 +16,7 @@
       style="height: 100%"
     >
       <BaseCard class="h-6 flex justify-between items-center px-6">
-        <BaseTypography class="font-medium" weight="bold"
+        <BaseTypography class="font-medium" weight="medium"
           >로그인하고 투자 자산 확인하기</BaseTypography
         >
         <div
