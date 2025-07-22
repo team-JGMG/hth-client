@@ -3,8 +3,6 @@
     <slot></slot>
   </main>
   <CommonNav />
-
-  <CommonNav />
 </template>
 <script setup>
 import CommonNav from './CommonNav.vue'
