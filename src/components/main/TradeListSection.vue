@@ -7,7 +7,7 @@
     >
       <img src="@/assets/images/HOMEch.png" alt="아이콘" class="w-20 mb-2" />
       <div class="flex justify-between items-center gap-1">
-        <BaseTypography class="text-left leading-tight break-keep" weight="bold">
+        <BaseTypography class="text-left leading-tight break-keep ml-2" weight="bold">
           거래중인 매물, 실시간으로 관리하기
         </BaseTypography>
         <button
