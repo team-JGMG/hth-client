@@ -1,10 +1,12 @@
 <script setup>
-import BaseLayout from '@/layouts/BaseLayout.vue'
 import SignUpForm from '@/components/auth/SignUpForm.vue'
+import BlankLayout from '@/layouts/BlankLayout.vue'
+import DetailHeader from '@/layouts/DetailHeader.vue'
 </script>
 
 <template>
-  <BaseLayout>
+  <BlankLayout>
+    <DetailHeader>회원가입</DetailHeader>
     <SignUpForm />
-  </BaseLayout>
+  </BlankLayout>
 </template>

@@ -1,20 +1,16 @@
-<script setup lang="ts">
+<script setup>
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 
-const props = withDefaults(
-  defineProps<{
-    label: string
-    placeholder?: string
-    modelValue: string
-  }>(),
-  {
-    placeholder: '',
+const props = defineProps({
+  label: String,
+  placeholder: {
+    type: String,
+    default: '',
   },
-)
+  modelValue: String,
+})
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void
-}>()
+const emit = defineEmits(['update:modelValue'])
 </script>
 
 <template>
@@ -27,7 +23,7 @@ const emit = defineEmits<{
     <!-- 입력 필드 -->
     <input
       :value="props.modelValue"
-      @input="(e) => emit('update:modelValue', (e.target as HTMLInputElement).value)"
+      @input="(e) => emit('update:modelValue', e.target.value)"
       :placeholder="props.placeholder"
       class="w-full border-b border-gray-300 focus:outline-none focus:border-black p-2 text-sm"
     />
