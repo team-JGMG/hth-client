@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
-import BankSelectModal from '@/components/common/Modal/BankSelectModal.vue'
+import BankSelectModal from '@/components/auth/BankSelectModal.vue'
 
 const props = defineProps({
   bankCode: String,
