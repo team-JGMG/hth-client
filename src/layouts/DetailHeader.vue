@@ -4,7 +4,7 @@
   >
     <button
       class="w-8 h-8 flex justify-center items-center text-black mr-2"
-      @click="onBack"
+      @click="goBack"
       aria-label="뒤로 가기"
     >
       <span class="material-symbols-outlined text-2xl">chevron_left</span>
@@ -19,14 +19,12 @@
 </template>
 <script setup>
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-defineProps({
-  onBack: {
-    type: Function,
-    default: () => {},
-    validator: (value) => {
-      return typeof value === 'function'
-    },
-  },
-})
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const goBack = () => {
+  router.go(-1)
+}
 </script>
 <style scoped></style>
