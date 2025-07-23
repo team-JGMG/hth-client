@@ -15,7 +15,7 @@ const props = defineProps({
 })
 
 const buttonClass = computed(() => {
-  const baseClasses = 'px-4 py-2 rounded-md cursor-pointer mr-2.5 transition-colors'
+  const baseClasses = 'px-4 py-2 rounded-md cursor-pointer transition-colors'
 
   const variantClasses = {
     primary: 'bg-blue-500 text-white border-none hover:bg-blue-600',
