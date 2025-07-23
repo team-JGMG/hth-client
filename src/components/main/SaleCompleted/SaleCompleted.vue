@@ -16,7 +16,7 @@
           <span class="material-symbols-outlined text-base mt-0.5">info</span>
         </button>
 
-        <SaleCompletedInfoPopover :is-open="showInfoPopover" @close="showInfoPopover = false" />
+        <SaleCompletedInfoAccodian :is-open="showInfoPopover" @close="showInfoPopover = false" />
       </div>
 
       <div
@@ -39,8 +39,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { usePropertyStore } from '@/stores/property'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import SoldPropertyCard from './SoldPropertyCard.vue'
-import SaleCompletedInfoPopover from './SaleCompletedInfoPopover.vue'
-
+import SaleCompletedInfoAccodian from './SaleCompletedInfoAccodian.vue'
 const propertyStore = usePropertyStore()
 const showInfoPopover = ref(false)
 const infoButtonRef = ref(null)

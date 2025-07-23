@@ -5,8 +5,8 @@ import adminRoutes from './modules/admin'
 import authRoutes from './modules/auth'
 import fundingRoutes from './modules/funding'
 import propertyRoutes from './modules/property'
-import tradeRoutes from './modules/trade'
 import publicRoutes from './modules/public'
+import tradeRoutes from './modules/trade'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

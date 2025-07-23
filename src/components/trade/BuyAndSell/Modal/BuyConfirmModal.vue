@@ -1,0 +1,1 @@
+<template>ConfirmModal</template>
