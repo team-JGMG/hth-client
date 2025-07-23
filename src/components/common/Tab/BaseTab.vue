@@ -26,7 +26,6 @@ const isModalOpen = ref(false) -->
 </template>
 
 <script setup>
-import { defineEmits } from 'vue'
 import BaseTypography from '../Typography/BaseTypography.vue'
 
 defineProps({

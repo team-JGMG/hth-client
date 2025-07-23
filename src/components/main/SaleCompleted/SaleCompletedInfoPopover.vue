@@ -27,7 +27,7 @@
 
 <script setup>
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import { defineProps, defineEmits } from 'vue'
+import { defineProps } from 'vue'
 
 defineProps({
   isOpen: {
