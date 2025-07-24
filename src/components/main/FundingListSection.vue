@@ -2,10 +2,9 @@
   <BaseCard class="h-26 flex items-center px-3 mb-4 border-none" style="background-color: #ffe9e9">
     <button
       class="flex flex-col items-center border-none w-full"
-      @click="fundingListPage"
-      aria-label="투자매물 탐색하기"
+      @click="handleButtonClick"
+      aria-label="펀딩매물"
     >
-      <img src="@/assets/images/character/APTch.png" alt="아이콘" class="w-20 mb-2" />
       <div class="flex justify-between items-center gap-1">
         <BaseTypography class="text-left leading-tight break-keep ml-2" weight="bold">
           다양한 투자 매물 탐색하기
@@ -16,16 +15,26 @@
           <span class="material-symbols-outlined text-2xl">chevron_right</span>
         </button>
       </div>
+
+      <img src="@/assets/images/character/APTch.png" alt="아이콘" class="w-[90px] mb-2" />
     </button>
   </BaseCard>
 </template>
+
 <script setup>
 import { useRouter } from 'vue-router'
 import BaseCard from '@/components/common/Card/BaseCard.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-const router = useRouter()
+import { useAuthStore } from '@/stores/authStore'
 
-const fundingListPage = () => {
-  router.push('/funding/list')
+const router = useRouter()
+const authStore = useAuthStore()
+
+const handleButtonClick = () => {
+  if (authStore.getIsLoggedIn) {
+    router.push('/funding/list')
+  } else {
+    router.push('/auth/login')
+  }
 }
 </script>
