@@ -1,6 +1,6 @@
 <!-- 호가 차트 컴포넌트! -->
 <template>
-  <VChart :option="option" autoresize class="w-full min-h-[600px]" />
+  <VChart :option="option" autoresize class="w-full min-h-[500px]" />
 </template>
 <script setup>
 import { ref, onMounted, defineEmits } from 'vue'
