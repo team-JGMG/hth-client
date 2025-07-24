@@ -140,6 +140,22 @@ const trades = [
     img: '/src/assets/images/sample-buliding.png',
     status: '승인 대기',
   },
+  {
+    name: '63빌딩 초고층 6301호',
+    percent: 0,
+    left: 0,
+    total: 0,
+    img: '/src/assets/images/sample-buliding.png',
+    status: '승인 거절',
+  },
+  {
+    name: '63빌딩 초고층 6301호',
+    percent: 0,
+    left: 0,
+    total: 0,
+    img: '/src/assets/images/sample-buliding.png',
+    status: '승인 거절',
+  },
 ]
 const tradeGroups = [
   {
@@ -153,6 +169,10 @@ const tradeGroups = [
   {
     title: '승인 대기 중인 매물',
     items: trades.filter((t) => t.status === '승인 대기'),
+  },
+  {
+    title: '거절된 매물',
+    items: trades.filter((t) => t.status === '승인 거절'),
   },
 ]
 const router = useRouter()
