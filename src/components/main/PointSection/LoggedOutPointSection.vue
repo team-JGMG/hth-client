@@ -5,7 +5,7 @@
       <BaseTypography class="text-xl font-medium" color="white">보유 포인트</BaseTypography>
       <BaseTypography class="text-xl font-medium" color="white">???원</BaseTypography>
     </div>
-    <BaseTypography class="text-sm mb-4 text-center" :style="{ color: '#F4EAB2' }">
+    <BaseTypography class="text-sm mb-4 text-center break-keep" :style="{ color: '#F4EAB2' }">
       소액으로도 안전하게, 부동산 투자의 첫 걸음 <br />반의반집 포인트로 당신의 소중한 투자를
       시작하고 관리하세요.
     </BaseTypography>
