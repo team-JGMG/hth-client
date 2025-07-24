@@ -16,7 +16,7 @@
         </button>
       </div>
 
-      <img src="@/assets/images/character/APTch.png" alt="아이콘" class="w-[90px] mb-2" />
+      <img src="@/assets/images/character/APTch.png" alt="아이콘" class="w-[90px] mt-5" />
     </button>
   </BaseCard>
 </template>
