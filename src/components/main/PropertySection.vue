@@ -1,6 +1,6 @@
 <template>
   <BaseCard class="h-auto pb-6 mb-6 flex flex-col gap-4">
-    <button @click="propertyPage" aria-label="보유 매물 등록하기">
+    <button @click="handleButtonClick" aria-label="보유 매물 등록하기">
       <div class="flex justify-between items-center">
         <BaseTypography class="text-left leading-tight" weight="bold">
           보유 매물을 등록하고 <br />
@@ -62,10 +62,16 @@
 import BaseCard from '@/components/common/Card/BaseCard.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
 const router = useRouter()
+const authStore = useAuthStore()
 
-const propertyPage = () => {
-  router.push('/property/register')
+const handleButtonClick = () => {
+  if (authStore.getIsLoggedIn) {
+    router.push('/trade/list')
+  } else {
+    router.push('/auth/login')
+  }
 }
 </script>
 <style scoped>
