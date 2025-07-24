@@ -1,6 +1,9 @@
 <template>
   <div class="p-6 space-y-4">
-    <h2 class="text-xl font-bold">{{ property.title }}</h2>
+    <div class="flex justify-between items-start">
+      <h2 class="text-xl font-bold">{{ property.title }}</h2>
+      <p class="text-sm text-gray-500 self-end">등록일: {{ formatDateTime(property.updatedAt) }}</p>
+    </div>
 
     <section class="border p-4 rounded-lg bg-white">
       <h3 class="font-semibold mb-2">매도자 정보</h3>
@@ -23,14 +26,14 @@
     <section class="border p-4 rounded-lg bg-white">
       <h3 class="font-semibold mb-2">매물의 건축물 대장 정보</h3>
       <p>용도지역: {{ property.propertyType }}</p>
-      <p>대지 면적(매물): {{ property.roomCount }}㎡</p>
-      <p>대지 면적(건물): {{ property.roomCount }}㎡</p>
-      <p>연면적(매물): {{ property.roomCount }}㎡</p>
-      <p>연면적(건물): {{ property.roomCount }}㎡</p>
+      <p>대지 면적(매물): {{ property.landArea }}㎡</p>
+      <p>대지 면적(건물): {{ property.buildingArea }}㎡</p>
+      <p>연면적(매물): {{ property.totalFloorAreaProperty }}㎡</p>
+      <p>연면적(건물): {{ property.totalFloorAreaBuilding }}㎡</p>
       <p>건물 규모: 지하 {{ property.basementFloors }}층 / 지상 {{ property.groundFloors }}층</p>
       <p>준공일: {{ property.propertyType }}</p>
-      <p>공시지가: {{ property.floor }}원/㎡</p>
-      <p>연면적 평단가(평/공모금액 기준): {{ property.description }}원/평</p>
+      <p>공시지가: {{ property.officialLandPrice }}원/㎡</p>
+      <p>연면적 평단가(평/공모금액 기준): {{ property.unitPricePerPyeong }}원/평</p>
     </section>
 
     <section class="border p-4 rounded-lg bg-white">
@@ -38,7 +41,7 @@
       <p>방 수: {{ property.roomCount }}개</p>
       <p>욕실 수: {{ property.bathroomCount }}개</p>
       <p>해당 층 수: {{ property.floor }}층</p>
-      <p>해시 태그: {{ property.floor }}층</p>
+      <p>해시 태그: #역세권 #신축</p>
       <p>세부 정보: {{ property.description }}</p>
       <p>
         이미지:
@@ -54,7 +57,12 @@
       <h3 class="font-semibold mb-2">매물 서류</h3>
       <ul>
         <li v-for="doc in property.documents" :key="doc.fileUrl">
-          <a :href="doc.fileUrl" class="text-blue-500 underline" target="_blank">
+          <a
+            :href="doc.fileUrl"
+            class="text-blue-500 underline"
+            target="_blank"
+            :download="getDocumentName(doc.documentType)"
+          >
             {{ getDocumentName(doc.documentType) }}
           </a>
         </li>
@@ -64,6 +72,7 @@
 </template>
 
 <script setup>
+import { formatDateTime } from '@/utils/format'
 import { ref } from 'vue'
 
 const property = ref({
@@ -77,8 +86,32 @@ const property = ref({
   description: '역세권이며 투자 가치가 높습니다.',
   documents: [
     {
-      documentType: 'LICENSE',
-      fileUrl: 'https://example.com/document.pdf',
+      documentType: 'OWNERSHIP_CERTIFICATE',
+      fileUrl: 'https://example.com/ownership.pdf',
+    },
+    {
+      documentType: 'SEAL_CERTIFICATE',
+      fileUrl: 'https://example.com/seal.pdf',
+    },
+    {
+      documentType: 'POWER_OF_ATTORNEY',
+      fileUrl: 'https://example.com/power.pdf',
+    },
+    {
+      documentType: 'RESIDENT_REGISTRATION',
+      fileUrl: 'https://example.com/resident.pdf',
+    },
+    {
+      documentType: 'ID_COPY',
+      fileUrl: 'https://example.com/id.pdf',
+    },
+    {
+      documentType: 'STANDARD_CONTRACT',
+      fileUrl: 'https://example.com/standard.pdf',
+    },
+    {
+      documentType: 'LEASE_CONTRACT',
+      fileUrl: 'https://example.com/lease.pdf',
     },
   ],
   floor: 10,
@@ -123,11 +156,21 @@ function formatPrice(val) {
 function getDocumentName(type) {
   switch (type) {
     case 'OWNERSHIP_CERTIFICATE':
-      return '등기부등본'
+      return '등기권리증'
+    case 'SEAL_CERTIFICATE':
+      return '매도용 인감증명서'
+    case 'POWER_OF_ATTORNEY':
+      return '위임장'
     case 'RESIDENT_REGISTRATION':
       return '주민등록등본'
+    case 'ID_COPY':
+      return '신분증 사본'
+    case 'STANDARD_CONTRACT':
+      return '표준부동산매매계약서'
+    case 'LEASE_CONTRACT':
+      return '임대차 계약서'
     default:
-      return type
+      return '기타 문서'
   }
 }
 </script>
