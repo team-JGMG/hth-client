@@ -30,6 +30,7 @@
         <slot />
         <button
           class="block w-80 h-12 bg-black text-white rounded-lg flex items-center justify-center mx-auto mt-8"
+          :class="submitButtonClass"
           type="button"
           aria-label="제출"
           @click="emit('submit')"
