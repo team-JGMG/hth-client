@@ -1,0 +1,1 @@
+<template>CurrntPrice.vue</template>

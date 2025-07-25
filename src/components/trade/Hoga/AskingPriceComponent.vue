@@ -1,6 +1,6 @@
 <!-- 호가 차트 컴포넌트! -->
 <template>
-  <VChart :option="option" autoresize class="w-full min-h-[500px]" />
+  <VChart :option="option" autoresize class="w-full min-h-[800px]" />
 </template>
 <script setup>
 import { ref, onMounted, defineEmits } from 'vue'
@@ -104,11 +104,7 @@ onMounted(() => {
               color: '#000',
               fontWeight: 'bold',
               fontSize: 18,
-              backgroundColor: 'transparent', // 배경 제거
-              borderColor: '#D9D9D9', // 테두리 색상 (검정)
-              borderWidth: 1, // 테두리 두께
-              padding: [4, 6], // 여백
-              borderRadius: 2, // 모서리 둥글게
+              borderRadius: 2,
             },
           },
         },
