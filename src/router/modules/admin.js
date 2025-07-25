@@ -1,4 +1,5 @@
 import PropertyReviewPage from '@/pages/admin/AdminPage.vue'
+import AdminDetailPage from '@/pages/admin/AdminDetailPage.vue'
 
 export default [
   {
@@ -8,7 +9,7 @@ export default [
   },
   {
     path: '/admin/property-review/:id',
-    name: 'admin-property-detail',
-    component: () => import('@/pages/admin/AdminDetailPage.vue'),
+    name: 'AdminPropertyDetail',
+    component: AdminDetailPage,
   },
 ]
