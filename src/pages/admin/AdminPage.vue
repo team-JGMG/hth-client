@@ -21,18 +21,14 @@
       />
     </div>
 
-    <BaseModal :isOpen="modal.open" @close="modal.open = false" @submit="modal.onSubmit">
+    <BaseModal
+      :isOpen="modal.open"
+      @close="modal.open = false"
+      @submit="modal.onSubmit"
+      :submitButtonClass="modal.buttonClass"
+      :confirmText="modal.confirmText"
+    >
       <p class="text-sm font-medium text-center">{{ modal.message }}</p>
-
-      <template #submit>
-        <button
-          class="flex w-80 h-12 bg-red-500 text-white rounded-lg items-center justify-center mx-auto mt-8"
-          type="button"
-          @click="handleSubmit"
-        >
-          <BaseTypography class="text-white font-medium text-base"> 제출하기 </BaseTypography>
-        </button>
-      </template>
     </BaseModal>
   </AdminLayout>
 </template>
@@ -45,7 +41,6 @@ import AdminList from '@/components/admin/AdminList.vue'
 import AdminListApproved from '@/components/admin/AdminListApproved.vue'
 import AdminListExpired from '@/components/admin/AdminListExpired.vue'
 import BaseModal from '@/components/common/Modal/BaseModal.vue'
-import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import { usePropertyAdmin } from '@/stores/propertyadmin'
 
 const propertyadmin = usePropertyAdmin()
@@ -74,14 +69,16 @@ const modal = ref({
   open: false,
   message: '',
   confirmText: '',
+  buttonClass: '',
   onSubmit: () => {},
 })
 
-function showModal(message, confirmText, onSubmit) {
+function showModal(message, confirmText, buttonClass, onSubmit) {
   modal.value = {
     open: true,
     message,
     confirmText,
+    buttonClass,
     onSubmit: () => {
       onSubmit()
       modal.value.open = false
