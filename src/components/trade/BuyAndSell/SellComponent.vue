@@ -1,64 +1,68 @@
 <template>
   <div class="p-4 bg-black text-white rounded-b-lg flex flex-col">
     <div class="mb-2">
-      <div class="flex items-center bg-white rounded-md px-3 py-2 gap-x-1">
+      <div class="relative bg-white rounded-md px-3 py-2 flex items-center">
         <input
           type="number"
           v-model.number="amount"
-          class="w-[220px] bg-transparent outline-none text-black text-lg"
+          class="flex-1 bg-transparent outline-none text-black text-lg min-w-0"
           placeholder="0원"
         />
-        <BaseTypography weight="medium" class="text-black text-lg mr-2">원</BaseTypography>
-        <button
-          @click="decrementAmount"
-          class="bg-gray-300 active:bg-gray-600 text-white rounded-full w-7 h-auto flex items-center justify-center text-xl font-bold"
-        >
-          <span class="material-symbols-outlined"> remove </span>
-        </button>
-        <button
-          @click="incrementAmount"
-          class="bg-gray-300 active:bg-gray-600 text-white rounded-full w-7 h-auto flex items-center justify-center text-xl font-bold"
-        >
-          <span class="material-symbols-outlined"> add </span>
-        </button>
+        <div class="flex items-center gap-x-1 ml-2 flex-shrink-0">
+          <BaseTypography weight="medium" class="text-black text-lg">원</BaseTypography>
+          <button
+            @click="decrementAmount"
+            class="bg-gray-300 active:bg-gray-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xl font-bold flex-shrink-0"
+          >
+            <span class="material-symbols-outlined"> remove </span>
+          </button>
+          <button
+            @click="incrementAmount"
+            class="bg-gray-300 active:bg-gray-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xl font-bold flex-shrink-0"
+          >
+            <span class="material-symbols-outlined"> add </span>
+          </button>
+        </div>
       </div>
     </div>
 
     <div class="mb-8">
-      <div class="flex items-center bg-white rounded-md px-3 py-2 gap-x-1">
+      <div class="relative bg-white rounded-md px-3 py-2 flex items-center">
         <input
           type="number"
-          v-model.number="amount"
-          class="w-[220px] bg-transparent outline-none text-black text-lg"
+          v-model.number="quantity"
+          class="flex-1 bg-transparent outline-none text-black text-lg min-w-0"
           placeholder="0주"
         />
-        <BaseTypography weight="medium" class="text-black text-lg mr-2">주</BaseTypography>
-        <button
-          @click="decrementQuantity"
-          class="bg-gray-300 active:bg-gray-600 text-white rounded-full w-7 h-auto flex items-center justify-center text-xl font-bold"
-        >
-          <span class="material-symbols-outlined"> remove </span>
-        </button>
-        <button
-          @click="incrementQuantity"
-          class="bg-gray-300 active:bg-gray-600 text-white rounded-full w-7 h-auto flex items-center justify-center text-xl font-bold"
-        >
-          <span class="material-symbols-outlined"> add </span>
-        </button>
+        <div class="flex items-center gap-x-1 ml-2 flex-shrink-0">
+          <BaseTypography weight="medium" class="text-black text-lg">주</BaseTypography>
+          <button
+            @click="decrementQuantity"
+            class="bg-gray-300 active:bg-gray-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xl font-bold flex-shrink-0"
+          >
+            <span class="material-symbols-outlined"> remove </span>
+          </button>
+          <button
+            @click="incrementQuantity"
+            class="bg-gray-300 active:bg-gray-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xl font-bold flex-shrink-0"
+          >
+            <span class="material-symbols-outlined"> add </span>
+          </button>
+        </div>
       </div>
     </div>
 
     <div class="mt-auto flex justify-center">
       <CompletedButton
         type="button"
-        color="blue-600"
+        color="red-600"
         textColor="white"
         typographySize="base"
         typographyWeight="bold"
-        customClass="rounded-md w-28 py-3"
+        customClass="rounded-md w-36 py-3"
         @click="handlePurchase"
       >
-        판매하기
+        구매하기
       </CompletedButton>
     </div>
   </div>
