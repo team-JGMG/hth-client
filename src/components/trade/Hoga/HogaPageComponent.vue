@@ -8,7 +8,7 @@ const scrollContainer = ref(null)
 const handleCenterIndex = (index) => {
   nextTick(() => {
     if (scrollContainer.value) {
-      const rowHeight = 50
+      const rowHeight = 60
       const containerHeight = scrollContainer.value.clientHeight
       const scrollTo = index * rowHeight - containerHeight / 2 + rowHeight / 2
       scrollContainer.value.scrollTop = Math.max(scrollTo, 0)

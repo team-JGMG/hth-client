@@ -98,12 +98,12 @@ onMounted(() => {
             else return value
           },
           rich: {
-            red: { color: 'red', fontWeight: 'bold', fontSize: 17 },
-            blue: { color: 'blue', fontWeight: 'bold', fontSize: 17 },
+            red: { color: 'red', fontWeight: 'bold', fontSize: 14 },
+            blue: { color: 'blue', fontWeight: 'bold', fontSize: 14 },
             highlight: {
               color: '#000',
               fontWeight: 'bold',
-              fontSize: 18,
+              fontSize: 14,
               borderRadius: 2,
             },
           },
