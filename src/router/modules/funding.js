@@ -14,7 +14,7 @@ export default [
     component: FundingDetailPage,
   },
   {
-    path: '/funding/trade',
+    path: '/funding/trade/:id?',
     name: 'funding-trade',
     component: FundingTradePage,
   },
