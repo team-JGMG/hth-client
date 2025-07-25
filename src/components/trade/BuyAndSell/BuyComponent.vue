@@ -1,22 +1,23 @@
 <template>
-  <div class="p-2 bg-black text-white rounded-b-lg flex flex-col">
+  <div class="p-4 bg-black text-white rounded-b-lg flex flex-col">
     <div class="mb-2">
-      <div class="flex items-center bg-white rounded-md px-3 py-2">
+      <div class="flex items-center bg-white rounded-md px-3 py-2 gap-x-1">
         <input
           type="number"
           v-model.number="amount"
-          class="min-w-0 w-full bg-transparent outline-none text-black text-lg px-0"
+          class="w-[220px] bg-transparent outline-none text-black text-lg"
+          placeholder="0원"
         />
-        <BaseTypography weight="medium" class="text-black text-lg ml-1 mr-1">원</BaseTypography>
+        <BaseTypography weight="medium" class="text-black text-lg mr-2">원</BaseTypography>
         <button
           @click="decrementAmount"
-          class="bg-gray-300 active:bg-gray-600 text-white rounded-full w-7 h-7 flex items-center justify-center text-xl font-bold my-1"
+          class="bg-gray-300 active:bg-gray-600 text-white rounded-full w-7 h-auto flex items-center justify-center text-xl font-bold"
         >
           <span class="material-symbols-outlined"> remove </span>
         </button>
         <button
           @click="incrementAmount"
-          class="bg-gray-300 active:bg-gray-600 text-white rounded-full w-7 h-7 flex items-center justify-center ml-2 text-xl font-bold"
+          class="bg-gray-300 active:bg-gray-600 text-white rounded-full w-7 h-auto flex items-center justify-center text-xl font-bold"
         >
           <span class="material-symbols-outlined"> add </span>
         </button>
@@ -24,23 +25,23 @@
     </div>
 
     <div class="mb-8">
-      <div class="flex items-center bg-white rounded-md px-3 py-2">
+      <div class="flex items-center bg-white rounded-md px-3 py-2 gap-x-1">
         <input
           type="number"
-          v-model.number="quantity"
-          class="flex-grow bg-transparent outline-none text-black text-lg"
+          v-model.number="amount"
+          class="w-[220px] bg-transparent outline-none text-black text-lg"
           placeholder="0주"
         />
-        <BaseTypography weight="medium" class="text-black text-lg mr-0">주</BaseTypography>
+        <BaseTypography weight="medium" class="text-black text-lg mr-2">주</BaseTypography>
         <button
           @click="decrementQuantity"
-          class="bg-gray-300 hover:bg-gray-600 text-white rounded-full w-7 h-7 my-1 flex items-center justify-center text-xl font-bold"
+          class="bg-gray-300 active:bg-gray-600 text-white rounded-full w-7 h-auto flex items-center justify-center text-xl font-bold"
         >
           <span class="material-symbols-outlined"> remove </span>
         </button>
         <button
           @click="incrementQuantity"
-          class="bg-gray-300 hover:bg-gray-600 text-white rounded-full w-7 h-7 flex items-center justify-center ml-2 text-xl font-bold"
+          class="bg-gray-300 active:bg-gray-600 text-white rounded-full w-7 h-auto flex items-center justify-center text-xl font-bold"
         >
           <span class="material-symbols-outlined"> add </span>
         </button>
