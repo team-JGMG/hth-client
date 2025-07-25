@@ -1,6 +1,6 @@
 // CleanLineVolumeChart.vue
 <template>
-  <div class="w-[calc(90%+50px)] ml-[-15px] h-[520px]">
+  <div class="w-[calc(90%+50px)] ml-[-15px] h-[530px]">
     <VChart :option="option" autoresize class="mb-20" />
   </div>
 </template>
@@ -133,13 +133,18 @@ onMounted(() => {
         markPoint: {
           symbol: 'circle',
           symbolSize: 6,
+          itemStyle: {
+            color: '#fff',
+            borderColor: '#0057FF',
+            borderWidth: 2,
+          },
           data: [
             {
               type: 'max',
               label: {
                 formatter: () => `최고 ${max.toLocaleString()}`,
                 position: 'top',
-                offset: [0, -10],
+                offset: [0, -15],
                 fontWeight: 'bold',
                 color: '#0057FF',
               },
@@ -149,12 +154,24 @@ onMounted(() => {
               label: {
                 formatter: () => `최저 ${min.toLocaleString()}`,
                 position: 'bottom',
-                offset: [0, 10],
+                offset: [0, 15],
                 fontWeight: 'bold',
                 color: '#0057FF',
               },
             },
           ],
+        },
+        markLine: {
+          symbol: 'none',
+          lineStyle: {
+            color: '#e0e0e0',
+            width: 1,
+            type: 'solid',
+          },
+          data: times.map((time, index) => ({
+            xAxis: index,
+            label: { show: false },
+          })),
         },
       },
       {
