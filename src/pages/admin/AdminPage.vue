@@ -7,93 +7,107 @@
     </div>
 
     <div class="flex-1 overflow-y-auto pb-24">
-      <!-- props 전달 -->
       <AdminList
-        v-if="currentAdminStatus === 'admin'"
-        :list="propertyList"
+        v-if="currentAdminStatus === 'pending'"
+        :list="pendingList"
         @approve="handleApprove"
         @reject="handleReject"
       />
-      <AdminListCompleted v-else :list="propertyList" />
+      <AdminListApproved v-else-if="currentAdminStatus === 'approved'" :list="approvedList" />
+      <AdminListExpired
+        v-else-if="currentAdminStatus === 'expired'"
+        :list="expiredList"
+        @delete="handleDelete"
+      />
     </div>
+
+    <BaseModal :isOpen="modal.open" @close="modal.open = false" @submit="modal.onSubmit">
+      <p class="text-sm font-medium text-center">{{ modal.message }}</p>
+
+      <template #submit>
+        <button
+          class="flex w-80 h-12 bg-red-500 text-white rounded-lg items-center justify-center mx-auto mt-8"
+          type="button"
+          @click="handleSubmit"
+        >
+          <BaseTypography class="text-white font-medium text-base"> 제출하기 </BaseTypography>
+        </button>
+      </template>
+    </BaseModal>
   </AdminLayout>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import BaseTab from '@/components/common/Tab/BaseTab.vue'
+import { ref, computed } from 'vue'
 import AdminLayout from '@/layouts/AdminLayout.vue'
+import BaseTab from '@/components/common/Tab/BaseTab.vue'
 import AdminList from '@/components/admin/AdminList.vue'
-import AdminListCompleted from '@/components/admin/AdminListCompleted.vue'
+import AdminListApproved from '@/components/admin/AdminListApproved.vue'
+import AdminListExpired from '@/components/admin/AdminListExpired.vue'
+import BaseModal from '@/components/common/Modal/BaseModal.vue'
+import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
+import { usePropertyAdmin } from '@/stores/propertyadmin'
 
-// 탭
+const propertyadmin = usePropertyAdmin()
+propertyadmin.initializeMockData()
+
+const pendingList = computed(() =>
+  (propertyadmin.propertyList || []).filter((p) => p.status === '대기'),
+)
+const approvedList = computed(() =>
+  (propertyadmin.propertyList || []).filter((p) => p.status === '승인됨'),
+)
+const expiredList = computed(() =>
+  (propertyadmin.propertyList || []).filter((p) => p.status === '만료됨'),
+)
+
+// 탭 관련
 const AdminTabs = [
-  { label: '관리', value: 'admin' },
-  { label: '완료', value: 'adminCompleted' },
+  { label: '대기', value: 'pending' },
+  { label: '승인 매물 조회', value: 'approved' },
+  { label: '만료', value: 'expired' },
 ]
-const currentAdminStatus = ref('admin')
+const currentAdminStatus = ref('pending')
 
-// 임시 목데이터
-const propertyList = ref([
-  {
-    id: 1,
-    title: '신도림 핀포인트타워 3호',
-    address: '서울 강서구 등촌로 216',
-    price: 1000000000,
-    period: '12개월',
-    image: '',
-    status: '대기',
-  },
-  {
-    id: 2,
-    title: '신사역 코너 상가',
-    address: '서울 강남구 논현로 216',
-    price: 9000000000,
-    period: '10개월',
-    image: '',
-    status: '대기',
-  },
-  {
-    id: 3,
-    title: '강남역 파이낸스센터',
-    address: '서울 강남구 역삼로 123',
-    price: 15000000000,
-    period: '15개월',
-    image: '',
-    status: '대기',
-  },
-  {
-    id: 4,
-    title: '여의도 IFC몰',
-    address: '서울 영등포구 여의대로 108',
-    price: 20000000000,
-    period: '18개월',
-    image: '',
-    status: '만료됨',
-  },
-  {
-    id: 5,
-    title: '판교 스타필드',
-    address: '경기도 성남시 분당구 판교로 235',
-    price: 12000000000,
-    period: '24개월',
-    image: '',
-    status: '만료됨',
-  },
-])
+// 모달 관련
+const modal = ref({
+  open: false,
+  message: '',
+  confirmText: '',
+  onSubmit: () => {},
+})
 
+function showModal(message, confirmText, onSubmit) {
+  modal.value = {
+    open: true,
+    message,
+    confirmText,
+    onSubmit: () => {
+      onSubmit()
+      modal.value.open = false
+    },
+  }
+}
+
+// 승인 처리
 function handleApprove(id) {
-  const item = propertyList.value.find((p) => p.id === id)
+  const item = propertyadmin.propertyList.find((p) => p.id === id)
   if (item) item.status = '승인됨'
 }
 
+// 거절 처리
 function handleReject(id) {
-  const item = propertyList.value.find((p) => p.id === id)
-  if (item) item.status = '거절됨'
+  showModal('정말 거절하시겠습니까?', '거절하기', () => {
+    const idx = propertyadmin.propertyList.findIndex((p) => p.id === id)
+    if (idx !== -1) propertyadmin.propertyList.splice(idx, 1)
+  })
 }
 
-// function handleExpire(id) {
-//   const item = propertyList.value.find((p) => p.id === id)
-//   if (item) item.status = '만료됨'
-// } --> 기간 만료 된 거 확인하고 당일 날짜 지났으면 완료로 넘어가는 함수 만들어야함
+// 삭제 처리
+function handleDelete(id) {
+  showModal('정말 삭제하시겠습니까?', '삭제하기', () => {
+    const idx = propertyadmin.propertyList.findIndex((p) => p.id === id)
+    if (idx !== -1) propertyadmin.propertyList.splice(idx, 1)
+  })
+}
 </script>
