@@ -1,6 +1,8 @@
 // utils/format.js
 
+
 //날짜+시간 2025.7.23 12:00 형식
+
 export function formatDateTime(dateString) {
   if (!dateString) return '-'
   const date = new Date(dateString)

@@ -105,7 +105,6 @@ const propertyId = computed(() => Number(route.params.id))
 const { propertyList } = usePropertyAdmin()
 
 const property = computed(() => propertyList.find((p) => p.id === propertyId.value))
-
 function getDocumentName(type) {
   switch (type) {
     case 'OWNERSHIP_CERTIFICATE':
