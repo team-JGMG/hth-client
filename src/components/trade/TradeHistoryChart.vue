@@ -18,7 +18,7 @@ import {
   AxisPointerComponent,
 } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
-import { mockOrderbookData as chartData } from '@/utils/mockOrderbookData'
+import { mockOrderbookData as chartData } from '@/utils/tradeHistoryData'
 
 echarts.use([
   LineChart,
