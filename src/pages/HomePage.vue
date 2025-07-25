@@ -6,7 +6,6 @@
     </div>
     <PropertySection />
     <SaleCompleted />
-    <CommonNav />
   </BaseLayout>
 </template>
 
@@ -17,5 +16,4 @@ import PropertySection from '@/components/main/PropertySection.vue'
 import FundingListSection from '@/components/main/FundingListSection.vue'
 import PointSection from '@/components/main/PointSection/PointSection.vue'
 import TradeListSection from '@/components/main/TradeListSection.vue'
-import CommonNav from '@/layouts/CommonNav.vue'
 </script>

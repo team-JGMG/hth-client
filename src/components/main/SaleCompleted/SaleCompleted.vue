@@ -1,5 +1,5 @@
 <template>
-  <div class="px-4 mb-20">
+  <div class="mb-20">
     <section class="mt-4">
       <div class="flex items-center justify-between mb-2 relative">
         <BaseTypography class="text-lg" weight="bold">매각 완료</BaseTypography>
