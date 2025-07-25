@@ -103,7 +103,7 @@
 
 <script setup>
 import { formatPriceInEokwon } from '@/utils/format'
-import { useRouter } from 'vue-router'
+SSimport { useRouter } from 'vue-router'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import BaseButton from '@/components/common/Button/BaseButton.vue'
 import fallbackImage from '@/assets/images/cardtestimage.png'
