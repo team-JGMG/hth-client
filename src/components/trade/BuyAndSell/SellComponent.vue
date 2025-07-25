@@ -55,7 +55,7 @@
         textColor="white"
         typographySize="base"
         typographyWeight="bold"
-        customClass="rounded-md w-48 py-3"
+        customClass="rounded-md w-28 py-3"
         @click="handlePurchase"
       >
         판매하기
