@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-4">
     <AdminListItemCard
-      v-for="item in filtered"
+      v-for="item in props.list"
       :key="item.id"
       v-bind="item"
       @approve="$emit('approve', item.id)"
@@ -11,11 +11,9 @@
 </template>
 
 <script setup>
-import { computed, defineProps } from 'vue'
+import { defineProps } from 'vue'
 import AdminListItemCard from './AdminListItemCard.vue'
 const props = defineProps({
   list: Array,
 })
-
-const filtered = computed(() => props.list.filter((p) => p.status === '대기'))
 </script>

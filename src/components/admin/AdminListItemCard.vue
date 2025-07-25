@@ -44,9 +44,7 @@
             <BaseTypography size="xs" weight="regular" color="gray-2" class="min-w-[90px]">
               희망 공모 기간
             </BaseTypography>
-            <BaseTypography weight="bold" color="black">
-              {{ period }}
-            </BaseTypography>
+            <BaseTypography weight="bold" color="black"> {{ postingPeriod }}개월 </BaseTypography>
           </div>
         </div>
       </div>
@@ -83,7 +81,7 @@
       </template>
 
       <template v-else-if="status === '승인됨'">
-        <BaseButton variant="primary" class="w-full hover:bg-blue-500" disabled>
+        <BaseButton variant="primary" class="w-full bg-blue-500 hover:bg-blue-500" disabled>
           <BaseTypography size="xs" weight="semibold" color="white"> 매물 승인됨 </BaseTypography>
         </BaseButton>
       </template>
@@ -104,7 +102,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { formatPriceInEokwon } from '@/utils/format'
 import { useRouter } from 'vue-router'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import BaseButton from '@/components/common/Button/BaseButton.vue'
@@ -116,13 +114,12 @@ const props = defineProps({
   address: String,
   price: Number,
   period: String,
+  postingPeriod: Number,
   image: String,
-  status: String, // "대기", "승인됨", "거절됨", "만료됨"
+  status: String,
 })
 
-const formattedPrice = computed(() => {
-  return props.price ? `${(props.price / 100000000).toFixed(0)}억` : '-'
-})
+const formattedPrice = formatPriceInEokwon(props.price)
 
 const router = useRouter()
 
