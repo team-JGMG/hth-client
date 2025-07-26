@@ -7,6 +7,7 @@ import fundingRoutes from './modules/funding'
 import propertyRoutes from './modules/property'
 import publicRoutes from './modules/public'
 import tradeRoutes from './modules/trade'
+import NotFound from '@/pages/NotFound.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,9 +23,7 @@ const router = createRouter({
     {
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
-      // component: () => import('@/pages/NotFoundPage.vue'),
-      // 실제 404 페이지 컴포넌트 연결
-      redirect: '/',
+      component: NotFound,
     },
   ],
 })
