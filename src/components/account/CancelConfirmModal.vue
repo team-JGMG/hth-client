@@ -7,7 +7,7 @@
     >
       <div @click.stop class="max-w-[340px] w-full bg-white rounded-lg p-6 relative">
         <!-- 닫기 버튼 -->
-        <button
+        <BaseButton
           type="button"
           aria-label="닫기"
           @click="emit('close')"
@@ -18,26 +18,28 @@
           >
             close
           </span>
-        </button>
+        </BaseButton>
 
         <!-- 제목 -->
-        <div class="text-base font-bold mb-3">정말 취소하시겠습니까?</div>
+        <BaseTypography tag="div" size="base" weight="bold" class="mb-3">
+          정말 취소하시겠습니까?
+        </BaseTypography>
 
         <!-- 본문 안내 -->
-        <div class="text-sm text-gray-500 leading-relaxed">
+        <BaseTypography tag="p" size="sm" color="gray-2">
           취소 시 참여 금액은 포인트로 환불되며,<br />
           다른 ‘반의반집’ 매물로 새로운 투자를 시작할 수 있습니다.
-        </div>
+        </BaseTypography>
 
         <!-- 제출 버튼 -->
-        <button
-          class="block w-full h-12 bg-[#ff3b3b] text-white rounded-lg flex items-center justify-center mx-auto mt-8"
+        <BaseButton
           type="button"
           aria-label="제출"
           @click="emit('submit')"
+          class="block w-full h-12 bg-[#ff3b3b] text-white rounded-lg flex items-center justify-center mx-auto mt-8"
         >
           <span class="text-white font-medium text-base">취소하기</span>
-        </button>
+        </BaseButton>
       </div>
     </div>
   </Teleport>
