@@ -24,7 +24,7 @@
     </button>
 
     <!-- 하단 여백 -->
-    <div class="h-20"></div>
+    <div class="py-8"></div>
   </div>
 </template>
 
