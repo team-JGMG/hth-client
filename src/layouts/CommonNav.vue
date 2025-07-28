@@ -34,14 +34,14 @@
     </router-link>
 
     <router-link
-      to="/trade/list"
+      to="/trade"
       class="flex flex-col items-center hover:text-white px-2"
       :class="{
         'text-white': activeItem === 'trade',
         'text-gray-600': activeItem !== 'trade',
-        'is-disabled': !authStore.getIsLoggedIn, // 비활성화 클래스 추가
+        'is-disabled': !authStore.getIsLoggedIn,
       }"
-      @click.prevent="checkLoginAndNavigate('/trade/list')"
+      @click.prevent="checkLoginAndNavigate('/trade')"
     >
       <span
         class="material-symbols-outlined text-2xl"
@@ -86,9 +86,9 @@ const updateActiveItemBasedOnRoute = () => {
   const currentPath = route.path
   if (currentPath === '/') {
     activeItem.value = 'home'
-  } else if (currentPath.startsWith('/funding/list')) {
+  } else if (currentPath.startsWith('/funding')) {
     activeItem.value = 'funding'
-  } else if (currentPath.startsWith('/trade/list')) {
+  } else if (currentPath.startsWith('/trade')) {
     activeItem.value = 'trade'
   } else if (currentPath.startsWith('/account/my-page')) {
     activeItem.value = 'my-page'
