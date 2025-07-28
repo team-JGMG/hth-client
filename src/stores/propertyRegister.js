@@ -25,18 +25,26 @@ export const usePropertyRegisterStore = defineStore('propertyRegister', () => {
     period: '', // 날짜 문자열 (ex: 2024-08-15)
   })
 
-  const buildingInfo = ref({
-    usage: '',
-    yearBuilt: '',
-    totalFloors: '',
-    structure: '',
+  const propertyBuilding = ref({
+    landUsageZone: '', // 용도 지역
+    landSize: '', // 대지 면적 (매물)
+    buildingSize: '', // 대지 면적 (건물)
+    landTotalArea: '', // 연면적 (매물)
+    buildingTotalArea: '', // 연면적 (건물)
+    floorUnder: '', // 지하 층수
+    floorAbove: '', // 지상 층수
+    builtDate: '', // 준공일
+    officialPrice: '', // 공시지가
+    marketPrice: '', // 연면적 평단가
   })
 
   const propertyDetail = ref({
-    type: '',
-    price: '',
-    options: [],
-    memo: '',
+    type: '', // 매물 유형
+    roomCount: '', // 방 수
+    bathroomCount: '', // 욕실 수
+    floor: '', // 해당 층 수
+    options: [], // 해시태그 (배열)
+    memo: '', // 세부 설명
   })
 
   const documents = ref([])
@@ -53,7 +61,7 @@ export const usePropertyRegisterStore = defineStore('propertyRegister', () => {
     step,
     ownerInfo,
     propertyBasic,
-    buildingInfo,
+    propertyBuilding,
     propertyDetail,
     documents,
     goToNextStep,
