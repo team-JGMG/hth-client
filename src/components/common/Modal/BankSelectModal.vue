@@ -70,7 +70,6 @@ function selectBank(bank) {
         ×
       </button>
 
-      <!-- 상단 여백 (제목 없음) -->
       <div class="h-6 mb-6"></div>
 
       <!-- 은행 목록 -->
@@ -80,12 +79,14 @@ function selectBank(bank) {
           :key="bank.code"
           @click="selectBank(bank)"
           :class="[
-            'flex flex-col items-center justify-center border rounded-xl p-3 cursor-pointer transition',
-            selectedBank === bank.code ? 'border-black' : 'border-gray-200 hover:border-gray-400',
+            'w-24 h-24 flex flex-col items-center justify-center rounded-xl p-2 cursor-pointer transition-all duration-20 border text-xs text-center whitespace-nowrap',
+            selectedBank === bank.code
+              ? 'bg-[#D3DAE8] border-3 border-black text-[#54575C]'
+              : 'bg-[#FAFAFB] border border-[#F4F4F4] hover:bg-[#D3DAE8] hover:border-4 hover:border-black hover:text-[#54575C]',
           ]"
         >
-          <img :src="bank.img" alt="은행 로고" class="w-10 h-10 mb-1 object-contain" />
-          <span class="text-xs text-center whitespace-nowrap">{{ bank.label }}</span>
+          <img :src="bank.img" alt="은행 로고" class="w-8 h-8 mb-1 object-contain" />
+          <span>{{ bank.label }}</span>
         </div>
       </div>
     </div>
