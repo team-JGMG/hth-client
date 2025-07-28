@@ -61,6 +61,6 @@ const fetchUserDataAndPoints = async () => {
 }
 
 onMounted(() => {
-  fetchUserDataAndPoints()
+  // fetchUserDataAndPoints()
 })
 </script>
