@@ -1,6 +1,6 @@
 <template>
   <BlankLayout>
-    <DetailHeader>{{}}</DetailHeader>
+    <DetailHeader>{{ tradeItem.name }}</DetailHeader>
     <CurrentPrice />
     <div class="filter-tabs-container mb-2 shrink-0">
       <BaseTab :tabs="fundingStatusTabs" v-model="currentFundingStatus" />
@@ -24,6 +24,12 @@ import BuyAndSellAccodian from '@/components/trade/BuyAndSell/BuyAndSellAccodian
 import CurrentPrice from '@/components/trade/CurrentPrice.vue'
 import TradeHistoryChart from '@/components/trade/TradeHistoryChart.vue'
 import OrderbookChart from '@/components/trade/Hoga/OrderbookChart.vue'
+import { useRoute } from 'vue-router'
+import { mockTradeListData } from '@/utils/mockTradeListData.js'
+
+const route = useRoute()
+const tradeId = route.params.id
+const tradeItem = mockTradeListData[tradeId - 1]
 
 const fundingStatusTabs = [
   { label: '호가', value: 'askingPrice' },

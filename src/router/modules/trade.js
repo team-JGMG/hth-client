@@ -8,8 +8,8 @@ export default [
     component: TradeListPage,
   },
   {
-    path: '/trade/order',
-    // path: '/trade/order/:id',
+    // path: '/trade/order',
+    path: '/trade/order/:id',
     name: 'trade-order',
     component: TradeOrderPage,
   },

@@ -1,3 +1,4 @@
+// 호가창 목데이터
 export const mockOrderbook = [
   { price: '2,195', buyVolume: 72, sellVolume: 0 },
   { price: '2,190', buyVolume: 38, sellVolume: 0 },
