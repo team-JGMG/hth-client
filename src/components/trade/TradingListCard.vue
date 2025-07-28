@@ -42,7 +42,6 @@ const props = defineProps({
 
 const router = useRouter()
 
-// 템플릿에서 사용할 이미지 정보가 추가된 아이템 목록
 const tradeItems = ref([])
 
 onMounted(() => {
@@ -53,13 +52,11 @@ onMounted(() => {
     new URL('../../assets/images/randombuilding/building4.png', import.meta.url).href,
   ]
 
-  // 로컬 스토리지를 사용하여 이미지 할당을 유지합니다.
   const oldAssignments = JSON.parse(localStorage.getItem('tradeItemImages')) || {}
   const newAssignments = { ...oldAssignments }
-  let needsUpdate = false // 로컬 스토리지 업데이트가 필요한지 확인
+  let needsUpdate = false
 
   props.items.forEach((item) => {
-    // 해당 아이템 ID에 할당된 이미지가 없으면 새로 할당합니다.
     if (!newAssignments[item.id]) {
       const randomIndex = Math.floor(Math.random() * imagePaths.length)
       newAssignments[item.id] = imagePaths[randomIndex]
@@ -67,12 +64,10 @@ onMounted(() => {
     }
   })
 
-  // 새로운 할당이 있다면 로컬 스토리지에 저장합니다.
   if (needsUpdate) {
     localStorage.setItem('tradeItemImages', JSON.stringify(newAssignments))
   }
 
-  // props.items에 이미지 경로를 추가하여 tradeItems를 업데이트합니다.
   tradeItems.value = props.items.map((item) => ({
     ...item,
     image: newAssignments[item.id],
