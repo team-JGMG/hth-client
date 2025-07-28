@@ -1,14 +1,21 @@
 <template>
-  <div>
-    <BaseTypography class="text-xl mb-1" color="white">
-      {{ userStore.userName ? `${userStore.userName}님,` : '???님,' }}
-    </BaseTypography>
-
-    <div class="flex items-baseline justify-between mb-4">
-      <BaseTypography class="text-xl font-medium" color="white">보유 포인트</BaseTypography>
-      <BaseTypography class="text-xl font-medium" color="white">
-        {{ userStore.userPoints.toLocaleString() }}원
+  <div class="relative mb-4">
+    <div>
+      <BaseTypography class="text-xl mb-1" color="white">
+        {{ userStore.userName ? `${userStore.userName}님,` : '???님,' }}
       </BaseTypography>
+
+      <!-- 이 컴포넌트 가져다가 slot부분에 정보수정 버튼 넣으심 됩니다 -->
+      <div class="absolute top-0 right-0">
+        <slot></slot>
+      </div>
+
+      <div class="mb-4 flex items-baseline justify-between">
+        <BaseTypography class="text-xl font-medium" color="white">보유 포인트</BaseTypography>
+        <BaseTypography class="text-xl font-medium" color="white">
+          {{ userStore.userPoints.toLocaleString() }}원
+        </BaseTypography>
+      </div>
     </div>
 
     <div class="flex space-x-3 mb-3">
