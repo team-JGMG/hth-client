@@ -41,7 +41,7 @@
         'text-gray-600': activeItem !== 'trade',
         'is-disabled': !authStore.getIsLoggedIn,
       }"
-      @click.prevent="checkLoginAndNavigate('/trade')"
+      @click.prevent="checkLoginAndNavigate('/trade/list')"
     >
       <span
         class="material-symbols-outlined text-2xl"
