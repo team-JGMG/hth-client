@@ -1,4 +1,3 @@
-<!-- components/trade/TradeConfirmModal.vue -->
 <template>
   <BaseModal :isOpen="isOpen" @close="$emit('close')">
     <div class="p-4">
