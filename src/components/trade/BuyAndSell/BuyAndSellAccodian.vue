@@ -37,9 +37,9 @@
       </span>
     </div>
 
-    <transition>
+    <transition name="slide-up">
       <div v-if="isOpen" class="p-4 pt-0 bg-black text-white">
-        <component :is="activePanelComponent" />
+        <TradeForm :type="activeMode" />
         <div class="mb-18"></div>
       </div>
     </transition>
@@ -47,10 +47,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import BaseTypography from '@/components/common/Typography/BaseTypography.vue' // Adjust path as needed
-import BuyComponent from './BuyComponent.vue'
-import SellComponent from './SellComponent.vue'
+import { ref } from 'vue'
+import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
+import TradeForm from './TradeForm.vue'
 
 const isOpen = ref(false)
 const activeMode = ref('buy')
@@ -58,33 +57,7 @@ const activeMode = ref('buy')
 const toggleOpen = () => {
   isOpen.value = !isOpen.value
 }
-
 const setActiveMode = (mode) => {
   activeMode.value = mode
 }
-
-const activePanelComponent = computed(() => {
-  return activeMode.value === 'buy' ? BuyComponent : SellComponent
-})
-
-onMounted(() => {
-  // No direct call needed here as computed property handles initial rendering
-})
 </script>
-
-<style scoped>
-.slide-up-enter-active,
-.slide-up-leave-active {
-  transition: all 0.3s ease;
-}
-
-.slide-up-enter-from,
-.slide-up-leave-to {
-  transform: translateY(-100%);
-  opacity: 0;
-}
-
-.shadow-up {
-  box-shadow: 0 -4px 5px rgba(81, 81, 81, 0.5);
-}
-</style>
