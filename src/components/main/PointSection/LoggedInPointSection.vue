@@ -1,24 +1,3 @@
-<script setup>
-import { ref } from 'vue'
-import BaseCard from '@/components/common/Card/BaseCard.vue'
-import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import { useUserStore } from '@/stores/user'
-import { useRouter } from 'vue-router'
-import BaseModal from '@/components/common/Modal/BaseModal.vue'
-import PointChargeModal from './PointModal/PointChargeModel.vue'
-import PointRefundModal from './PointModal/PointRefundModal.vue'
-
-const router = useRouter()
-const userStore = useUserStore()
-
-const isChargeModalOpen = ref(false)
-const isRefundModalOpen = ref(false)
-
-const myPage = () => {
-  router.push('/account/my-page')
-}
-</script>
-
 <template>
   <div>
     <BaseTypography class="text-xl mb-1" color="white">
@@ -86,3 +65,24 @@ const myPage = () => {
     </BaseModal>
   </div>
 </template>
+<script setup>
+import { ref } from 'vue'
+import BaseCard from '@/components/common/Card/BaseCard.vue'
+import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
+import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
+import BaseModal from '@/components/common/Modal/BaseModal.vue'
+import PointChargeModal from './PointModal/PointChargeModel.vue'
+import PointRefundModal from './PointModal/PointRefundModal.vue'
+
+const router = useRouter()
+const userStore = useUserStore()
+
+// 추후 모달 submit 로직 추가 예정
+const isChargeModalOpen = ref(false)
+const isRefundModalOpen = ref(false)
+
+const myPage = () => {
+  router.push('/account/my-page')
+}
+</script>
