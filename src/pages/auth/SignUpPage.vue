@@ -7,6 +7,7 @@ import DetailHeader from '@/layouts/DetailHeader.vue'
 <template>
   <BlankLayout>
     <DetailHeader>회원가입</DetailHeader>
+    <div class="py-5"></div>
     <SignUpForm />
   </BlankLayout>
 </template>

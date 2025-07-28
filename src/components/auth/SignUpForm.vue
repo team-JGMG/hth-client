@@ -3,10 +3,10 @@
     <DetailHeader title="회원가입" class="mb-0" />
 
     <div class="-mt-12">
-      <BaseTypography class="text-sm mt-0 mb-3 text-gray-700">
+      <BaseTypography class="font-medium mt-0 mb-3 text-gray-700">
         추가 정보를 입력해주세요.
       </BaseTypography>
-
+      <div class="py-2"></div>
       <!-- 이름 -->
       <div class="relative mb-6">
         <InputField v-model="nickname" label="이름" placeholder="이름을 입력해주세요." />
@@ -17,59 +17,128 @@
           이름을 입력해주세요.
         </BaseTypography>
       </div>
+      <div class="py-3"></div>
 
       <!-- 주민등록번호 -->
-      <div class="relative mb-6">
-        <RrnInput v-model:rrnFront="rrnFront" v-model:rrnBack="rrnBack" />
+      <div class="mb-6 flex items-center gap-2">
+        <RrnInput v-model:rrnFront="rrnFront" v-model:rrnBack="rrnBack" class="flex-1" />
+        <BaseButton
+          :disabled="isRrnVerified"
+          @click="verifyRrn"
+          class="h-[38px] px-2.5 text-xs font-medium rounded-md transition-colors duration-200"
+          :class="isRrnVerified ? 'bg-gray-400 text-white' : 'bg-gray-800 text-white'"
+        >
+          {{ isRrnVerified ? '인증완료' : '인증하기' }}
+        </BaseButton>
       </div>
 
       <!-- 전화번호 -->
-      <div class="relative mb-6">
-        <InputField v-model="phone" label="전화번호" placeholder="전화번호를 입력해주세요." />
+      <div class="relative mb-6 flex items-center gap-2">
+        <InputField
+          v-model="phone"
+          label="전화번호"
+          placeholder="전화번호를 입력해주세요."
+          class="flex-1"
+        />
+        <BaseButton
+          :disabled="isPhoneVerified"
+          @click="verifyPhone"
+          class="h-[38px] px-2.5 text-xs font-medium rounded-md transition-colors duration-200"
+          :class="isPhoneVerified ? 'bg-gray-400 text-white' : 'bg-gray-800 text-white'"
+        >
+          {{ isPhoneVerified ? '인증완료' : '인증하기' }}
+        </BaseButton>
         <BaseTypography
           v-if="phone && !isPhoneValid"
-          class="absolute text-red-500 text-sm mt-1 left-0 top-full"
+          class="absolute !text-red-500 text-sm -mt-4 left-0 top-full !font-normal"
         >
           정확한 전화번호를 입력해주세요.
         </BaseTypography>
       </div>
-
+      <div class="py-1"></div>
       <!-- 계좌번호 -->
-      <div class="relative mb-6">
-        <BankAccountInput v-model:accountNumber="accountNumber" v-model:bankCode="bankCode" />
+      <!-- 계좌번호 -->
+      <div class="mb-6 flex items-center gap-2">
+        <BankAccountInput
+          v-model:accountNumber="accountNumber"
+          v-model:bankCode="bankCode"
+          class="flex-1"
+        />
+        <BaseButton
+          :disabled="isAccountVerified"
+          @click="verifyAccount"
+          class="h-[38px] -mt-4 px-2.5 text-xs font-medium rounded-md transition-colors duration-200"
+          :class="isAccountVerified ? 'bg-gray-400 text-white' : 'bg-gray-800 text-white'"
+        >
+          {{ isAccountVerified ? '인증완료' : '인증하기' }}
+        </BaseButton>
       </div>
-
       <!-- 약관 동의 영역 -->
       <div class="mb-10">
         <BaseTypography class="block font-medium mb-2">약관 동의</BaseTypography>
 
         <!-- 전체 동의 -->
         <div class="flex items-center mb-3 cursor-pointer" @click="toggleAll">
-          <div :class="['check-circle', { checked: allChecked }]" />
-          <span class="ml-2 text-sm font-medium">전체 동의합니다.</span>
+          <span
+            class="material-symbols-outlined text-lg rounded-full border-gray-400 w-5 h-5 flex items-center justify-center"
+            :class="agreements.terms ? 'bg-black text-white' : 'bg-gray-300 text-white'"
+          >
+            check
+          </span>
+          <span class="ml-2 text-sm">전체 동의합니다.</span>
         </div>
 
         <hr class="mb-3" />
 
         <!-- 개별 약관 항목 -->
         <ul class="space-y-2 text-sm text-gray-800">
+          <!-- 이용약관 -->
           <li class="flex items-center justify-between">
             <div class="flex items-center cursor-pointer" @click="toggleAgreement('terms')">
-              <div :class="['check-circle', { checked: agreements.terms }]" />
+              <span
+                class="material-symbols-outlined text-lg rounded-full border-gray-400 w-5 h-5 flex items-center justify-center"
+                :class="agreements.terms ? 'bg-black text-white' : 'bg-gray-300 text-white'"
+              >
+                check
+              </span>
               <span class="ml-2">이용약관에 동의합니다. (필수)</span>
             </div>
-            <button class="chevron-btn" @click.prevent="openModal('terms')">&gt;</button>
+            <span
+              class="material-symbols-outlined text-xs cursor-pointer"
+              @click="openModal('terms')"
+            >
+              arrow_forward_ios
+            </span>
           </li>
+
+          <!-- 개인정보 수집 -->
           <li class="flex items-center justify-between">
             <div class="flex items-center cursor-pointer" @click="toggleAgreement('privacy')">
-              <div :class="['check-circle', { checked: agreements.privacy }]" />
+              <span
+                class="material-symbols-outlined text-lg rounded-full border-gray-400 w-5 h-5 flex items-center justify-center"
+                :class="agreements.privacy ? 'bg-black text-white' : 'bg-gray-300 text-white'"
+              >
+                check
+              </span>
               <span class="ml-2">개인정보 수집 및 이용에 동의합니다. (필수)</span>
             </div>
-            <button class="chevron-btn" @click.prevent="openModal('privacy')">&gt;</button>
+            <span
+              class="material-symbols-outlined text-xs cursor-pointer"
+              @click="openModal('privacy')"
+            >
+              arrow_forward_ios
+            </span>
           </li>
+
+          <!-- 만 14세 이상 -->
           <li class="flex items-center justify-between">
             <div class="flex items-center cursor-pointer" @click="toggleAgreement('age')">
-              <div :class="['check-circle', { checked: agreements.age }]" />
+              <span
+                class="material-symbols-outlined text-lg rounded-full border-gray-400 w-5 h-5 flex items-center justify-center"
+                :class="agreements.age ? 'bg-black text-white' : 'bg-gray-300 text-white'"
+              >
+                check
+              </span>
               <span class="ml-2">만 14세 이상입니다. (필수)</span>
             </div>
           </li>
@@ -121,9 +190,11 @@ import InputField from '@/components/auth/InputField.vue'
 import BankAccountInput from '@/components/auth/BankAccountInput.vue'
 import RrnInput from '@/components/auth/RrnInput.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-
+import BaseButton from '../common/Button/BaseButton.vue'
 const router = useRouter()
-
+const isRrnVerified = ref(false)
+const isPhoneVerified = ref(false)
+const isAccountVerified = ref(false)
 const nickname = ref('')
 const rrnFront = ref('')
 const rrnBack = ref('')
@@ -149,7 +220,15 @@ const isFormValid = computed(
     isAccountValid.value &&
     allChecked.value,
 )
+const modalText = {
+  terms: '여기에 이용약관 내용을 작성하세요.\n\n예시: 이 서비스는 ...',
+  privacy: '여기에 개인정보 수집 및 이용에 대한 내용을 작성하세요.',
+}
 
+const openModal = (key) => {
+  activeModal.value = key
+  modalVisible.value = true
+}
 watch(agreedAll, (newVal) => {
   agreements.value.terms = newVal
   agreements.value.privacy = newVal
@@ -162,20 +241,30 @@ watch(
   },
   { deep: true },
 )
+const verifyRrn = () => {
+  if (isRrnValid.value) {
+    isRrnVerified.value = true
+  }
+}
 
+const verifyPhone = () => {
+  // 여기에 실제 인증 로직 넣으세요
+  isPhoneVerified.value = true
+}
+
+const verifyAccount = () => {
+  // 여기에 실제 인증 로직 넣으세요
+  isAccountVerified.value = true
+}
 // 모달
 const modalVisible = ref(false)
 const activeModal = ref('')
-const openModal = (key) => {
-  activeModal.value = key
-  modalVisible.value = true
-}
+// const openModal = (key) => {
+//   activeModal.value = key
+//   modalVisible.value = true
+// }
 const closeModal = () => {
   modalVisible.value = false
-}
-const modalText = {
-  terms: '여기에 이용약관 내용을 작성하세요.\n\n예시: 이 서비스는 ...',
-  privacy: '여기에 개인정보 수집 및 이용에 대한 내용을 작성하세요.',
 }
 
 const toggleAll = () => {
@@ -208,7 +297,7 @@ const handleSubmit = () => {
   height: 20px;
   border: 2px solid #999;
   border-radius: 50%;
-  background-color: white;
+  background-color: rgb(207, 207, 207);
   position: relative;
 }
 .check-circle.checked {
@@ -239,7 +328,7 @@ const handleSubmit = () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: #d3dae8; /* ← 여기 수정됨 */
   display: flex;
   justify-content: center;
   align-items: center;
