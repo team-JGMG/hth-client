@@ -10,21 +10,25 @@
       <span class="material-symbols-outlined text-2xl">chevron_left</span>
     </button>
     <BaseTypography class="flex-grow text-start text-2xl" weight="bold">
-      <BaseTypography class="flex-grow text-start text-2xl" weight="bold">
-        <slot></slot>
-      </BaseTypography>
+      <slot></slot>
     </BaseTypography>
   </header>
   <div class="h-20"></div>
 </template>
 <script setup>
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import { useRouter } from 'vue-router'
+import { usePropertyRegisterStore } from '@/stores/propertyRegister'
+import { useRouter, useRoute } from 'vue-router'
 
+const store = usePropertyRegisterStore()
 const router = useRouter()
+const route = useRoute()
 
 const goBack = () => {
-  router.go(-1)
+  if (route.name === 'property-register' && store.step > 1) {
+    store.goToPrevStep()
+  } else {
+    router.go(-1)
+  }
 }
 </script>
-<style scoped></style>
