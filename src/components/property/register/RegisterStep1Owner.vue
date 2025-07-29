@@ -4,9 +4,14 @@
 
     <!-- 이름 -->
     <div class="mb-12 relative">
-      <InputField v-model="store.ownerInfo.name" label="이름" placeholder="이름을 입력해주세요." />
+      <InputField
+        v-model="store.ownerInfo.name"
+        label="이름"
+        placeholder="이름을 입력해주세요."
+        @focus="touched.name = true"
+      />
       <BaseTypography
-        v-if="submitTried && !isNameValid"
+        v-if="touched.name && !isNameValid"
         color="red-1"
         size="xs"
         class="absolute mt-1 left-0 top-full"
@@ -21,14 +26,15 @@
         v-model="store.ownerInfo.phone"
         label="전화번호"
         placeholder="전화번호를 입력해주세요."
+        @focus="touched.phone = true"
       />
       <BaseTypography
-        v-if="submitTried && !isPhoneValid"
+        v-if="touched.phone && !isPhoneValid"
         color="red-1"
         size="xs"
         class="absolute mt-1 left-0 top-full"
       >
-        {{ isPhoneEmpty ? '* 필수 항목입니다.' : '* 전화번호 형식에 맞지 않습니다.' }}
+        {{ phoneRaw ? '* 전화번호 형식에 맞지 않습니다.' : '* 필수 항목입니다.' }}
       </BaseTypography>
     </div>
 
@@ -38,14 +44,15 @@
         v-model="store.ownerInfo.email"
         label="이메일"
         placeholder="이메일을 입력해주세요."
+        @focus="touched.email = true"
       />
       <BaseTypography
-        v-if="submitTried && !isEmailValid"
+        v-if="touched.email && !isEmailValid"
         color="red-1"
         size="xs"
         class="absolute mt-1 left-0 top-full"
       >
-        {{ isEmailEmpty ? '* 필수 항목입니다.' : '* 이메일 형식에 맞지 않습니다.' }}
+        {{ emailRaw ? '* 이메일 형식에 맞지 않습니다.' : '* 필수 항목입니다.' }}
       </BaseTypography>
     </div>
 
@@ -63,6 +70,8 @@
         <span class="ml-2 text-sm">전체 동의합니다.</span>
       </div>
 
+      <hr class="mb-3" />
+
       <ul class="space-y-1 text-sm text-gray-800">
         <li class="flex items-center justify-between cursor-pointer" @click="toggle('terms')">
           <div class="flex items-center">
@@ -74,7 +83,12 @@
             </span>
             <span class="ml-2">이용약관에 동의 합니다. (필수)</span>
           </div>
-          <span class="material-symbols-outlined text-base text-gray-400">chevron_right</span>
+          <span
+            class="material-symbols-outlined text-xs cursor-pointer"
+            @click="openModal('terms')"
+          >
+            arrow_forward_ios
+          </span>
         </li>
         <li class="flex items-center justify-between cursor-pointer" @click="toggle('privacy')">
           <div class="flex items-center">
@@ -86,7 +100,12 @@
             </span>
             <span class="ml-2">개인정보 수집 및 이용에 동의합니다. (필수)</span>
           </div>
-          <span class="material-symbols-outlined text-base text-gray-400">chevron_right</span>
+          <span
+            class="material-symbols-outlined text-xs cursor-pointer"
+            @click="openModal('terms')"
+          >
+            arrow_forward_ios
+          </span>
         </li>
         <li class="flex items-center justify-between cursor-pointer" @click="toggle('age')">
           <div class="flex items-center">
@@ -102,7 +121,7 @@
       </ul>
 
       <BaseTypography
-        v-if="submitTried && !allChecked"
+        v-if="isPartiallyChecked"
         color="red-1"
         size="xs"
         class="absolute mt-2 left-0 top-full"
@@ -113,13 +132,16 @@
 
     <!-- 다음 버튼 -->
     <div class="pb-28">
-      <BaseButton
-        class="w-full py-3 rounded font-semibold"
-        :class="isFormValid ? 'bg-black text-white' : 'bg-gray-300 text-gray-400'"
-        @click="handleSubmit"
+      <CompletedButton
+        :color="isStepValid ? 'black' : 'gray-300'"
+        :text-color="isStepValid ? 'white' : 'gray-400'"
+        :active-color="isStepValid ? 'gray-700' : 'gray-300'"
+        :disabled="!isStepValid"
+        class="w-full font-semibold py-3"
+        @click="handleNext"
       >
         다음
-      </BaseButton>
+      </CompletedButton>
     </div>
   </div>
 </template>
@@ -128,11 +150,18 @@
 import { ref, computed } from 'vue'
 import { usePropertyRegisterStore } from '@/stores/propertyRegister'
 import InputField from '@/components/auth/InputField.vue'
-import BaseButton from '@/components/common/Button/BaseButton.vue'
+import CompletedButton from '@/components/common/Button/CompletedButton.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 
 const store = usePropertyRegisterStore()
-const submitTried = ref(false)
+
+// const submitTried = ref(false)
+
+const touched = ref({
+  name: false,
+  phone: false,
+  email: false,
+})
 
 const agreements = store.ownerInfo.agreements
 
@@ -145,6 +174,12 @@ const toggleAll = () => {
   agreements.privacy = next
   agreements.age = next
 }
+
+const isPartiallyChecked = computed(() => {
+  const count = [agreements.terms, agreements.privacy, agreements.age].filter(Boolean).length
+  return count > 0 && count < 3
+})
+
 const allChecked = computed(() => agreements.terms && agreements.privacy && agreements.age)
 
 const nameRaw = computed(() => store.ownerInfo.name.trim())
@@ -152,30 +187,21 @@ const phoneRaw = computed(() => store.ownerInfo.phone.trim())
 const emailRaw = computed(() => store.ownerInfo.email.trim())
 
 const isNameValid = computed(() => nameRaw.value.length > 0)
-
-const isPhoneEmpty = computed(() => phoneRaw.value === '')
-const isPhoneFormatWrong = computed(
-  () => phoneRaw.value !== '' && !/^01[0-9]{8,9}$/.test(phoneRaw.value),
+const isPhoneValid = computed(() => phoneRaw.value !== '' && /^01[0-9]{8,9}$/.test(phoneRaw.value))
+const isEmailValid = computed(
+  () => emailRaw.value !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailRaw.value),
 )
 
-const isEmailEmpty = computed(() => emailRaw.value === '')
-const isEmailFormatWrong = computed(
-  () => emailRaw.value !== '' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailRaw.value),
+const isStepValid = computed(
+  () => isNameValid.value && isPhoneValid.value && isEmailValid.value && allChecked.value,
 )
 
-const isFormValid = computed(
-  () =>
-    isNameValid.value &&
-    !isPhoneEmpty.value &&
-    !isPhoneFormatWrong.value &&
-    !isEmailEmpty.value &&
-    !isEmailFormatWrong.value &&
-    allChecked.value,
-)
-
-const handleSubmit = () => {
-  submitTried.value = true
-  if (isFormValid.value) {
+const handleNext = () => {
+  // submitTried.value = true
+  // touched.value.name = true
+  // touched.value.phone = true
+  // touched.value.email = true
+  if (isStepValid.value) {
     store.goToNextStep()
   }
 }

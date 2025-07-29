@@ -3,10 +3,10 @@
     <BaseTypography class="text-xl font-bold mb-6">매물 상세 정보를 입력해주세요.</BaseTypography>
 
     <!-- 매물 유형 -->
-    <div class="mb-8 relative">
+    <div class="mb-12 relative">
+      <BaseTypography class="mb-2">매물 유형</BaseTypography>
       <InputSelect
         v-model="store.propertyDetail.type"
-        label="매물 유형"
         placeholder="매물 유형을 선택해주세요."
         :options="propertyTypes"
       />
@@ -16,24 +16,54 @@
         size="xs"
         class="absolute mt-1 left-0 top-full"
       >
-        * 매물 유형을 선택해주세요.
+        * 필수 항목입니다. 매물 유형을 선택해주세요.
       </BaseTypography>
     </div>
 
     <!-- 구조 -->
-    <div class="mb-8 grid grid-cols-3 gap-2">
-      <InputField v-model="store.propertyDetail.roomCount" placeholder="방 수" type="number" />
-      <InputField
-        v-model="store.propertyDetail.bathroomCount"
-        placeholder="욕실 수"
-        type="number"
-      />
-      <InputField v-model="store.propertyDetail.floor" placeholder="해당 층 수" type="number" />
+    <div class="mb-8 relative">
+      <BaseTypography class="mb-2">해당 층 수</BaseTypography>
+      <div class="flex items-center w-full gap-3">
+        <span class="material-symbols-outlined -translate-y-2"> stairs_2 </span>
+        <div class="flex-1">
+          <InputField v-model="store.propertyDetail.floor" type="number" />
+        </div>
+        <span class="text-base text-black -translate-y-2">층</span>
+      </div>
+    </div>
+
+    <!-- 방 수 & 욕실 수 -->
+    <div class="mb-10 relative">
+      <div class="flex items-center w-full gap-4">
+        <!-- 방 수 -->
+        <div class="flex items-center gap-2 w-1/2">
+          <span class="material-symbols-outlined -translate-y-2"> bedroom_child </span>
+          <span class="text-base text-black whitespace-nowrap -translate-y-2">방 수</span>
+          <InputField
+            v-model="store.propertyDetail.roomCount"
+            type="number"
+            class="flex-1"
+            placeholder="방 수"
+          />
+        </div>
+
+        <!-- 욕실 수 -->
+        <div class="flex items-center gap-2 w-1/2">
+          <span class="material-symbols-outlined -translate-y-2"> bathroom </span>
+          <span class="text-base text-black whitespace-nowrap -translate-y-2">욕실 수</span>
+          <InputField
+            v-model="store.propertyDetail.bathroomCount"
+            type="number"
+            class="flex-1"
+            placeholder="욕실 수"
+          />
+        </div>
+      </div>
     </div>
 
     <!-- 해시태그 선택 -->
-    <div class="mb-8">
-      <BaseTypography class="mb-2 text-sm font-medium">해시태그 선택</BaseTypography>
+    <div class="mb-12">
+      <BaseTypography class="mb-2 text-base font-medium">해시태그 선택</BaseTypography>
       <div class="flex flex-wrap gap-2">
         <button
           v-for="tag in hashtagOptions"
@@ -52,8 +82,8 @@
     </div>
 
     <!-- 세부 정보 -->
-    <div class="mb-8 relative">
-      <BaseTypography class="mb-2 text-sm font-medium">세부 정보 입력</BaseTypography>
+    <div class="mb-12 relative">
+      <BaseTypography class="mb-2 text-base font-medium">세부 정보 입력</BaseTypography>
       <textarea
         v-model="store.propertyDetail.memo"
         class="w-full border rounded-lg p-3 text-sm resize-none h-32 focus:outline-none focus:ring focus:ring-black/30"
@@ -63,7 +93,7 @@
 
     <!-- 매물 사진 첨부 -->
     <div class="mb-12">
-      <label class="text-sm font-medium block mb-2">매물 사진 첨부</label>
+      <label class="text-base font-medium block mb-2">매물 사진 첨부</label>
       <input type="file" class="hidden" id="fileInput" @change="handleFile" />
       <label
         for="fileInput"
@@ -74,13 +104,18 @@
     </div>
 
     <!-- 다음 버튼 -->
-    <BaseButton
-      class="w-full py-3 rounded font-semibold"
-      :class="isStepValid ? 'bg-black text-white' : 'bg-gray-300 text-gray-400'"
-      @click="handleNext"
-    >
-      다음
-    </BaseButton>
+    <div class="pb-28">
+      <CompletedButton
+        :color="isStepValid ? 'black' : 'gray-300'"
+        :text-color="isStepValid ? 'white' : 'gray-400'"
+        :active-color="isStepValid ? 'gray-700' : 'gray-300'"
+        :disabled="!isStepValid"
+        class="w-full font-semibold py-3"
+        @click="handleNext"
+      >
+        다음
+      </CompletedButton>
+    </div>
   </div>
 </template>
 
@@ -90,19 +125,22 @@ import { usePropertyRegisterStore } from '@/stores/propertyRegister'
 import InputField from '@/components/auth/InputField.vue'
 import InputSelect from '@/components/common/Select/InputSelect.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import BaseButton from '@/components/common/Button/BaseButton.vue'
-
+import CompletedButton from '@/components/common/Button/CompletedButton.vue'
 const store = usePropertyRegisterStore()
 const submitTried = ref(false)
 
-const propertyTypes = ['아파트', '오피스텔', '상가', '토지', '주택']
+const propertyTypes = ['아파트']
 const hashtagOptions = [
   '#신축',
-  '#채광 좋음',
-  '#오픈 확률 높음',
+  '#냠향',
+  '#편세권',
   '#역세권',
+  '#학세권',
+  '#숲세권',
   '#대형 마트',
   '#개발 지역',
+  '#한강뷰',
+  '#투자가치',
 ]
 
 const toggleTag = (tag) => {

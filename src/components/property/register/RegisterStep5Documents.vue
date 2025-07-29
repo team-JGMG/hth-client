@@ -2,11 +2,11 @@
   <div class="w-full max-w-md mx-auto px-4 pb-32">
     <BaseTypography class="text-xl font-bold mb-6"> 매물 관련 서류를 입력해주세요. </BaseTypography>
 
-    <div v-for="(doc, index) in documentFields" :key="index" class="mb-6">
-      <BaseTypography class="mb-1 text-sm font-medium">{{ doc.label }}</BaseTypography>
+    <div v-for="(doc, index) in documentFields" :key="index" class="mb-12">
+      <BaseTypography class="mb-1 text-base font-medium">{{ doc.label }}</BaseTypography>
 
       <div class="flex items-center justify-between border-b py-2">
-        <span class="text-gray-500 text-sm">
+        <span class="text-gray-500 text-base">
           {{ documents[index]?.name || '파일명.jpg' }}
         </span>
         <label class="cursor-pointer">
@@ -16,16 +16,26 @@
       </div>
     </div>
 
-    <BaseButton class="w-full mt-10 py-3 rounded font-semibold" @click="handleSubmit">
-      등록하기
-    </BaseButton>
+    <!-- 등록하기 버튼 -->
+    <div class="pb-28">
+      <CompletedButton
+        :color="isStepValid ? 'black' : 'gray-300'"
+        :text-color="isStepValid ? 'white' : 'gray-400'"
+        :active-color="isStepValid ? 'gray-700' : 'gray-300'"
+        :disabled="!isStepValid"
+        class="w-full font-semibold py-3"
+        @click="handleNext"
+      >
+        등록하기
+      </CompletedButton>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import BaseButton from '@/components/common/Button/BaseButton.vue'
+import CompletedButton from '@/components/common/Button/CompletedButton.vue'
 import { usePropertyRegisterStore } from '@/stores/propertyRegister'
 import { useRouter } from 'vue-router'
 
