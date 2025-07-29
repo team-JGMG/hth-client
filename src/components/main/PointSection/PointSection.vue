@@ -29,8 +29,7 @@ const fetchUserDataAndPoints = async () => {
       return
     }
 
-    const response = await fetch('/points/history/1', {
-      // 실제 userId 경로로 변경
+    const response = await fetch('/api/users/me', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -49,18 +48,22 @@ const fetchUserDataAndPoints = async () => {
     }
 
     const data = await response.json()
-    const fetchedUserName = data.user_name || data.username || ''
+    console.log('✅ 사용자 정보:', data)
+    const fetchedUserName = data.name || data.username || ''
     const fetchedPoints = data.current_balance || data.total_points || 0
+
+    console.log('🧾 저장할 이름:', fetchedUserName)
+    console.log('💰 저장할 포인트:', fetchedPoints)
 
     userStore.setUserName(fetchedUserName)
     userStore.setUserPoints(fetchedPoints)
   } catch (error) {
-    console.error('사용자 데이터 및 포인트를 가져오지 못했습니다:', error)
+    console.error('사용자 정보를 가져오지 못했습니다:', error)
     userStore.clearUserData()
   }
 }
 
 onMounted(() => {
-  // fetchUserDataAndPoints()
+  fetchUserDataAndPoints()
 })
 </script>
