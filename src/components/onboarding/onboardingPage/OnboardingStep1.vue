@@ -26,9 +26,9 @@
           class="flex flex-col items-end mr-6 gap-3 absolute inset-0 justify-center"
         >
           <img
-            src="@/assets/images/logo/longlogo.svg"
+            src="@/assets/images/logo/longlogo.png"
             alt="로고"
-            class="w-36 h-auto mt-20"
+            class="w-44 h-auto mt-20"
             @error="handleImageError"
           />
 
