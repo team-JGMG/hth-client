@@ -5,14 +5,18 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import router from './router'
 import { useKakao } from 'vue3-kakao-maps'
-
 useKakao('4215b6b611faa29a4ce872b00b8f8e8b', { libraries: ['services'] })
-const app = createApp(App)
-app.use(createPinia())
-app.use(router)
 
-document.fonts.load('24px "Material Icons"').then(() => {
-  document.documentElement.classList.add('material-icons-loaded')
+// ✅ 폰트 로딩 후 .icons-loaded 클래스 추가 → Vue 마운트
+Promise.all([
+  document.fonts.load('24px "Material Symbols Outlined"'),
+  document.fonts.load('24px "Material Symbols Rounded"'),
+  document.fonts.load('24px "Material Symbols Sharp"'),
+]).then(() => {
+  document.documentElement.classList.add('icons-loaded')
+
+  const app = createApp(App)
+  app.use(createPinia())
+  app.use(router)
+  app.mount('#app')
 })
-
-app.mount('#app')
