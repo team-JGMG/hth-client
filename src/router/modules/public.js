@@ -1,4 +1,5 @@
 import HomePage from '@/pages/HomePage.vue'
+import OnboardingPage from '@/pages/onboarding/OnboardingPage.vue'
 
 export default [
   {
@@ -6,5 +7,5 @@ export default [
     name: 'home',
     component: HomePage,
   },
-  // 404 Not Found 라우트 추가
+  { path: '/onboarding', name: 'OnboardingPage', component: OnboardingPage },
 ]
