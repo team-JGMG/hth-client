@@ -11,4 +11,8 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 
+document.fonts.load('24px "Material Icons"').then(() => {
+  document.documentElement.classList.add('material-icons-loaded')
+})
+
 app.mount('#app')

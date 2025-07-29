@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+.material-icons {
+  visibility: hidden;
+  transition: visibility 0.2s ease;
+}
+
+.material-icons-loaded .material-icons {
+  visibility: visible;
+}
+
 @font-face {
   font-family: 'Pretendard';
   font-weight: 900;
