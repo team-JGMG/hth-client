@@ -19,6 +19,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useOnboardingStore } from '@/stores/onboarding'
+
 import StepIndicator from '@/components/onboarding/StepIndicator.vue'
 import CompletedButton from '@/components/common/Button/CompletedButton.vue'
 import OnboardingStep1 from '@/components/onboarding/onboardingPage/OnboardingStep1.vue'
@@ -28,6 +30,7 @@ import OnboardingStep4 from '@/components/onboarding/onboardingPage/OnboardingSt
 import OnboardingStep5 from '@/components/onboarding/onboardingPage/OnboardingStep5.vue'
 
 const router = useRouter()
+const onboardingStore = useOnboardingStore()
 const step = ref(1)
 
 const stepComponents = [
@@ -44,12 +47,11 @@ const nextStep = () => {
   if (step.value < 5) {
     step.value++
   } else {
-    localStorage.setItem('hasVisited', 'true')
-    router.push('/')
+    onboardingStore.completeOnboarding()
+    router.replace('/') // push도 가능, 둘 다 OK
   }
 }
 </script>
-
 <style scoped>
 .slide-enter-active,
 .slide-leave-active {
