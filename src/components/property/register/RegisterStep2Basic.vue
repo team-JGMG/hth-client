@@ -8,9 +8,10 @@
         v-model="store.propertyBasic.title"
         label="매물명"
         placeholder="매물명을 입력해주세요."
+        @focus="touched.title = true"
       />
       <BaseTypography
-        v-if="submitTried && !store.propertyBasic.title.trim()"
+        v-if="touched.title && !titleValid"
         color="red-1"
         size="xs"
         class="absolute mt-1 left-0 top-full"
@@ -21,7 +22,7 @@
 
     <!-- 주소 -->
     <div class="mb-12 relative">
-      <div class="flex items-center gap-1 mb-0">
+      <div class="flex items-center gap-2">
         <InputField
           v-model="store.propertyBasic.zipcode"
           label="매물 주소 조회"
@@ -29,23 +30,25 @@
           class="flex-1"
           readonly
         />
-        <BaseButton class="h-[38px] bg-gray-500 hover:bg-gray-600 text-sm" @click="searchAddress"
-          >주소 검색</BaseButton
-        >
+        <BaseButton class="h-[38px] bg-gray-600 hover:bg-gray-600 text-sm" @click="searchAddress">
+          주소 검색
+        </BaseButton>
       </div>
       <InputField
         v-model="store.propertyBasic.address"
         placeholder="주소를 입력해주세요."
-        class="mt-1"
+        class="mt-1 mb-7"
         readonly
+        @focus="touched.address = true"
       />
       <InputField
         v-model="store.propertyBasic.detailAddress"
         placeholder="상세주소를 입력해주세요."
         class="mt-1"
+        @focus="touched.detailAddress = true"
       />
       <BaseTypography
-        v-if="submitTried && (!store.propertyBasic.address || !store.propertyBasic.detailAddress)"
+        v-if="(touched.address || touched.detailAddress) && (!addressValid || !detailAddressValid)"
         color="red-1"
         size="xs"
         class="absolute mt-1 left-0 top-full"
@@ -56,48 +59,61 @@
 
     <!-- 매물 크기 -->
     <div class="mb-12 relative">
-      <InputField
-        v-model="store.propertyBasic.size"
-        label="매물 크기"
-        placeholder="면적을 입력해주세요."
-      />
+      <div class="flex items-center w-full gap-3">
+        <div class="flex-1">
+          <InputField
+            v-model="store.propertyBasic.size"
+            label="매물 크기"
+            placeholder="면적을 입력해주세요."
+            @focus="touched.size = true"
+          />
+        </div>
+        <span class="text-base text-black translate-y-2">㎡</span>
+      </div>
       <BaseTypography
-        v-if="submitTried && !/^[0-9]+$/.test(store.propertyBasic.size)"
+        v-if="touched.size && !sizeValid"
         color="red-1"
         size="xs"
         class="absolute mt-1 left-0 top-full"
       >
-        * 숫자만 입력해주세요.
+        {{ store.propertyBasic.size.trim() ? '* 숫자만 입력해주세요.' : '* 필수 항목입니다.' }}
       </BaseTypography>
     </div>
 
     <!-- 희망 매매가 -->
     <div class="mb-12 relative">
-      <InputField
-        v-model="store.propertyBasic.price"
-        label="희망 매매가"
-        placeholder="금액을 입력해주세요."
-      />
+      <div class="flex items-center w-full gap-3">
+        <div class="flex-1">
+          <InputField
+            v-model="store.propertyBasic.price"
+            label="희망 매매가"
+            placeholder="금액을 입력해주세요."
+            @focus="touched.price = true"
+          />
+        </div>
+        <span class="text-base text-black translate-y-2">원</span>
+      </div>
       <BaseTypography
-        v-if="submitTried && !/^[0-9]+$/.test(store.propertyBasic.price)"
+        v-if="touched.price && !priceValid"
         color="red-1"
         size="xs"
         class="absolute mt-1 left-0 top-full"
       >
-        * 숫자만 입력해주세요.
+        {{ store.propertyBasic.price.trim() ? '* 숫자만 입력해주세요.' : '* 필수 항목입니다.' }}
       </BaseTypography>
     </div>
 
-    <!-- 공고 기간 (날짜 선택 추가 필요) -->
+    <!-- 공고 기간 -->
     <div class="mb-12 relative">
       <InputField
         v-model="store.propertyBasic.period"
         label="희망 공고 기간"
         type="date"
         placeholder="날짜를 선택해주세요."
+        @focus="touched.period = true"
       />
       <BaseTypography
-        v-if="submitTried && !store.propertyBasic.period"
+        v-if="touched.period && !periodValid"
         color="red-1"
         size="xs"
         class="absolute mt-1 left-0 top-full"
@@ -107,13 +123,18 @@
     </div>
 
     <!-- 다음 버튼 -->
-    <BaseButton
-      class="w-full py-3 rounded font-semibold"
-      :class="isStepValid ? 'bg-black text-white' : 'bg-gray-300 text-gray-400'"
-      @click="handleNext"
-    >
-      다음
-    </BaseButton>
+    <div class="pb-28">
+      <CompletedButton
+        :color="isStepValid ? 'black' : 'gray-300'"
+        :text-color="isStepValid ? 'white' : 'gray-400'"
+        :active-color="isStepValid ? 'gray-700' : 'gray-300'"
+        :disabled="!isStepValid"
+        class="w-full font-semibold py-3"
+        @click="handleNext"
+      >
+        다음
+      </CompletedButton>
+    </div>
   </div>
 </template>
 
@@ -123,30 +144,45 @@ import { usePropertyRegisterStore } from '@/stores/propertyRegister'
 import InputField from '@/components/auth/InputField.vue'
 import BaseButton from '@/components/common/Button/BaseButton.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
+import CompletedButton from '@/components/common/Button/CompletedButton.vue'
 
 const store = usePropertyRegisterStore()
-const submitTried = ref(false)
 
+const touched = ref({
+  title: false,
+  address: false,
+  detailAddress: false,
+  size: false,
+  price: false,
+  period: false,
+})
+
+// 주소 검색 임시 처리
 const searchAddress = () => {
-  // TODO: 실제 다음 주소 API 연동
   store.propertyBasic.zipcode = '12345'
   store.propertyBasic.address = '서울시 강남구 테헤란로 123'
 }
 
-const isStepValid = computed(() => {
-  const p = store.propertyBasic
-  return (
-    p.title.trim() &&
-    p.address &&
-    p.detailAddress &&
-    /^[0-9]+$/.test(p.size) &&
-    /^[0-9]+$/.test(p.price) &&
-    !!p.period
-  )
-})
+// 유효성 검사
+const titleValid = computed(() => store.propertyBasic.title.trim() !== '')
+const addressValid = computed(() => store.propertyBasic.address.trim() !== '')
+const detailAddressValid = computed(() => store.propertyBasic.detailAddress.trim() !== '')
+const sizeValid = computed(() => /^[0-9]+$/.test(store.propertyBasic.size.trim()))
+const priceValid = computed(() => /^[0-9]+$/.test(store.propertyBasic.price.trim()))
+const periodValid = computed(() => !!store.propertyBasic.period)
+
+const isStepValid = computed(
+  () =>
+    titleValid.value &&
+    addressValid.value &&
+    detailAddressValid.value &&
+    sizeValid.value &&
+    priceValid.value &&
+    periodValid.value,
+)
 
 const handleNext = () => {
-  submitTried.value = true
+  Object.keys(touched.value).forEach((key) => (touched.value[key] = true))
   if (isStepValid.value) {
     store.goToNextStep()
   }
