@@ -1,8 +1,8 @@
 <template>
-  <component :is="currentComponent" :key="step" />
-
-  <StepIndicator :currentStep="step" :totalSteps="5" />
-
+  <Transition name="slide" mode="out-in">
+    <component :is="currentComponent" :key="step" />
+  </Transition>
+  <StepIndicator :currentStep="step" :totalSteps="5" class="mt-6" />
   <div class="max-w-xs mx-auto">
     <CompletedButton
       color="black"
@@ -53,7 +53,7 @@ const nextStep = () => {
 <style scoped>
 .slide-enter-active,
 .slide-leave-active {
-  transition: transform 0.4s ease;
+  transition: transform 0.2s ease;
 }
 .slide-enter-from {
   transform: translateX(100%);

@@ -1,40 +1,38 @@
 <template>
   <div class="flex flex-col items-center justify-between min-h-[80vh] text-center">
-    <!-- 애니메이션 영역 -->
     <div class="relative w-full h-96 top-10">
-      <!-- 1번 이미지 -->
       <transition name="fade" appear>
         <img
           v-if="show1"
           src="@/assets/images/character/onboarding2.png"
-          alt="집앞"
-          class="w-60 absolute top-[160px] right-[80px]"
+          alt="집뒤"
+          class="w-56 absolute top-[200px] left-[16px]"
         />
       </transition>
 
-      <!-- 2번 이미지 -->
       <transition name="fade" appear>
         <img
           v-if="show2"
           src="@/assets/images/character/onboarding1.png"
           alt="집옆"
-          class="w-28 absolute top-[40px] right-[20px]"
+          class="w-36 absolute top-[80px] right-[40px]"
+          style="transform: scaleX(-1) rotate(10deg)"
         />
       </transition>
 
-      <!-- 3번: 로고 + 목업 이미지 -->
       <transition name="slide-fade" appear>
-        <div v-if="show3" class="flex flex-col items-center gap-3 absolute inset-0 justify-center">
-          <!-- 로고 -->
+        <div
+          v-if="show3"
+          class="flex flex-col items-end mr-6 gap-3 absolute inset-0 justify-center"
+        >
           <img
             src="@/assets/images/logo/longlogo.svg"
             alt="로고"
-            class="w-32 h-auto mt-32"
+            class="w-36 h-auto mt-20"
             @error="handleImageError"
           />
 
-          <!-- 목업 이미지 -->
-          <div class="mt-8">
+          <div class="mt-8 self-start">
             <img
               src="@/assets/images/mockup.png"
               alt="앱 화면"
@@ -46,14 +44,13 @@
       </transition>
     </div>
 
-    <!-- 고정된 텍스트 (항상 표시) -->
-    <div class="mt-20">
-      <BaseTypography size="xl" weight="bold" class="mb-2 break-keep"
+    <div class="mt-10">
+      <BaseTypography size="2xl" weight="bold" class="mb-2 break-keep"
         >반의 반으로 시작하는 건물 투자</BaseTypography
       >
-      <BaseTypography size="sm" color="gray-1" class="leading-relaxed mb-6 break-keep">
-        큰돈 없어도 누구나 부동산 투자, <br />
-        반의 반집으로 시작해보세요.
+      <BaseTypography size="base" color="black" class="leading-relaxed mb-12 break-keep">
+        큰 돈 없이도 누구나! <br />
+        부동산 투자, 반의 반집으로 시작해보세요.
       </BaseTypography>
     </div>
   </div>
@@ -69,16 +66,8 @@ const show1 = ref(false)
 const show2 = ref(false)
 const show3 = ref(false)
 
-// 이미지 로드 에러 핸들링
 const handleImageError = (event) => {
   console.error('이미지 로드 실패:', event.target.src)
-}
-
-// 다음 버튼 클릭 핸들러
-const handleNext = () => {
-  // 다음 페이지로 이동하는 로직
-  console.log('다음 버튼 클릭됨')
-  // 예: router.push('/onboarding/step2')
 }
 
 onMounted(() => {
@@ -93,7 +82,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* 기본 페이드 */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.6s ease;
@@ -103,7 +91,6 @@ onMounted(() => {
   opacity: 0;
 }
 
-/* 위로 올라오며 페이드 */
 .slide-fade-enter-active {
   transition: all 0.8s ease;
 }
@@ -112,7 +99,6 @@ onMounted(() => {
   transform: translateY(30px);
 }
 
-/* 애니메이션 영역 제한 */
 .animation-container {
   overflow: hidden;
 }
