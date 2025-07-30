@@ -38,23 +38,28 @@ const pointLogs = [
 const groupedLogs = computed(() => {
   const yearMap = new Map()
 
-const handleCharge = (amount) => {
-  console.log('충전 금액:', amount)
-  isChargeModalOpen.value = false
-}
+  pointLogs.forEach((log) => {
+    const year = log.date.slice(0, 4)
+    if (!yearMap.has(year)) yearMap.set(year, [])
+    yearMap.get(year).push(log)
+  })
 
-const handleWithdraw = (amount) => {
-  console.log('환급 금액:', amount)
-  isWithdrawModalOpen.value = false
-}
+  return [...yearMap.entries()].sort((a, b) => b[0] - a[0]).map(([year, logs]) => ({ year, logs }))
+})
 </script>
-
 <template>
-  <div class="p-4 min-h-[600px]">
-    <!-- 포인트 관리 버튼 -->
-    <div class="flex justify-between mb-6">
-      <button
-        class="flex-1 mr-2 py-2 bg-green-100 border-2 border-green-400 text-green-700 rounded-lg"
+  <div class="p-4 min-h-[600px] space-y-6">
+    <div v-for="group in groupedLogs" :key="group.year">
+      <BaseTypography class="text-sm text-gray-500"> {{ group.year }}년 </BaseTypography>
+
+      <!-- 항목 전체 -->
+      <div
+        v-for="(log, idx) in group.logs"
+        :key="idx"
+        :class="[
+          'flex items-center gap-4 rounded-md px-3 h-[72px] overflow-hidden',
+          idx % 2 === 0 ? 'bg-gray-100' : 'bg-white',
+        ]"
       >
         <!-- 날짜 -->
         <!-- 날짜 -->
@@ -94,17 +99,5 @@ const handleWithdraw = (amount) => {
         </BaseTypography>
       </div>
     </div>
-
-    <!-- 모달 컴포넌트 -->
-    <ChargePointModal
-      :isOpen="isChargeModalOpen"
-      @close="isChargeModalOpen = false"
-      @submit="handleCharge"
-    />
-    <WithdrawPointModal
-      :isOpen="isWithdrawModalOpen"
-      @close="isWithdrawModalOpen = false"
-      @submit="handleWithdraw"
-    />
   </div>
 </template>
