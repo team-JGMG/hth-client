@@ -165,11 +165,7 @@ const waitingItems = trades.filter((t) => t.status === '거래 대기')
 </script>
 <template>
   <div class="p-4 min-h-[600px]">
-    <div v-for="(group, idx) in investmentGroups" :key="idx">
-      <!-- 그룹 타이틀 -->
-      <BaseTypography class="font-bold text-base mb-2">
-        {{ group.title }}
-      </BaseTypography>
+    <NoInvestmentItems v-if="!fundingItems.length && !ownedItems.length && !waitingItems.length" />
 
     <!-- 펀딩 중인 매물 -->
     <div v-if="fundingItems.length" class="space-y-4 mb-6">

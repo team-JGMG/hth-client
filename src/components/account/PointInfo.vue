@@ -47,6 +47,7 @@ const groupedLogs = computed(() => {
   return [...yearMap.entries()].sort((a, b) => b[0] - a[0]).map(([year, logs]) => ({ year, logs }))
 })
 </script>
+
 <template>
   <div class="p-4 min-h-[600px]">
     <!-- 포인트 관리 버튼 -->
@@ -92,5 +93,17 @@ const groupedLogs = computed(() => {
         </BaseTypography>
       </div>
     </div>
+
+    <!-- 모달 컴포넌트 -->
+    <ChargePointModal
+      :isOpen="isChargeModalOpen"
+      @close="isChargeModalOpen = false"
+      @submit="handleCharge"
+    />
+    <WithdrawPointModal
+      :isOpen="isWithdrawModalOpen"
+      @close="isWithdrawModalOpen = false"
+      @submit="handleWithdraw"
+    />
   </div>
 </template>
