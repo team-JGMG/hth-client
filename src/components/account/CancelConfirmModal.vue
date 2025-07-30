@@ -24,12 +24,8 @@
         <BaseTypography tag="div" size="base" weight="bold" class="mb-3">
           정말 취소하시겠습니까?
         </BaseTypography>
-        <BaseTypography tag="div" size="base" weight="bold" class="mb-3">
-          정말 취소하시겠습니까?
-        </BaseTypography>
 
         <!-- 본문 안내 -->
-
         <BaseTypography tag="p" size="sm" color="gray-2">
           취소 시 참여 금액은 포인트로 환불되며,<br />
           다른 ‘반의반집’ 매물로 새로운 투자를 시작할 수 있습니다.
