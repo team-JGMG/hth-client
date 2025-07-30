@@ -99,5 +99,17 @@ const groupedLogs = computed(() => {
         </BaseTypography>
       </div>
     </div>
+
+    <!-- 모달 컴포넌트 -->
+    <ChargePointModal
+      :isOpen="isChargeModalOpen"
+      @close="isChargeModalOpen = false"
+      @submit="handleCharge"
+    />
+    <WithdrawPointModal
+      :isOpen="isWithdrawModalOpen"
+      @close="isWithdrawModalOpen = false"
+      @submit="handleWithdraw"
+    />
   </div>
 </template>
