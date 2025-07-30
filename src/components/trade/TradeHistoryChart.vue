@@ -50,11 +50,21 @@ onMounted(() => {
     ],
     tooltip: {
       trigger: 'axis',
-      triggerOn: 'mousemove',
+      triggerOn: 'mousemove', // hover 시 활성화
+      showDelay: 0, // 지연 시간 없음
+      hideDelay: 100, // 숨김 지연 시간
+      enterable: false, // 툴팁 내부로 마우스 진입 방지
+      confine: true, // 차트 영역 내에 툴팁 표시
       axisPointer: {
         type: 'line',
         axis: 'x',
+        snap: true, // 가장 가까운 데이터 포인트에 스냅
         lineStyle: {
+          color: '#999',
+          width: 1,
+          type: 'solid',
+        },
+        crossStyle: {
           color: '#999',
           width: 1,
           type: 'solid',
@@ -113,7 +123,9 @@ onMounted(() => {
         type: 'line',
         data: prices,
         smooth: true,
-        showSymbol: false,
+        showSymbol: true, // hover 감지를 위해 활성화
+        symbolSize: 0, // 보이지 않게 설정
+        hoverAnimation: true,
         lineStyle: {
           color: '#0057FF',
           width: 2,
