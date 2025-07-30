@@ -5,7 +5,7 @@
       @click="onBackdropClick"
       class="fixed inset-0 z-[9999] bg-black bg-opacity-40 flex items-center justify-center"
     >
-      <div @click.stop class="w-[45vw] h-[39vw] bg-white rounded-xl p-6 relative">
+      <div @click.stop class="w-[400px] max-w-[90vw] bg-white rounded-xl p-6 relative">
         <!-- 닫기 버튼 -->
         <button
           type="button"
