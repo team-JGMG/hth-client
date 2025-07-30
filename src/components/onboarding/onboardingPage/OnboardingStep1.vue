@@ -1,12 +1,12 @@
 <template>
   <div class="flex flex-col items-center justify-between min-h-[80vh] text-center">
-    <div class="relative w-full h-96 top-10">
+    <div class="relative w-full h-80 top-5">
       <transition name="fade" appear>
         <img
           v-if="show1"
           src="@/assets/images/character/onboarding2.png"
           alt="집뒤"
-          class="w-56 absolute top-[200px] left-[16px]"
+          class="w-56 absolute top-28 left-1"
         />
       </transition>
 
@@ -15,28 +15,25 @@
           v-if="show2"
           src="@/assets/images/character/onboarding1.png"
           alt="집옆"
-          class="w-36 absolute top-[80px] right-[40px]"
+          class="w-36 absolute top-12 right-12"
           style="transform: scaleX(-1) rotate(10deg)"
         />
       </transition>
 
       <transition name="slide-fade" appear>
-        <div
-          v-if="show3"
-          class="flex flex-col items-end mr-6 gap-3 absolute inset-0 justify-center"
-        >
+        <div v-if="show3" class="flex flex-col items-end mr-4 absolute inset-0 justify-center">
           <img
             src="@/assets/images/logo/longlogo.png"
             alt="로고"
-            class="w-44 h-auto mt-20"
+            class="w-44 h-auto mt-16"
             @error="handleImageError"
           />
 
-          <div class="mt-8 self-start">
+          <div class="mt-0 self-start">
             <img
               src="@/assets/images/mockup.png"
               alt="앱 화면"
-              class="w-[400px] max-w-full h-auto"
+              class="w-[300px] max-w-full h-auto"
               @error="handleImageError"
             />
           </div>
@@ -84,7 +81,7 @@ onMounted(() => {
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.6s ease;
+  transition: opacity 0.3s ease-out;
 }
 .fade-enter-from,
 .fade-leave-to {
@@ -92,15 +89,11 @@ onMounted(() => {
 }
 
 .slide-fade-enter-active {
-  transition: all 0.8s ease;
+  transition: all 0.3s ease-out;
 }
 .slide-fade-enter-from {
   opacity: 0;
-  transform: translateY(30px);
-}
-
-.animation-container {
-  overflow: hidden;
+  transform: translateY(10px); /* 더 작게 올라오게 */
 }
 
 img {

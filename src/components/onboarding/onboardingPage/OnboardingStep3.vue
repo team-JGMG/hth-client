@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col items-center justify-between min-h-[80vh] text-center">
-    <div class="relative w-full h-96 top-12">
+    <div class="relative w-full h-80 top-12">
       <transition name="slide-fade-up" appear>
         <img
           src="@/assets/images/onboarding/onboarding7.png"
@@ -33,11 +33,10 @@ defineOptions({ name: 'OnboardingStep1' })
   @apply w-[260px] absolute left-1/2 top-2/3;
   transform: translate(-50%, -50%);
 }
-
 .slide-fade-up-enter-active {
   transition:
-    opacity 0.6s ease 0.4s,
-    transform 0.6s ease 0.4s;
+    opacity 0.3s ease-out 0.1s,
+    transform 0.3s ease-out 0.1s;
 }
 .slide-fade-up-enter-from {
   opacity: 0;
