@@ -10,7 +10,7 @@ const pointLogs = [
 ]
 </script>
 <template>
-  <div class="p-4">
+  <div class="p-4 min-h-[600px]">
     <!-- 포인트 관리 버튼 -->
     <div class="flex justify-between mb-6">
       <button

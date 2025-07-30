@@ -22,6 +22,11 @@ export default [
         name: 'my-page-investments',
         component: () => import('@/components/account/MyInvestments.vue'),
       },
+      {
+        path: 'orderLists',
+        name: 'my-page-rderLists',
+        component: () => import('@/components/account/OrderLists.vue'),
+      },
     ],
   },
 ]
