@@ -15,7 +15,7 @@
         class="relative flex items-center justify-center px-9 py-4 rounded-[15px] text-white text-lg leading-none bg-[#2e3548] hover:bg-[#1f2738]"
       >
         <!-- + 버튼: 왼쪽 정렬 + 중앙 정렬 -->
-        <span class="absolute left-6 top-8/10 -translate-y-1/2 text-2xl">+</span>
+        <span class="absolute left-6 top-6 -translate-y-1/2 text-2xl">+</span>
         <span class="ml-6">매물 등록하기</span>
       </BaseButton>
     </div>
@@ -163,7 +163,7 @@ const tradeGroups = [
     items: trades.filter((t) => t.status === '진행 중'),
   },
   {
-    title: '거래 완료된 매물',
+    title: '매각 완료된 매물',
     items: trades.filter((t) => t.status === '거래 완료'),
   },
   {
