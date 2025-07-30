@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     // 임시로 true로 설정함, 추후 로직 구현 시 false 변경 필요
-    isLoggedIn: true,
+    isLoggedIn: false,
   }),
   actions: {
     login() {

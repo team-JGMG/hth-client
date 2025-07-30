@@ -21,9 +21,7 @@
       :class="{
         'text-white': activeItem === 'funding',
         'text-gray-600': activeItem !== 'funding',
-        'is-disabled': !authStore.getIsLoggedIn, // 비활성화 클래스 추가
       }"
-      @click.prevent="checkLoginAndNavigate('/funding/list')"
     >
       <span
         class="material-symbols-outlined text-2xl"
@@ -34,14 +32,12 @@
     </router-link>
 
     <router-link
-      to="/trade"
+      to="/trade/list"
       class="flex flex-col items-center hover:text-white px-2"
       :class="{
         'text-white': activeItem === 'trade',
         'text-gray-600': activeItem !== 'trade',
-        'is-disabled': !authStore.getIsLoggedIn,
       }"
-      @click.prevent="checkLoginAndNavigate('/trade/list')"
     >
       <span
         class="material-symbols-outlined text-2xl"
@@ -51,15 +47,13 @@
       <span class="text-sm mt-1 font-semibold leading-tight">거래</span>
     </router-link>
 
-    <router-link
-      to="/account/my-page"
+    <button
       class="flex flex-col items-center hover:text-white px-2"
       :class="{
         'text-white': activeItem === 'my-page',
-        'text-gray-600': activeItem !== 'my-page', // 오타 수정: 'myinfo' -> 'my-page'
-        'is-disabled': !authStore.getIsLoggedIn, // 비활성화 클래스 추가
+        'text-gray-600': activeItem !== 'my-page',
       }"
-      @click.prevent="checkLoginAndNavigate('/account/my-page')"
+      @click="handleMyPageClick"
     >
       <span
         class="material-symbols-outlined text-2xl"
@@ -67,24 +61,26 @@
         >person</span
       >
       <span class="text-sm mt-1 font-semibold leading-tight">내정보</span>
-    </router-link>
+    </button>
   </nav>
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router' // useRouter 임포트
-import { useAuthStore } from '@/stores/authStore' // Pinia 스토어 임포트
+import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
 
 const route = useRoute()
-const router = useRouter() // useRouter 인스턴스 생성
-const authStore = useAuthStore() // Pinia 스토어 인스턴스 생성
+const router = useRouter()
+const authStore = useAuthStore()
 
 const activeItem = ref('home')
 
 const updateActiveItemBasedOnRoute = () => {
   const currentPath = route.path
-  if (currentPath === '/') {
+  if (currentPath.startsWith('/auth')) {
+    activeItem.value = ''
+  } else if (currentPath === '/') {
     activeItem.value = 'home'
   } else if (currentPath.startsWith('/funding')) {
     activeItem.value = 'funding'
@@ -95,11 +91,11 @@ const updateActiveItemBasedOnRoute = () => {
   }
 }
 
-const checkLoginAndNavigate = (targetPath) => {
+const handleMyPageClick = () => {
   if (authStore.getIsLoggedIn) {
-    router.push(targetPath)
+    router.push('/account/my-page')
   } else {
-    router.push('auth/login')
+    router.push('/auth/login')
   }
 }
 
@@ -118,11 +114,5 @@ watch(
 <style scoped>
 .material-symbols-fill {
   font-variation-settings: 'FILL' 1;
-}
-
-.is-disabled {
-  pointer-events: none;
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 </style>

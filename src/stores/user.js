@@ -1,11 +1,14 @@
+import { computed, ref } from 'vue'
+
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
 
 export const useUserStore = defineStore('user', () => {
-  // 가상 유저
-  const userName = ref('투슬리스')
-  const userPoints = ref(100000)
-  const authToken = ref('mock_token')
+  const savedToken = localStorage.getItem('authToken')
+  const userName = ref('')
+  const userPoints = ref(0)
+  const authToken = ref(savedToken || '')
+
+  const getIsLoggedIn = computed(() => !!authToken.value)
 
   function setUserName(name) {
     userName.value = name
@@ -34,6 +37,7 @@ export const useUserStore = defineStore('user', () => {
     userName,
     userPoints,
     authToken,
+    getIsLoggedIn,
     setUserName,
     setUserPoints,
     setAuthToken,
