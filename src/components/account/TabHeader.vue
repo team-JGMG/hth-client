@@ -24,6 +24,7 @@ const tabs = [
   { label: '포인트', value: 'points', path: '/account/my-page/points' },
   { label: '내가 올린 매물', value: 'listings', path: '/account/my-page/listings' },
   { label: '내가 투자한 매물', value: 'investments', path: '/account/my-page/investments' },
+  { label: '주문 내역', value: 'orderLists', path: '/account/my-page/orderLists' },
 ]
 
 const route = useRoute()
@@ -34,7 +35,7 @@ function getTabFromRoute(path) {
   if (path.includes('points')) return 'points'
   if (path.includes('listings')) return 'listings'
   if (path.includes('investments')) return 'investments'
-  return 'points'
+  if (path.includes('orderLists')) return 'orderLists'
 }
 
 watch(

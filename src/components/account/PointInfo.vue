@@ -1,63 +1,115 @@
+<!-- PointInfo.vue -->
 <script setup>
+import { computed } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
+import { formatDateTime } from '@/utils/format.js'
+
+function formatToMMDD(dateStr) {
+  const fullDate = formatDateTime(dateStr) // 예: '2025.7.14 11:11'
+  const [datePart] = fullDate.split(' ')
+  const [, mm, dd] = datePart.split('.')
+  return `${mm.padStart(2, '0')}.${dd.padStart(2, '0')}`
+}
+
+function formatToHHMM(dateStr) {
+  const [, timePart] = formatDateTime(dateStr).split(' ')
+  return timePart
+}
 
 const pointLogs = [
-  { date: '25.07.14 00:00:00', desc: '어쩌구저쩌구', amount: 10000 },
-  { date: '25.07.13 14:32:12', desc: '어쩌구저쩌구', amount: 20000 },
-  { date: '25.07.12 09:15:00', desc: '이벤트 지급', amount: 5000 },
-  { date: '25.07.11 22:47:05', desc: '어쩌구저쩌구', amount: 10000 },
-  { date: '25.07.10 13:21:47', desc: '어쩌구저쩌구', amount: 10000 },
+  {
+    date: '2025.07.14 11:11:00',
+    title: '포인트 충전',
+    desc: '세부내용 있으면 여기에 없으면말고',
+    amount: 11250,
+  },
+  {
+    date: '2025.07.14 11:11:00',
+    title: '포인트 환급',
+    desc: '부내용 있으면 여기에 없으면말고',
+    amount: -11250,
+  },
+  { date: '2025.07.14 11:11:00', title: '펀딩 실패', desc: '', amount: -11250 },
+  { date: '2025-07-14 11:11:00', title: '포인트 충전', desc: '', amount: 11250 },
+  { date: '2025-07-14 11:11:00', title: '포인트 환급', desc: '', amount: -11250 },
+  { date: '2024-07-14 11:11:00', title: '포인트 환급', desc: '', amount: -11250 },
 ]
+
+const groupedLogs = computed(() => {
+  const yearMap = new Map()
+
+  pointLogs.forEach((log) => {
+    const year = log.date.slice(0, 4)
+    if (!yearMap.has(year)) yearMap.set(year, [])
+    yearMap.get(year).push(log)
+  })
+
+  return [...yearMap.entries()].sort((a, b) => b[0] - a[0]).map(([year, logs]) => ({ year, logs }))
+})
 </script>
 <template>
-  <div class="p-4">
-    <!-- 포인트 관리 버튼 -->
-    <div class="flex justify-between mb-6">
-      <button
-        class="flex-1 mr-2 py-2 bg-green-100 border-2 border-green-400 text-green-700 rounded-lg"
+  <div class="p-4 min-h-[600px] space-y-6">
+    <div v-for="group in groupedLogs" :key="group.year">
+      <BaseTypography class="text-sm text-gray-500"> {{ group.year }}년 </BaseTypography>
+
+      <!-- 항목 전체 -->
+      <div
+        v-for="(log, idx) in group.logs"
+        :key="idx"
+        :class="[
+          'flex items-center gap-4 rounded-md px-3 h-[72px] overflow-hidden',
+          idx % 2 === 0 ? 'bg-gray-100' : 'bg-white',
+        ]"
       >
-        <BaseTypography class="text-base font-bold text-center">
-          <span class="text-xl mr-1">+</span> 포인트 충전
-        </BaseTypography>
-      </button>
-      <button
-        class="flex-1 ml-2 py-2 bg-orange-100 border-2 border-orange-400 text-orange-700 rounded-lg"
-      >
-        <BaseTypography class="text-base font-bold text-center">
-          <span class="text-xl mr-1">-</span> 포인트 환급
-        </BaseTypography>
-      </button>
-    </div>
-
-    <!-- 지급/사용 내역 -->
-    <div>
-      <BaseTypography class="text-base font-semibold mb-2 block">
-        포인트 지급/사용 내역
-      </BaseTypography>
-
-      <div class="bg-gray-100 rounded-md overflow-hidden">
-        <!-- Header -->
-        <div
-          class="grid grid-cols-3 py-2 px-3 text-sm font-medium border-b border-gray-300 bg-gray-200"
-        >
-          <BaseTypography class="text-sm font-medium text-left">날짜</BaseTypography>
-          <BaseTypography class="text-sm font-medium text-center">세부 내용</BaseTypography>
-          <BaseTypography class="text-sm font-medium text-right">포인트 금액</BaseTypography>
-        </div>
-
-        <!-- Rows -->
-        <div
-          v-for="(log, idx) in pointLogs"
-          :key="idx"
-          class="grid grid-cols-3 py-3 px-3 text-sm border-b last:border-b-0 bg-white"
-        >
-          <BaseTypography class="text-sm text-left pl-1">{{ log.date }}</BaseTypography>
-          <BaseTypography class="text-sm text-center px-2">{{ log.desc.trim() }}</BaseTypography>
-          <BaseTypography class="text-sm font-medium text-right text-black pr-1">
-            +{{ log.amount.toLocaleString() }}원
+        <!-- 날짜 -->
+        <!-- 날짜 -->
+        <div class="flex flex-col justify-center items-end min-w-[50px] h-full">
+          <BaseTypography class="text-gray-500 text-xs text-right">
+            {{ formatToMMDD(log.date) }}
+          </BaseTypography>
+          <BaseTypography class="text-xs text-gray-500 text-right">
+            {{ formatToHHMM(log.date) }}
           </BaseTypography>
         </div>
+
+        <!-- 제목 + 세부내용 -->
+        <div class="flex-1 flex flex-col justify-center h-full overflow-hidden">
+          <!-- 제목 -->
+          <div class="h-[20px] overflow-hidden">
+            <BaseTypography class="!font-bold text-sm truncate whitespace-nowrap overflow-hidden">
+              {{ log.title }}
+            </BaseTypography>
+          </div>
+
+          <!-- 세부내용 -->
+          <div class="h-[18px] overflow-hidden">
+            <BaseTypography
+              class="text-xs !font-semibold text-gray-600 truncate whitespace-nowrap overflow-hidden"
+              :title="log.desc || ''"
+            >
+              {{ log.desc || '\u00A0' }}
+            </BaseTypography>
+          </div>
+        </div>
+        <!-- 금액 -->
+        <BaseTypography class="text-sm !font-black min-w-[60px] text-right px-2">
+          <span :class="log.amount > 0 ? 'text-red-600' : 'text-blue-600'">
+            {{ log.amount > 0 ? '+' : '-' }}{{ Math.abs(log.amount).toLocaleString() }}
+          </span>
+        </BaseTypography>
       </div>
     </div>
+
+    <!-- 모달 컴포넌트 -->
+    <ChargePointModal
+      :isOpen="isChargeModalOpen"
+      @close="isChargeModalOpen = false"
+      @submit="handleCharge"
+    />
+    <WithdrawPointModal
+      :isOpen="isWithdrawModalOpen"
+      @close="isWithdrawModalOpen = false"
+      @submit="handleWithdraw"
+    />
   </div>
 </template>
