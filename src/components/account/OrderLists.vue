@@ -39,6 +39,46 @@
       </div>
     </div>
   </div>
+  <div class="p-4 space-y-6">
+    <!-- 연도별 그룹 -->
+    <div v-for="(group, year) in groupedOrders" :key="year">
+      <h3 class="text-sm font-bold text-gray-500 mb-2">{{ year }}년</h3>
+
+      <div
+        v-for="(order, index) in group"
+        :key="index"
+        class="flex justify-between items-center border-b pb-3 mb-3"
+      >
+        <!-- 날짜 및 시간 -->
+        <div class="text-xs text-gray-400 w-14">
+          <div>{{ formatDate(order.createdAt, 'MM.DD') }}</div>
+          <div>{{ formatDate(order.createdAt, 'HH:mm') }}</div>
+        </div>
+
+        <!-- 매물 정보 -->
+        <div class="flex-1 ml-3">
+          <div class="text-sm font-semibold text-black">
+            {{ order.itemName }}
+          </div>
+          <div class="text-xs mt-1 text-gray-500 flex items-center gap-1">
+            <!-- 상태 뱃지 -->
+            <span
+              class="px-2 py-0.5 rounded-full text-white text-[11px]"
+              :class="statusColor(order.status)"
+            >
+              {{ order.status }}
+            </span>
+          </div>
+        </div>
+
+        <!-- 가격 및 주수 -->
+        <div class="text-right text-sm font-semibold text-black">
+          <div>{{ order.totalPrice.toLocaleString() }}원</div>
+          <div class="text-xs text-red-500 mt-1">구매 {{ order.shares }}주</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
