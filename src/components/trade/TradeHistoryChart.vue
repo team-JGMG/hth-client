@@ -1,7 +1,8 @@
-// CleanLineVolumeChart.vue
 <template>
-  <div class="w-[calc(90%+50px)] ml-[-15px] h-[530px]">
-    <VChart :option="option" autoresize class="mb-20" />
+  <div class="overflow-hidden">
+    <div class="w-[calc(90%+100px)] ml-[-45px] h-[530px]">
+      <VChart :option="option" autoresize class="mb-20 relative z-0" />
+    </div>
   </div>
 </template>
 
