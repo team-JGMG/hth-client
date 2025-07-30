@@ -25,16 +25,10 @@
 import { useRouter } from 'vue-router'
 import BaseCard from '@/components/common/Card/BaseCard.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import { useAuthStore } from '@/stores/authStore'
 
 const router = useRouter()
-const authStore = useAuthStore()
 
 const handleButtonClick = () => {
-  if (authStore.getIsLoggedIn) {
-    router.push('/funding/list')
-  } else {
-    router.push('/auth/login')
-  }
+  router.push('/funding/list')
 }
 </script>
