@@ -48,18 +48,11 @@ const groupedLogs = computed(() => {
 })
 </script>
 <template>
-  <div class="p-4 min-h-[600px] space-y-6">
-    <div v-for="group in groupedLogs" :key="group.year">
-      <BaseTypography class="text-sm text-gray-500"> {{ group.year }}년 </BaseTypography>
-
-      <!-- 항목 전체 -->
-      <div
-        v-for="(log, idx) in group.logs"
-        :key="idx"
-        :class="[
-          'flex items-center gap-4 rounded-md px-3 h-[72px] overflow-hidden',
-          idx % 2 === 0 ? 'bg-gray-100' : 'bg-white',
-        ]"
+  <div class="p-4 min-h-[600px]">
+    <!-- 포인트 관리 버튼 -->
+    <div class="flex justify-between mb-6">
+      <button
+        class="flex-1 mr-2 py-2 bg-green-100 border-2 border-green-400 text-green-700 rounded-lg"
       >
         <!-- 날짜 -->
         <!-- 날짜 -->
