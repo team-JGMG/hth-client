@@ -11,30 +11,17 @@ const pointLogs = [
   { date: '25.07.11 22:47:05', desc: '어쩌구저쩌구', amount: 10000 },
   { date: '25.07.10 13:21:47', desc: '어쩌구저쩌구', amount: 10000 },
 ]
-</script>
-<template>
-  <div class="p-4 min-h-[600px]">
-    <!-- 포인트 관리 버튼 -->
-    <div class="flex justify-between mb-6">
-      <button
-        class="flex-1 mr-2 py-2 bg-green-100 border-2 border-green-400 text-green-700 rounded-lg"
-      >
-        <BaseTypography class="text-base font-bold text-center">
-          <span class="text-xl mr-1">+</span> 포인트 충전
-        </BaseTypography>
-      </button>
-      <button
-        class="flex-1 ml-2 py-2 bg-orange-100 border-2 border-orange-400 text-orange-700 rounded-lg"
-      >
-        <BaseTypography class="text-base font-bold text-center">
-          <span class="text-xl mr-1">-</span> 포인트 환급
-        </BaseTypography>
-      </button>
-    </div>
 
 // 모달 제어
 const isChargeModalOpen = ref(false)
 const isWithdrawModalOpen = ref(false)
+
+const openChargeModal = () => {
+  isChargeModalOpen.value = true
+}
+const openWithdrawModal = () => {
+  isWithdrawModalOpen.value = true
+}
 
 const handleCharge = (amount) => {
   console.log('충전 금액:', amount)

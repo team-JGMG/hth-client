@@ -1,3 +1,54 @@
+<template>
+  <div class="bg-black text-white p-4 rounded-lg shadow relative">
+    <!-- 유저 이름 & 포인트 라벨 -->
+    <div class="flex justify-between items-start mb-4">
+      <div>
+        <p class="text-xl font-bold">이채빵님,</p>
+        <p class="text-lg">보유 포인트</p>
+      </div>
+
+      <div class="flex flex-col items-end">
+        <button class="bg-[#2E3548] px-3 py-1 rounded-md mb-1">
+          <span class="text-xs font-semibold text-white">정보 수정</span>
+        </button>
+        <p class="text-2xl font-bold text-white">60,000원</p>
+      </div>
+    </div>
+
+    <!-- 포인트 버튼들 -->
+    <div class="flex space-x-3">
+      <button
+        class="flex-1 bg-green-400 text-black rounded-xl font-medium py-2"
+        @click="isChargeModalOpen = true"
+      >
+        <span class="material-symbols-outlined text-2xl">add</span>
+        <br />
+        <span class="font-extrabold">포인트 충전</span>
+      </button>
+      <button
+        class="flex-1 bg-yellow-400 text-black py-2 rounded-xl font-medium"
+        @click="isWithdrawModalOpen = true"
+      >
+        <span class="material-symbols-outlined text-2xl">remove</span>
+        <br />
+        <span class="font-extrabold">포인트 환급</span>
+      </button>
+    </div>
+
+    <!-- 연결된 모달 컴포넌트들 -->
+    <PointChargeModal
+      :isOpen="isChargeModalOpen"
+      @close="isChargeModalOpen = false"
+      @submit="handleCharge"
+    />
+    <PointChangeModal
+      :isOpen="isWithdrawModalOpen"
+      @close="isWithdrawModalOpen = false"
+      @submit="handleWithdraw"
+    />
+  </div>
+</template>
+
 <script setup>
 const isChargeModalOpen = ref(false)
 const isWithdrawModalOpen = ref(false)
@@ -15,32 +66,12 @@ import PointChargeModal from '@/components/account/PointChargeModal.vue'
 import PointChangeModal from '@/components/account/PointChangeModal.vue'
 </script>
 
-<template>
-  <div class="relative bg-black rounded-xl px-5 pt-5 pb-5 text-white">
-    <!-- 정보 수정 버튼 -->
-    <button class="absolute top-4 right-4 bg-[#2E3548] px-4 py-2 rounded-md">
-      <BaseTypography class="text-sm font-semibold !text-white">정보 수정</BaseTypography>
-    </button>
-
-    <!-- 사용자 정보 -->
-    <div class="flex items-center mb-4">
-      <!-- 프로필 아이콘 -->
-      <div class="w-9 h-9 bg-gray-300 rounded-full flex items-center justify-center">
-        <BaseTypography class="text-sm font-semibold text-black">오</BaseTypography>
-      </div>
-      <!-- 이름 + 이메일 -->
-      <div class="ml-3">
-        <BaseTypography class="text-lg font-extrabold !text-white">이채빵</BaseTypography>
-        <BaseTypography class="text-sm !text-white">Ice001105@gmail.com</BaseTypography>
-      </div>
-    </div>
-
-    <!-- 보유 포인트 -->
-    <div class="flex justify-between items-center">
-      <BaseTypography class="text-base font-bold !text-white">보유 포인트</BaseTypography>
-      <BaseTypography class="text-xl font-extrabold tracking-tight !text-white">
-        60,000원
-      </BaseTypography>
-    </div>
-  </div>
-</template>
+<style scoped>
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 48;
+}
+</style>
