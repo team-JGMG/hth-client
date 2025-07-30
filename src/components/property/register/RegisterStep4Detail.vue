@@ -1,6 +1,8 @@
 <template>
   <div class="w-full max-w-md mx-auto px-4 pb-32">
-    <BaseTypography class="text-xl font-bold mb-6">매물 상세 정보를 입력해주세요.</BaseTypography>
+    <BaseTypography class="mb-6" size="xl" weight="bold">
+      매물 상세 정보를 입력해주세요.
+    </BaseTypography>
 
     <!-- 매물 유형 -->
     <div class="mb-12 relative">
@@ -93,7 +95,7 @@
 
     <!-- 해시태그 선택 -->
     <div class="mb-12 relative">
-      <BaseTypography class="mb-2 text-base font-medium">해시태그 선택</BaseTypography>
+      <BaseTypography class="mb-2" size="base" weight="medium">해시태그 선택</BaseTypography>
       <div class="flex flex-wrap gap-2">
         <button
           v-for="tag in hashtagOptions"
@@ -127,7 +129,7 @@
 
     <!-- 세부 정보 -->
     <div class="mb-12 relative">
-      <BaseTypography class="mb-2 text-base font-medium">세부 정보 입력</BaseTypography>
+      <BaseTypography class="mb-2" size="base" weight="medium">세부 정보 입력</BaseTypography>
       <textarea
         v-model="store.propertyDetail.memo"
         class="w-full border rounded-lg p-3 text-sm resize-none h-32 focus:outline-none focus:ring focus:ring-black/30"

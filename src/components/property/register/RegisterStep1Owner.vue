@@ -1,6 +1,8 @@
 <template>
   <div class="w-full max-w-md mx-auto px-4">
-    <BaseTypography class="text-xl font-bold mb-6">매도자 정보를 입력해주세요.</BaseTypography>
+    <BaseTypography class="mb-6" size="xl" weight="bold">
+      매도자 정보를 입력해주세요.
+    </BaseTypography>
 
     <!-- 이름 -->
     <div class="mb-12 relative">
@@ -58,7 +60,7 @@
 
     <!-- 약관 동의 -->
     <div class="mb-12 relative">
-      <BaseTypography class="font-semibold mb-2">약관 동의</BaseTypography>
+      <BaseTypography class="mb-2" weight="semibold">약관 동의</BaseTypography>
 
       <div class="flex items-center mb-3 cursor-pointer" @click="toggleAll">
         <span

@@ -1,6 +1,6 @@
 <template>
   <div class="w-full max-w-md mx-auto px-4 pb-32">
-    <BaseTypography class="text-xl font-bold mb-6">
+    <BaseTypography class="mb-6" size="xl" weight="bold">
       매물의 건축물 대장 정보를 입력해주세요.
     </BaseTypography>
 
