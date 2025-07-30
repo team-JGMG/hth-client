@@ -12,12 +12,13 @@
         placeholder="용도 지역을 선택해주세요."
         :options="landUsageZoneTypes"
         class="text-base"
+        @focus="touched.landUsageZone = true"
       />
       <BaseTypography
-        v-if="submitTried && !store.propertyBuilding.landUsageZone"
+        v-if="touched.landUsageZone && !isValid.landUsageZone"
         color="red-1"
         size="xs"
-        class="absolute mt-1 left-0 top-full"
+        class="absolute left-0 top-full"
       >
         * 필수 항목입니다. 용도 지역을 선택해주세요.
       </BaseTypography>
@@ -35,6 +36,7 @@
               v-model="store.propertyBuilding.landSize"
               placeholder="매물 면적을 입력해주세요."
               type="number"
+              @focus="touched.landSize = true"
             />
           </div>
           <span class="text-base text-black mr-4 -translate-y-2">㎡</span>
@@ -47,21 +49,26 @@
               v-model="store.propertyBuilding.buildingSize"
               placeholder="건물 면적을 입력해주세요."
               type="number"
+              @focus="touched.buildingSize = true"
             />
           </div>
           <span class="text-base text-black mr-4 -translate-y-2">㎡</span>
         </div>
+        <!-- 에러 메시지 -->
         <BaseTypography
           v-if="
-            submitTried &&
-            (!isNumber(store.propertyBuilding.landSize) ||
-              !isNumber(store.propertyBuilding.buildingSize))
+            (touched.landSize && getErrorMessage(store.propertyBuilding.landSize)) ||
+            (touched.buildingSize && getErrorMessage(store.propertyBuilding.buildingSize))
           "
           color="red-1"
           size="xs"
-          class="absolute mt-1 left-0 top-full"
+          class="absolute left-0 top-full"
         >
-          * 숫자를 입력해주세요.
+          {{
+            touched.landSize && getErrorMessage(store.propertyBuilding.landSize)
+              ? getErrorMessage(store.propertyBuilding.landSize)
+              : getErrorMessage(store.propertyBuilding.buildingSize)
+          }}
         </BaseTypography>
       </div>
     </div>
@@ -78,6 +85,7 @@
               v-model="store.propertyBuilding.landTotalArea"
               placeholder="매물 면적을 입력해주세요."
               type="number"
+              @focus="touched.landTotalArea = true"
             />
           </div>
           <span class="text-base text-black -translate-y-2">㎡</span>
@@ -90,21 +98,26 @@
               v-model="store.propertyBuilding.buildingTotalArea"
               placeholder="건물 면적을 입력해주세요."
               type="number"
+              @focus="touched.buildingTotalArea = true"
             />
           </div>
           <span class="text-base text-black -translate-y-2">㎡</span>
         </div>
+        <!-- 에러 메시지 -->
         <BaseTypography
           v-if="
-            submitTried &&
-            (!isNumber(store.propertyBuilding.landTotalArea) ||
-              !isNumber(store.propertyBuilding.buildingTotalArea))
+            (touched.landTotalArea && getErrorMessage(store.propertyBuilding.landTotalArea)) ||
+            (touched.buildingTotalArea && getErrorMessage(store.propertyBuilding.buildingTotalArea))
           "
           color="red-1"
           size="xs"
-          class="absolute mt-1 left-0 top-full"
+          class="absolute left-0 top-full"
         >
-          * 숫자를 입력해주세요.
+          {{
+            touched.landTotalArea && getErrorMessage(store.propertyBuilding.landTotalArea)
+              ? getErrorMessage(store.propertyBuilding.landTotalArea)
+              : getErrorMessage(store.propertyBuilding.buildingTotalArea)
+          }}
         </BaseTypography>
       </div>
     </div>
@@ -119,6 +132,7 @@
           icon="unfold_less"
           placeholder="지하 층 수"
           type="number"
+          @focus="touched.floorUnder = true"
         />
         <span class="text-base text-black -translate-y-2 mr-4">층</span>
         <span class="material-symbols-outlined -translate-y-2"> arrow_circle_up </span>
@@ -127,20 +141,25 @@
           icon="unfold_more"
           placeholder="지상 층 수"
           type="number"
+          @focus="touched.floorAbove = true"
         />
         <span class="text-base text-black -translate-y-2">층</span>
       </div>
+      <!-- 에러 메시지 -->
       <BaseTypography
         v-if="
-          submitTried &&
-          (!isNumber(store.propertyBuilding.floorUnder) ||
-            !isNumber(store.propertyBuilding.floorAbove))
+          (touched.floorUnder && getErrorMessage(store.propertyBuilding.floorUnder)) ||
+          (touched.floorAbove && getErrorMessage(store.propertyBuilding.floorAbove))
         "
         color="red-1"
         size="xs"
-        class="absolute mt-1 left-0 top-full"
+        class="absolute left-0 top-full"
       >
-        * 숫자를 입력해주세요.
+        {{
+          touched.floorUnder && getErrorMessage(store.propertyBuilding.floorUnder)
+            ? getErrorMessage(store.propertyBuilding.floorUnder)
+            : getErrorMessage(store.propertyBuilding.floorAbove)
+        }}
       </BaseTypography>
     </div>
 
@@ -151,14 +170,15 @@
         v-model="store.propertyBuilding.builtDate"
         type="date"
         placeholder="날짜를 입력해주세요."
+        @focus="touched.builtDate = true"
       />
       <BaseTypography
-        v-if="submitTried && !store.propertyBuilding.builtDate"
+        v-if="touched.builtDate && !isValid.builtDate"
         color="red-1"
         size="xs"
-        class="absolute mt-1 left-0 top-full"
+        class="absolute left-0 top-full"
       >
-        * 날짜를 입력해주세요.
+        * 필수 항목입니다.
       </BaseTypography>
     </div>
 
@@ -171,17 +191,19 @@
             v-model="store.propertyBuilding.officialPrice"
             placeholder="금액을 입력해주세요."
             type="number"
+            @focus="touched.officialPrice = true"
           />
         </div>
         <span class="text-base text-black -translate-y-1 relative">원/㎡</span>
       </div>
+      <!-- 에러 메시지 -->
       <BaseTypography
-        v-if="submitTried && !isNumber(store.propertyBuilding.officialPrice)"
+        v-if="touched.officialPrice && getErrorMessage(store.propertyBuilding.officialPrice)"
         color="red-1"
         size="xs"
-        class="absolute mt-1 left-0 top-full"
+        class="absolute left-0 top-full"
       >
-        * 숫자를 입력해주세요.
+        {{ getErrorMessage(store.propertyBuilding.officialPrice) }}
       </BaseTypography>
     </div>
 
@@ -194,17 +216,19 @@
             v-model="store.propertyBuilding.marketPrice"
             placeholder="금액을 입력해주세요."
             type="number"
+            @focus="touched.marketPrice = true"
           />
         </div>
         <span class="text-base text-black -translate-y-2">원</span>
       </div>
+      <!-- 에러 메시지 -->
       <BaseTypography
-        v-if="submitTried && !isNumber(store.propertyBuilding.marketPrice)"
+        v-if="touched.marketPrice && getErrorMessage(store.propertyBuilding.marketPrice)"
         color="red-1"
         size="xs"
-        class="absolute mt-1 left-0 top-full"
+        class="absolute left-0 top-full"
       >
-        * 숫자를 입력해주세요.
+        {{ getErrorMessage(store.propertyBuilding.marketPrice) }}
       </BaseTypography>
     </div>
 
@@ -233,32 +257,52 @@ import CompletedButton from '@/components/common/Button/CompletedButton.vue'
 import InputSelect from '@/components/common/Select/InputSelect.vue'
 
 const store = usePropertyRegisterStore()
-const submitTried = ref(false)
+
+const touched = ref({
+  landUsageZone: false,
+  landSize: false,
+  buildingSize: false,
+  landTotalArea: false,
+  buildingTotalArea: false,
+  floorUnder: false,
+  floorAbove: false,
+  builtDate: false,
+  officialPrice: false,
+  marketPrice: false,
+})
 
 const landUsageZoneTypes = ['주거지역', '상업지역', '기타']
 
-const isNumber = (value) => {
-  return /^[0-9]+$/.test(value)
+const isNumber = (value) => /^[0-9]+$/.test(value)
+
+const isValid = computed(() => {
+  const b = store.propertyBuilding
+  return {
+    landUsageZone: !!b.landUsageZone,
+    landSize: b.landSize !== '' && isNumber(b.landSize),
+    buildingSize: b.buildingSize !== '' && isNumber(b.buildingSize),
+    landTotalArea: b.landTotalArea !== '' && isNumber(b.landTotalArea),
+    buildingTotalArea: b.buildingTotalArea !== '' && isNumber(b.buildingTotalArea),
+    floorUnder: b.floorUnder !== '' && isNumber(b.floorUnder),
+    floorAbove: b.floorAbove !== '' && isNumber(b.floorAbove),
+    builtDate: !!b.builtDate,
+    officialPrice: b.officialPrice !== '' && isNumber(b.officialPrice),
+    marketPrice: b.marketPrice !== '' && isNumber(b.marketPrice),
+  }
+})
+
+const getErrorMessage = (value) => {
+  if (value === '') return '* 필수 항목입니다.'
+  if (!isNumber(value)) return '* 숫자를 입력해주세요.'
+  return ''
 }
 
 const isStepValid = computed(() => {
-  const b = store.propertyBuilding
-  return (
-    b.landUsageZone &&
-    isNumber(b.landSize) &&
-    isNumber(b.buildingSize) &&
-    isNumber(b.landTotalArea) &&
-    isNumber(b.buildingTotalArea) &&
-    isNumber(b.floorUnder) &&
-    isNumber(b.floorAbove) &&
-    b.builtDate &&
-    isNumber(b.officialPrice) &&
-    isNumber(b.marketPrice)
-  )
+  return Object.values(isValid.value).every(Boolean)
 })
 
 const handleNext = () => {
-  submitTried.value = true
+  Object.keys(touched.value).forEach((key) => (touched.value[key] = true))
   if (isStepValid.value) {
     store.goToNextStep()
   }

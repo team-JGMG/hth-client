@@ -9,12 +9,13 @@
         v-model="store.propertyDetail.type"
         placeholder="매물 유형을 선택해주세요."
         :options="propertyTypes"
+        @focus="touched.type = true"
       />
       <BaseTypography
-        v-if="submitTried && !store.propertyDetail.type"
+        v-if="touched.type && !store.propertyDetail.type"
         color="red-1"
         size="xs"
-        class="absolute mt-1 left-0 top-full"
+        class="absolute left-0 top-full"
       >
         * 필수 항목입니다. 매물 유형을 선택해주세요.
       </BaseTypography>
@@ -24,12 +25,24 @@
     <div class="mb-8 relative">
       <BaseTypography class="mb-2">해당 층 수</BaseTypography>
       <div class="flex items-center w-full gap-3">
-        <span class="material-symbols-outlined -translate-y-2"> stairs_2 </span>
+        <span class="material-symbols-outlined -translate-y-2"> stairs </span>
         <div class="flex-1">
-          <InputField v-model="store.propertyDetail.floor" type="number" />
+          <InputField
+            v-model="store.propertyDetail.floor"
+            type="number"
+            @focus="touched.floor = true"
+          />
         </div>
         <span class="text-base text-black -translate-y-2">층</span>
       </div>
+      <BaseTypography
+        v-if="touched.floor && getErrorMessage(store.propertyDetail.floor)"
+        color="red-1"
+        size="xs"
+        class="absolute left-0 top-full"
+      >
+        {{ getErrorMessage(store.propertyDetail.floor) }}
+      </BaseTypography>
     </div>
 
     <!-- 방 수 & 욕실 수 -->
@@ -44,6 +57,7 @@
             type="number"
             class="flex-1"
             placeholder="방 수"
+            @focus="touched.roomCount = true"
           />
         </div>
 
@@ -56,29 +70,59 @@
             type="number"
             class="flex-1"
             placeholder="욕실 수"
+            @focus="touched.bathroomCount = true"
           />
         </div>
       </div>
+      <BaseTypography
+        v-if="
+          (touched.roomCount && getErrorMessage(store.propertyDetail.roomCount)) ||
+          (touched.bathroomCount && getErrorMessage(store.propertyDetail.bathroomCount))
+        "
+        color="red-1"
+        size="xs"
+        class="absolute left-0 top-full"
+      >
+        {{
+          touched.roomCount && getErrorMessage(store.propertyDetail.roomCount)
+            ? getErrorMessage(store.propertyDetail.roomCount)
+            : getErrorMessage(store.propertyDetail.bathroomCount)
+        }}
+      </BaseTypography>
     </div>
 
     <!-- 해시태그 선택 -->
-    <div class="mb-12">
+    <div class="mb-12 relative">
       <BaseTypography class="mb-2 text-base font-medium">해시태그 선택</BaseTypography>
       <div class="flex flex-wrap gap-2">
         <button
           v-for="tag in hashtagOptions"
           :key="tag"
           @click="toggleTag(tag)"
+          :disabled="
+            store.propertyDetail.options.length >= 3 && !store.propertyDetail.options.includes(tag)
+          "
           :class="[
+            // 선택된 상태면 활성화
             'px-3 py-1 rounded-full text-sm border',
             store.propertyDetail.options.includes(tag)
               ? 'bg-black text-white border-black'
-              : 'bg-white text-gray-500 border-gray-300',
+              : 'bg-white text-gray-500 border-gray-300 disabled:opacity-40 ',
           ]"
         >
           {{ tag }}
         </button>
       </div>
+      <BaseTypography
+        v-if="touched.options && store.propertyDetail.options.length < 3"
+        color="red-1"
+        size="xs"
+        class="absolute mt-1 left-0 top-full"
+      >
+        {{
+          store.propertyDetail.options.length === 0 ? '* 필수 항목입니다.' : '* 3개를 선택해주세요.'
+        }}
+      </BaseTypography>
     </div>
 
     <!-- 세부 정보 -->
@@ -92,15 +136,33 @@
     </div>
 
     <!-- 매물 사진 첨부 -->
-    <div class="mb-12">
+    <div class="mb-12 relative">
       <label class="text-base font-medium block mb-2">매물 사진 첨부</label>
+
       <input type="file" class="hidden" id="fileInput" @change="handleFile" />
+
       <label
         for="fileInput"
-        class="block w-full cursor-pointer py-2 border rounded px-4 text-gray-600"
+        class="flex items-center justify-between w-full cursor-pointer border-b border-gray-400 py-2 text-base text-gray-700"
+        @click="touched.image = true"
       >
-        {{ store.documents[0]?.name || '파일 선택' }}
+        <!-- 파일명 또는 기본 텍스트 -->
+        <span class="truncate">
+          {{ store.documents[0]?.name || '파일 선택' }}
+        </span>
+
+        <!-- 클립 아이콘 -->
+        <span class="material-symbols-outlined text-gray-500">attach_file</span>
       </label>
+
+      <BaseTypography
+        v-if="touched.image && !store.documents[0]"
+        color="red-1"
+        size="xs"
+        class="absolute mt-1 left-0 top-full"
+      >
+        * 필수 항목입니다. 매물 사진을 첨부해주세요.
+      </BaseTypography>
     </div>
 
     <!-- 다음 버튼 -->
@@ -126,8 +188,17 @@ import InputField from '@/components/auth/InputField.vue'
 import InputSelect from '@/components/common/Select/InputSelect.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import CompletedButton from '@/components/common/Button/CompletedButton.vue'
+
 const store = usePropertyRegisterStore()
-const submitTried = ref(false)
+
+const touched = ref({
+  type: false,
+  floor: false,
+  roomCount: false,
+  bathroomCount: false,
+  options: false,
+  image: false,
+})
 
 const propertyTypes = ['아파트']
 const hashtagOptions = [
@@ -144,9 +215,18 @@ const hashtagOptions = [
 ]
 
 const toggleTag = (tag) => {
-  const idx = store.propertyDetail.options.indexOf(tag)
-  if (idx === -1) store.propertyDetail.options.push(tag)
-  else store.propertyDetail.options.splice(idx, 1)
+  const options = store.propertyDetail.options
+  const idx = options.indexOf(tag)
+
+  if (idx === -1) {
+    if (options.length < 3) {
+      options.push(tag)
+    }
+  } else {
+    options.splice(idx, 1)
+  }
+
+  touched.value.options = true
 }
 
 const handleFile = (e) => {
@@ -154,13 +234,31 @@ const handleFile = (e) => {
   if (file) store.documents[0] = file
 }
 
+const isNumber = (value) => /^[0-9]+$/.test(value)
+
+const getErrorMessage = (value) => {
+  if (value === '') return '* 필수 항목입니다.'
+  if (!isNumber(value)) return '* 숫자를 입력해주세요.'
+  return ''
+}
+
 const isStepValid = computed(() => {
   const d = store.propertyDetail
-  return d.type && d.roomCount && d.bathroomCount && d.floor
+  return (
+    d.type &&
+    d.floor !== '' &&
+    isNumber(d.floor) &&
+    d.roomCount !== '' &&
+    isNumber(d.roomCount) &&
+    d.bathroomCount !== '' &&
+    isNumber(d.bathroomCount) &&
+    d.options.length >= 3 &&
+    !!store.documents[0]
+  )
 })
 
 const handleNext = () => {
-  submitTried.value = true
+  Object.keys(touched.value).forEach((key) => (touched.value[key] = true))
   if (isStepValid.value) {
     store.goToNextStep()
   }
