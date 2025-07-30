@@ -38,14 +38,15 @@ const pointLogs = [
 const groupedLogs = computed(() => {
   const yearMap = new Map()
 
-  pointLogs.forEach((log) => {
-    const year = log.date.slice(0, 4)
-    if (!yearMap.has(year)) yearMap.set(year, [])
-    yearMap.get(year).push(log)
-  })
+const handleCharge = (amount) => {
+  console.log('충전 금액:', amount)
+  isChargeModalOpen.value = false
+}
 
-  return [...yearMap.entries()].sort((a, b) => b[0] - a[0]).map(([year, logs]) => ({ year, logs }))
-})
+const handleWithdraw = (amount) => {
+  console.log('환급 금액:', amount)
+  isWithdrawModalOpen.value = false
+}
 </script>
 
 <template>
