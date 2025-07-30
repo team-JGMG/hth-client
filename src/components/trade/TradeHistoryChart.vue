@@ -1,7 +1,7 @@
 <template>
   <div class="overflow-hidden">
-    <div class="w-[calc(90%+100px)] ml-[-45px] h-[530px]">
-      <VChart :option="option" autoresize class="mb-20 relative z-0" />
+    <div class="w-[calc(90%+80px)] ml-[-30px] h-[530px]">
+      <VChart :option="option" autoresize class="mb-20" />
     </div>
   </div>
 </template>
@@ -50,15 +50,16 @@ onMounted(() => {
     ],
     tooltip: {
       trigger: 'axis',
-      triggerOn: 'mousemove', // hover 시 활성화
-      showDelay: 0, // 지연 시간 없음
-      hideDelay: 100, // 숨김 지연 시간
-      enterable: false, // 툴팁 내부로 마우스 진입 방지
-      confine: true, // 차트 영역 내에 툴팁 표시
+      triggerOn: 'mousemove',
+      showDelay: 0,
+      hideDelay: 100,
+      enterable: false,
+      confine: true,
+      extraCssText: 'z-index:0;',
       axisPointer: {
         type: 'line',
         axis: 'x',
-        snap: true, // 가장 가까운 데이터 포인트에 스냅
+        snap: true,
         lineStyle: {
           color: '#999',
           width: 1,

@@ -5,9 +5,9 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import router from './router'
 import { useKakao } from 'vue3-kakao-maps'
+
 useKakao('4215b6b611faa29a4ce872b00b8f8e8b', { libraries: ['services'] })
 
-// ✅ 폰트 로딩 후 .icons-loaded 클래스 추가 → Vue 마운트
 Promise.all([
   document.fonts.load('24px "Material Symbols Outlined"'),
   document.fonts.load('24px "Material Symbols Rounded"'),
