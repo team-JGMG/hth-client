@@ -1,7 +1,9 @@
 <template>
-  <Transition name="slide" mode="out-in">
-    <component :is="currentComponent" :key="step" />
-  </Transition>
+  <div class="relative overflow-hidden">
+    <Transition name="slide" mode="out-in">
+      <component :is="currentComponent" :key="step" />
+    </Transition>
+  </div>
   <StepIndicator :currentStep="step" :totalSteps="5" class="mt-6" />
   <div class="max-w-xs mx-auto">
     <CompletedButton
@@ -48,7 +50,7 @@ const nextStep = () => {
     step.value++
   } else {
     onboardingStore.completeOnboarding()
-    router.replace('/') // push도 가능, 둘 다 OK
+    router.replace('/')
   }
 }
 </script>
