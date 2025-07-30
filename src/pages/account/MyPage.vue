@@ -49,7 +49,7 @@ watch(currentTab, (value) => {
   <DetailLayout>
     <DetailHeader>마이 페이지</DetailHeader>
     <div>
-      <!-- 이메일, 보유포인트 등 -->
+      <!-- 정보 수정 및 보유포인트 등 -->
       <div class="px-4 py-2 bg-white -mt-8">
         <component :is="profileComponent" class="-mt-14" />
         <BaseTab :tabs="tabs" v-model="currentTab" class="mt-5" />
