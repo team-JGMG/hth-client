@@ -1,6 +1,6 @@
 <template>
   <div class="w-full max-w-md mx-auto px-4 pb-32">
-    <BaseTypography class="text-xl font-bold mb-6">매물 정보를 입력해주세요.</BaseTypography>
+    <BaseTypography class="mb-6" size="xl" weight="bold">매물 정보를 입력해주세요.</BaseTypography>
 
     <!-- 매물명 -->
     <div class="mb-12 relative">
