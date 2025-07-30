@@ -1,11 +1,31 @@
+<!-- MyInvestments.vue -->
 <script setup>
+import BaseButton from '@/components/common/Button/BaseButton.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import CancelConfirmModal from '@/components/account/CancelConfirmModal.vue'
 
-import { ref } from 'vue'
-
 import NoInvestmentItems from './NoInvestmentItems.vue'
 
+import { ref } from 'vue'
+import DividendModal from './DividendModal.vue'
+
+const isDividendModalOpen = ref(false)
+const selectedBuildingName = ref('')
+const selectedDividends = ref([])
+
+// 예시 배당금 데이터 (나중에 item에서 불러올 수도 있음)
+const dummyDividendData = [
+  { date: '07.14 11:11', amount: 250 },
+  { date: '06.14 11:11', amount: 250 },
+  { date: '05.14 11:11', amount: 250 },
+  { date: '04.14 11:11', amount: 250 },
+]
+
+const openDividendModal = (buildingName) => {
+  selectedBuildingName.value = buildingName
+  selectedDividends.value = dummyDividendData // 또는 실제 데이터
+  isDividendModalOpen.value = true
+}
 const isModalOpen = ref(false)
 
 const openModal = () => {
@@ -15,9 +35,9 @@ const closeModal = () => {
   isModalOpen.value = false
 }
 const confirmCancel = () => {
-  // 실제 취소 로직 실행
   closeModal()
 }
+
 const trades = [
   {
     name: '63빌딩 초고층 6301호',
@@ -90,79 +110,19 @@ const trades = [
   },
   {
     name: '63빌딩 초고층 6301호',
-    percent: 63,
-    left: 1_550,
+    percent: 100,
+    left: 0,
     total: 7_750_000,
     img: '/src/assets/images/sample-buliding.png',
-    status: '펀딩 중',
-  },
-  {
-    name: '63빌딩 초고층 6301호',
-    ownedAmount: 6,
-    avgPrice: 5300,
-    img: '/src/assets/images/sample-buliding.png',
-    status: '보유 중',
-    price: 5550,
-  },
-  {
-    name: '63빌딩 초고층 6308호',
-    ownedAmount: 5,
-    img: '/src/assets/images/sample-buliding.png',
-    status: '거래 대기',
-    price: 4800,
-  },
-  {
-    name: '63빌딩 초고층 6301호',
-    percent: 63,
-    left: 1_550,
-    total: 7_750_000,
-    img: '/src/assets/images/sample-buliding.png',
-    status: '펀딩 중',
-  },
-  {
-    name: '63빌딩 초고층 6301호',
-    ownedAmount: 6,
-    avgPrice: 5300,
-    img: '/src/assets/images/sample-buliding.png',
-    status: '보유 중',
-    price: 5550,
-  },
-  {
-    name: '63빌딩 초고층 6308호',
-    ownedAmount: 5,
-    img: '/src/assets/images/sample-buliding.png',
-    status: '거래 대기',
-    price: 4800,
-  },
-  {
-    name: '63빌딩 초고층 6301호',
-    percent: 63,
-    left: 1_550,
-    total: 7_750_000,
-    img: '/src/assets/images/sample-buliding.png',
-    status: '펀딩 중',
-  },
-  {
-    name: '63빌딩 초고층 6301호',
-    ownedAmount: 6,
-    avgPrice: 5300,
-    img: '/src/assets/images/sample-buliding.png',
-    status: '보유 중',
-    price: 5550,
-  },
-  {
-    name: '63빌딩 초고층 6308호',
-    ownedAmount: 5,
-    img: '/src/assets/images/sample-buliding.png',
-    status: '거래 대기',
-    price: 4800,
+    status: '펀딩 만료', // ✅ 추가
   },
 ]
-
-const fundingItems = trades.filter((t) => t.status === '펀딩 중')
+const fundingItems = trades.filter((t) => t.status === '펀딩 중' || t.status === '펀딩 만료')
 const ownedItems = trades.filter((t) => t.status === '보유 중')
+
 const waitingItems = trades.filter((t) => t.status === '거래 대기')
 </script>
+
 <template>
   <div class="p-4 min-h-[600px]">
     <NoInvestmentItems v-if="!fundingItems.length && !ownedItems.length && !waitingItems.length" />
@@ -201,15 +161,26 @@ const waitingItems = trades.filter((t) => t.status === '거래 대기')
             </BaseTypography>
           </div>
         </div>
-
         <div class="flex flex-col justify-between items-end ml-2 h-full">
           <div class="h-14"></div>
-          <button
-            @click="openModal"
-            class="text-xs bg-[#ff3b3b] text-white rounded-md px-3 py-1 hover:bg-[#e63232] transition-colors duration-150"
+
+          <!-- ✅ 상태 분기 -->
+          <BaseButton
+            v-if="item.status === '펀딩 만료'"
+            disabled
+            class="text-xs bg-gray-300 text-white rounded-md px-3 py-2 cursor-not-allowed"
           >
-            <BaseTypography class="text-xs font-medium !text-white">취소하기</BaseTypography>
-          </button>
+            <span class="text-xs font-medium">기간만료</span>
+          </BaseButton>
+
+          <BaseButton
+            v-else-if="item.status === '펀딩 중'"
+            @click="openModal"
+            variant="danger"
+            class="text-xs text-white rounded-md px-3 py-2 hover:bg-[#e63232] transition-colors duration-150"
+          >
+            <span class="text-xs font-medium">취소하기</span>
+          </BaseButton>
         </div>
       </div>
     </div>
@@ -239,6 +210,17 @@ const waitingItems = trades.filter((t) => t.status === '거래 대기')
         </div>
 
         <div class="flex flex-col justify-between items-end ml-2 h-full">
+          <!-- ✅ 나의 배당금 버튼 -->
+          <BaseButton
+            variant="secondary"
+            @click="openDividendModal(item.name)"
+            class="text-xs px-0.5 mb-1 !py-0.5"
+          >
+            <BaseTypography class="text-[10px] font-medium !text-white px-1">
+              내 배당금
+            </BaseTypography>
+          </BaseButton>
+
           <BaseTypography class="text-xs text-gray-500 mb-0.5">현재 시세</BaseTypography>
           <BaseTypography class="text-base font-semibold" style="color: #ff3b3b">
             {{ item.price.toLocaleString() }}원
@@ -276,15 +258,22 @@ const waitingItems = trades.filter((t) => t.status === '거래 대기')
             </BaseTypography>
           </div>
 
-          <button
+          <BaseButton
             @click="openModal"
-            class="mt-2 text-xs bg-[#ff3b3b] text-white rounded-md px-3 py-1 hover:bg-[#e63232] transition-colors duration-150"
+            variant="danger"
+            class="text-xs text-white rounded-md px-3 py-2 hover:bg-[#e63232] transition-colors duration-150 mt-auto"
           >
             <BaseTypography class="text-xs font-medium !text-white">취소하기</BaseTypography>
-          </button>
+          </BaseButton>
         </div>
       </div>
     </div>
   </div>
+  <DividendModal
+    :isOpen="isDividendModalOpen"
+    :buildingName="selectedBuildingName"
+    :dividends="selectedDividends"
+    @close="isDividendModalOpen = false"
+  />
   <CancelConfirmModal :isOpen="isModalOpen" @close="closeModal" @submit="confirmCancel" />
 </template>
