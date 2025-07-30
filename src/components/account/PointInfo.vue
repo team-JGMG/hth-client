@@ -16,13 +16,6 @@ const pointLogs = [
 const isChargeModalOpen = ref(false)
 const isWithdrawModalOpen = ref(false)
 
-const openChargeModal = () => {
-  isChargeModalOpen.value = true
-}
-const openWithdrawModal = () => {
-  isWithdrawModalOpen.value = true
-}
-
 const handleCharge = (amount) => {
   console.log('충전 금액:', amount)
   isChargeModalOpen.value = false
