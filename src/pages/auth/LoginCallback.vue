@@ -6,26 +6,21 @@ import axios from 'axios'
 const route = useRoute()
 const router = useRouter()
 
-onMounted(async () => {
-  const code = route.query.code
-  const provider = route.query.provider || 'kakao' // 경로 또는 상태값으로 전달받을 수도 있음
+onMounted(() => {
+  const status = route.query.status
 
-  if (code) {
-    try {
-      const { data } = await axios.post('https://api.example.com/auth/social/login', {
-        provider,
-        code,
-      })
-
-      localStorage.setItem('accessToken', data.accessToken)
-      localStorage.setItem('refreshToken', data.refreshToken)
-      // 필요시 userInfo 저장 등
-
-      router.push('/') // 로그인 성공 시 홈으로 이동
-    } catch (e) {
-      console.error('로그인 실패', e)
-      router.push('/login?error=1')
-    }
+  if (status === 'PRE_AUTH') {
+    // 회원가입이 필요한 신규 사용자
+    router.push('/auth/signup')
+  } else if (status === 'SUCCESS') {
+    // 기존 사용자, 백엔드에서 토큰 쿠키로 내려줬다고 가정
+    router.push('/')
+  } else {
+    // 예외 처리 (예: 로그인 실패)
+    router.push('/auth/login?error=1')
   }
 })
 </script>
+<template>
+  <div class="p-6 text-center">로그인 처리 중...</div>
+</template>

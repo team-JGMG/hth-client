@@ -191,6 +191,7 @@ import BankAccountInput from '@/components/auth/BankAccountInput.vue'
 import RrnInput from '@/components/auth/RrnInput.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import BaseButton from '../common/Button/BaseButton.vue'
+import { signUpWithPreAuth } from '@/api/auth'
 const router = useRouter()
 const isRrnVerified = ref(false)
 const isPhoneVerified = ref(false)
@@ -277,17 +278,25 @@ const toggleAgreement = (key) => {
   agreements.value[key] = !agreements.value[key]
 }
 
-const handleSubmit = () => {
-  if (!isFormValid.value) return
-  console.log('회원가입 정보 전송:', {
-    nickname: nickname.value,
-    rrn: rrnFront.value + rrnBack.value,
-    phone: phone.value,
-    account_number: accountNumber.value,
-    bank_code: bankCode.value,
-  })
+const handleSubmit = async () => {
+  try {
+    const userInfo = {
+      name: nickname.value, // nickname → name으로 변경
+      ssn: rrnFront.value + '-' + rrnBack.value, // 주민번호 조합
+      phone: phone.value,
+      bankCode: bankCode.value,
+      accountNumber: accountNumber.value,
+    }
 
-  router.push('/auth/login')
+    const { data } = await signUpWithPreAuth(userInfo)
+
+    localStorage.setItem('accessToken', data.accessToken)
+    localStorage.setItem('refreshToken', data.refreshToken)
+
+    router.push('/')
+  } catch (e) {
+    console.error('회원가입 실패:', e)
+  }
 }
 </script>
 
