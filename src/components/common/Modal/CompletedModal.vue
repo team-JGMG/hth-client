@@ -4,7 +4,11 @@
       <BaseTypography tag="h3" size="lg" weight="bold" class="mb-7 mt-3">
         <slot></slot>
       </BaseTypography>
-      <span class="material-symbols-outlined text-blue-600 text-8xl">check_circle</span>
+      <span
+        class="material-symbols-outlined text-blue-600"
+        style="font-size: 128px; line-height: 1; display: inline-block"
+        >check_circle</span
+      >
     </div>
 
     <template #submit>
