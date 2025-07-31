@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import axios from 'axios'
+// import axios from 'axios'
 
 const route = useRoute()
 const router = useRouter()
