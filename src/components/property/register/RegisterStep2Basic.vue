@@ -105,20 +105,25 @@
 
     <!-- 공고 기간 -->
     <div class="mb-12 relative">
-      <InputField
-        v-model="store.propertyBasic.period"
-        label="희망 공고 기간"
-        type="date"
-        placeholder="날짜를 선택해주세요."
-        @focus="touched.period = true"
-      />
+      <div class="flex items-center w-full gap-3">
+        <div class="flex-1">
+          <InputField
+            v-model="store.propertyBasic.period"
+            label="희망 공고 기간"
+            type="date"
+            placeholder="개월 수를 숫자로 입력해주세요."
+            @focus="touched.period = true"
+          />
+        </div>
+        <span class="text-base text-black translate-y-1">개월</span>
+      </div>
       <BaseTypography
         v-if="touched.period && !periodValid"
         color="red-1"
         size="xs"
         class="absolute mt-1 left-0 top-full"
       >
-        * 날짜를 선택해주세요.
+        {{ store.propertyBasic.period.trim() ? '* 숫자만 입력해주세요.' : '* 필수 항목입니다.' }}
       </BaseTypography>
     </div>
 
@@ -169,7 +174,7 @@ const addressValid = computed(() => store.propertyBasic.address.trim() !== '')
 const detailAddressValid = computed(() => store.propertyBasic.detailAddress.trim() !== '')
 const sizeValid = computed(() => /^[0-9]+$/.test(store.propertyBasic.size.trim()))
 const priceValid = computed(() => /^[0-9]+$/.test(store.propertyBasic.price.trim()))
-const periodValid = computed(() => !!store.propertyBasic.period)
+const periodValid = computed(() => /^[0-9]+$/.test(store.propertyBasic.period.trim()))
 
 const isStepValid = computed(
   () =>
