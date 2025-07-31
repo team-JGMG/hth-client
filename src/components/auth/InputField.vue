@@ -26,7 +26,7 @@ const emit = defineEmits(['update:modelValue', 'focus'])
       @input="(e) => emit('update:modelValue', e.target.value)"
       @focus="emit('focus')"
       :placeholder="props.placeholder"
-      class="w-full border-b border-gray-300 focus:outline-none focus:border-black p-2 text-base"
+      class="w-full border-b border-gray-300 focus:outline-none focus:border-red-400 p-2 text-base"
     />
   </div>
 </template>

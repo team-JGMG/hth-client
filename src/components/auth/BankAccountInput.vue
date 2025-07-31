@@ -31,9 +31,10 @@ const bankLogos = {
 </script>
 
 <template>
-  <div class="relative mb-12">
-    <label class="block text-sm font-medium mb-1">계좌 번호 (- 없이 입력)</label>
+  <div>
+    <!-- <label class="block text-sm font-medium mb-1">계좌 번호 (- 없이 입력)</label> -->
 
+    <BaseTypography class="mb-2">계좌 번호 (- 없이 입력)</BaseTypography>
     <div class="flex items-center gap-2">
       <!-- 클릭 시 모달 -->
       <img

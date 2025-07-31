@@ -50,27 +50,31 @@ const isInvalid = computed(() => {
 
 <template>
   <div class="w-full">
-    <BaseTypography class="block text-sm font-medium mb-2">주민등록번호</BaseTypography>
+    <BaseTypography class="block text-base font-medium mb-2">주민등록번호</BaseTypography>
 
-    <div class="flex items-center gap-1.5">
+    <div class="flex items-center gap-2">
       <!-- 앞자리 -->
-      <input
-        type="text"
-        inputmode="numeric"
-        maxlength="6"
-        placeholder="앞 6자리"
-        class="w-[127px] border-b border-gray-300 focus:outline-none focus:border-black py-2 px-2 text-sm text-left"
-        :value="props.rrnFront"
-        @input="(e) => emit('update:rrnFront', e.target.value.replace(/\D/g, '').slice(0, 6))"
-      />
+      <div class="flex-1">
+        <input
+          type="text"
+          inputmode="numeric"
+          maxlength="6"
+          placeholder="앞 6자리"
+          class="w-full border-b border-gray-300 focus:outline-none focus:border-black p-2 text-base"
+          :value="props.rrnFront"
+          @input="(e) => emit('update:rrnFront', e.target.value.replace(/\D/g, '').slice(0, 6))"
+        />
+      </div>
 
-      <span class="material-symbols-outlined text-xs">remove</span>
+      <!-- 구분자 -->
+      <!-- <span class="material-symbols-outlined text-xs">remove</span> -->
+      <p class="text-base">-</p>
 
       <!-- 뒷자리 (마스킹된 값과 실제 입력 분리) -->
-      <div class="relative w-[147px]">
+      <div class="flex-1 relative">
         <!-- 마스킹 표시 -->
         <div
-          class="absolute inset-0 px-2 py-2 text-sm tracking-widest pointer-events-none text-black"
+          class="absolute w-full inset-0 px-1 py-2 text-base tracking-widest pointer-events-none text-black"
         >
           {{ displayValue }}
         </div>
@@ -81,20 +85,20 @@ const isInvalid = computed(() => {
           inputmode="numeric"
           maxlength="7"
           placeholder="뒤 7자리"
-          class="w-full border-b border-gray-300 focus:outline-none focus:border-black py-2 px-2 text-sm text-left tracking-widest text-transparent caret-black bg-transparent"
+          class="w-full border-b border-gray-300 focus:outline-none focus:border-black p-2 tracking-widest text-transparent caret-black bg-transparent text-base"
           :value="rrnBackRaw"
           @input="handleMaskedInput"
         />
       </div>
     </div>
 
-    <div class="mt-1 min-h-[20px]">
-      <BaseTypography
-        v-show="isInvalid"
-        class="!font-normal text-sm !text-red-500 break-keep leading-snug"
-      >
-        정확한 주민등록번호를 입력해주세요.
-      </BaseTypography>
-    </div>
+    <BaseTypography
+      v-show="isInvalid"
+      color="red-1"
+      size="xs"
+      class="absolute mt-2 left-0 top-full"
+    >
+      * 정확한 주민등록번호를 입력해주세요.
+    </BaseTypography>
   </div>
 </template>
