@@ -163,15 +163,37 @@
       </BaseTypography>
     </div>
 
-    <!-- 준공일 -->
+    <!-- 준공일 (달력 입력) -->
     <div class="mb-12 relative">
       <BaseTypography class="mb-2">준공일</BaseTypography>
-      <InputField
-        v-model="store.propertyBuilding.builtDate"
-        type="date"
-        placeholder="날짜를 입력해주세요."
-        @focus="touched.builtDate = true"
-      />
+
+      <div class="relative">
+        <input
+          type="text"
+          class="w-full border-b border-gray-300 py-2 pr-10 text-base text-gray-600 focus:outline-none"
+          placeholder="날짜를 선택해주세요."
+          :value="formattedBuiltDate"
+          @focus="onBuiltDateFocus"
+          readonly
+        />
+        <!-- 달력 아이콘 -->
+        <span
+          class="material-symbols-outlined absolute right-2 top-2 text-gray-400 cursor-pointer"
+          @click="onBuiltDateFocus"
+        >
+          calendar_month
+        </span>
+      </div>
+
+      <!-- 달력 컴포넌트 -->
+      <div v-if="isDatePickerOpen" class="absolute z-50 mt-2 shadow-lg bg-white border rounded">
+        <VDatePicker
+          v-model="store.propertyBuilding.builtDate"
+          is-inline
+          @update:modelValue="handleDateSelect"
+        />
+      </div>
+
       <BaseTypography
         v-if="touched.builtDate && !isValid.builtDate"
         color="red-1"
@@ -250,11 +272,29 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { format } from 'date-fns'
 import { usePropertyRegisterStore } from '@/stores/propertyRegister'
 import InputField from '@/components/auth/InputField.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import CompletedButton from '@/components/common/Button/CompletedButton.vue'
 import InputSelect from '@/components/common/Select/InputSelect.vue'
+
+const isDatePickerOpen = ref(false)
+
+const formattedBuiltDate = computed(() => {
+  const raw = store.propertyBuilding.builtDate
+  if (!raw) return ''
+  return format(new Date(raw), 'yyyy-MM-dd')
+})
+
+const onBuiltDateFocus = () => {
+  isDatePickerOpen.value = true
+  touched.value.builtDate = true
+}
+
+const handleDateSelect = () => {
+  isDatePickerOpen.value = false
+}
 
 const store = usePropertyRegisterStore()
 
@@ -308,3 +348,19 @@ const handleNext = () => {
   }
 }
 </script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  display: inline-block;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  direction: ltr;
+}
+</style>
