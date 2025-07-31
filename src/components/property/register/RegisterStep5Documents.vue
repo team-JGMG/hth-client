@@ -86,11 +86,11 @@
     >
       매물이 성공적으로 등록되었습니다.
 
-      <template #submitText> 마이페이지로 이동 </template>
+      <template #submitText> 완료 </template>
     </CompletedModal>
   </div>
 </template>
-s
+
 <script setup>
 import { ref, computed } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
