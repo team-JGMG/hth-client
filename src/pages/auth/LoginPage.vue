@@ -2,6 +2,16 @@
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import SocialLoginButton from '@/components/common/Button/SocialLoginButton.vue'
 import BlankLayout from '@/layouts/BlankLayout.vue'
+import { getKakaoLoginUrl } from '@/api/auth'
+const handleKakaoLogin = async () => {
+  try {
+    const { data } = await getKakaoLoginUrl()
+    const loginUrl = data.data.loginUrl
+    window.location.href = loginUrl // 백엔드가 알려준 Kakao 로그인 URL로 이동
+  } catch (e) {
+    console.error('카카오 로그인 URL 불러오기 실패', e)
+  }
+}
 </script>
 
 <template>
@@ -15,7 +25,7 @@ import BlankLayout from '@/layouts/BlankLayout.vue'
       </BaseTypography>
 
       <div class="flex flex-col gap-3 w-full max-w-sm mt-6">
-        <SocialLoginButton type="kakao" />
+        <SocialLoginButton type="kakao" @click="handleKakaoLogin" />
         <SocialLoginButton type="naver" />
         <SocialLoginButton type="google" />
       </div>
