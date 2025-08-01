@@ -20,15 +20,13 @@ const emit = defineEmits(['close', 'completed'])
 
 const handleConfirm = async () => {
   try {
-    const response = await axios.post('/api/funding-order', null, {
-      params: {
-        // userId: userStore.userId,
-        userId: 1,
-        fundingId: props.fundingId,
-        price: props.amount,
-        shareCount: props.quantity,
-        orderType: props.type.toUpperCase(),
-      },
+    const response = await axios.post('/api/orders', {
+      // userId: userStore.userId,
+      userId: 1,
+      fundingId: props.fundingId,
+      orderPricePerShare: props.amount,
+      orderShareCount: props.quantity,
+      orderType: props.type.toUpperCase(),
     })
 
     console.log('✅ 주문 성공:', response.data)
