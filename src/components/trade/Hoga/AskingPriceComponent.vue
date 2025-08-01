@@ -1,34 +1,42 @@
-<!-- 호가 차트 컴포넌트! -->
 <template>
   <VChart :option="option" autoresize class="w-full min-h-[800px]" />
 </template>
+
 <script setup>
-import { ref, onMounted, defineEmits } from 'vue'
+import { ref, defineEmits } from 'vue'
+import { useTradeStore } from '@/stores/tradeStore'
 import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
 import { BarChart } from 'echarts/charts'
 import { GridComponent } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
-
-import { mockOrderbook, parseOrderbookData, currentPrice } from '@/utils/orderData.js'
+import { useOrderBookSocket } from '@/hooks/useOrderBookSocket'
 
 use([BarChart, GridComponent, CanvasRenderer])
 
-const option = ref({})
 const emit = defineEmits(['centerIndex'])
+const option = ref({})
+const fundingId = 1 // 실제 fundingId로 바꿔주세요
 
-onMounted(() => {
-  const { prices, buyVolumes, sellVolumes } = parseOrderbookData(mockOrderbook)
+const tradeStore = useTradeStore()
 
+useOrderBookSocket(fundingId, (parsedData) => {
+  console.log('Received data from WebSocket:', parsedData)
+  tradeStore.setTradeData(parsedData)
+  updateChart(parsedData)
+})
+
+const updateChart = (parsed) => {
+  const { prices, buyVolumes, sellVolumes, currentPrice } = parsed
   const currentPriceIndex = prices.findIndex((p) => p === currentPrice)
 
   emit('centerIndex', currentPriceIndex)
 
   option.value = {
     grid: [
-      { left: '0%', right: '60%', containLabel: false },
-      { left: '60%', right: '0%', containLabel: false },
-      { left: '50%', right: '40%', width: '10%', containLabel: false },
+      { left: '0%', right: '60%', containLabel: false }, // 매도
+      { left: '60%', right: '0%', containLabel: false }, // 매수
+      { left: '50%', right: '40%', width: '10%', containLabel: false }, // 가격
     ],
     xAxis: [
       {
@@ -63,7 +71,7 @@ onMounted(() => {
       {
         type: 'category',
         gridIndex: 0,
-        inverse: true,
+        inverse: false,
         data: prices,
         axisLine: { show: false },
         axisTick: { show: false },
@@ -73,7 +81,7 @@ onMounted(() => {
       {
         type: 'category',
         gridIndex: 1,
-        inverse: true,
+        inverse: false,
         data: prices,
         axisLine: { show: false },
         axisTick: { show: false },
@@ -83,18 +91,17 @@ onMounted(() => {
       {
         type: 'category',
         gridIndex: 2,
-        inverse: true,
+        inverse: false,
         data: prices,
         axisLine: { show: false },
         axisTick: { show: false },
         axisLabel: {
           show: true,
           align: 'center',
-          margin: 0,
           formatter: (value, index) => {
             if (index === currentPriceIndex) return `{highlight|${value}}`
-            else if (buyVolumes[index] > 0) return `{red|${value}}`
-            else if (sellVolumes[index] > 0) return `{blue|${value}}`
+            else if (buyVolumes[index] > 0) return `{blue|${value}}`
+            else if (sellVolumes[index] > 0) return `{red|${value}}`
             else return value
           },
           rich: {
@@ -104,7 +111,6 @@ onMounted(() => {
               color: '#000',
               fontWeight: 'bold',
               fontSize: 14,
-              borderRadius: 2,
             },
           },
         },
@@ -113,46 +119,42 @@ onMounted(() => {
     ],
     series: [
       {
-        name: '매수',
+        name: '매도',
         type: 'bar',
         xAxisIndex: 0,
         yAxisIndex: 0,
-        data: buyVolumes,
+        data: sellVolumes,
         barWidth: 30,
         itemStyle: {
           color: '#cce5ff',
-          borderRadius: [7, 7, 7, 7],
+          borderRadius: [4, 4, 4, 4],
         },
         label: {
           show: true,
           position: 'inside',
-          formatter: (params) => {
-            return params.value === 0 ? '' : params.value
-          },
+          formatter: (params) => (params.value === 0 ? '' : params.value),
           fontWeight: 'bold',
         },
       },
       {
-        name: '매도',
+        name: '매수',
         type: 'bar',
         xAxisIndex: 1,
         yAxisIndex: 1,
-        data: sellVolumes,
+        data: buyVolumes,
         barWidth: 30,
         itemStyle: {
           color: '#fbd5d5',
-          borderRadius: [7, 7, 7, 7],
+          borderRadius: [4, 4, 4, 4],
         },
         label: {
           show: true,
           position: 'inside',
-          formatter: (params) => {
-            return params.value === 0 ? '' : params.value
-          },
+          formatter: (params) => (params.value === 0 ? '' : params.value),
           fontWeight: 'bold',
         },
       },
     ],
   }
-})
+}
 </script>
