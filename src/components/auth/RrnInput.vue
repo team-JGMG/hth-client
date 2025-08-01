@@ -1,3 +1,4 @@
+//RrnInput.vue
 <script setup>
 import { ref, computed, watch } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
@@ -102,3 +103,4 @@ const isInvalid = computed(() => {
     </BaseTypography>
   </div>
 </template>
+//백에 보낼떄는 앞,뒤자리 합쳐서 보내야함.

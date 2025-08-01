@@ -1,26 +1,41 @@
+//LoginCallback.vue
+
 <script setup>
-import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-// import axios from 'axios'
+import { fetchUserInfo } from '@/api/auth'
+import { useAuthStore } from '@/stores/authStore'
 
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
+const preauthToken = route.query.preauthToken // ✅ 쿼리에서 먼저 받음
+const status = route.query.status
+const email = route.query.email
 
-onMounted(() => {
-  const status = route.query.status
-
-  if (status === 'PRE_AUTH') {
-    // 회원가입이 필요한 신규 사용자
-    router.push('/auth/signup')
-  } else if (status === 'SUCCESS') {
-    // 기존 사용자, 백엔드에서 토큰 쿠키로 내려줬다고 가정
-    router.push('/')
+const handleCallback = async () => {
+  if (status === 'SUCCESS') {
+    try {
+      const res = await fetchUserInfo()
+      authStore.setUserInfo(res.data)
+      authStore.setLoggedIn(true)
+      router.push('/') // 메인 페이지
+    } catch (err) {
+      console.error('유저 정보 요청 실패:', err)
+      router.push('/auth/login?error=1')
+    }
+  } else if (status === 'SIGNUP_REQUIRED') {
+    router.push({
+      path: '/auth/signup',
+      query: { email, preauthToken }, // 쿼리로 이메일 전달
+    })
   } else {
-    // 예외 처리 (예: 로그인 실패)
-    router.push('/auth/login?error=1')
+    router.push('/auth/login?error=1') // 예외 처리
   }
-})
+}
+
+handleCallback()
 </script>
+
 <template>
-  <div class="p-6 text-center">로그인 처리 중...</div>
+  <div>로그인 처리 중입니다...</div>
 </template>
