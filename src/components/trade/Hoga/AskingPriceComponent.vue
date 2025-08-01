@@ -27,6 +27,7 @@ useOrderBookSocket(fundingId, (parsedData) => {
 })
 
 const updateChart = (parsed) => {
+  console.log('📊 차트 갱신 시작', parsed)
   const { prices, buyVolumes, sellVolumes, currentPrice } = parsed
   const currentPriceIndex = prices.findIndex((p) => p === currentPrice)
 
@@ -156,5 +157,6 @@ const updateChart = (parsed) => {
       },
     ],
   }
+  console.log('✅ 최종 option:', JSON.stringify(option.value, null, 2))
 }
 </script>
