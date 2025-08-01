@@ -1,5 +1,5 @@
 <script setup>
-import axios from 'axios'
+import { createOrder } from '@/api/trade'
 import BaseModal from '@/components/common/Modal/BaseModal.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import { computed } from 'vue'
@@ -10,7 +10,7 @@ const props = defineProps({
   amount: Number,
   quantity: Number,
   isOpen: Boolean,
-  fundingId: Number, // 추가로 펀딩 ID도 받아야 함
+  fundingId: Number,
 })
 
 const total = computed(() => props.amount * props.quantity)
@@ -20,7 +20,7 @@ const emit = defineEmits(['close', 'completed'])
 
 const handleConfirm = async () => {
   try {
-    const response = await axios.post('/api/orders', {
+    const response = await createOrder({
       // userId: userStore.userId,
       userId: 1,
       fundingId: props.fundingId,
