@@ -1,10 +1,11 @@
+// BankSelectModal.vue
 <script setup>
 import { ref } from 'vue'
 
 const emit = defineEmits(['close', 'select'])
 
 const selectedBank = ref(null)
-
+// 백에는 은행코드 영문 대문자 두글자만 보내야함.
 const banks = [
   {
     code: 'KB',
@@ -12,7 +13,7 @@ const banks = [
     img: new URL('@/assets/images/KbIcon.png', import.meta.url).href,
   },
   {
-    code: 'SHINHAN',
+    code: 'SH',
     label: '신한은행',
     img: new URL('@/assets/images/ShinhanIcon.png', import.meta.url).href,
   },
@@ -22,32 +23,32 @@ const banks = [
     img: new URL('@/assets/images/NonghyupIcon.png', import.meta.url).href,
   },
   {
-    code: 'KAKAOBANK',
+    code: 'KA',
     label: '카카오뱅크',
     img: new URL('@/assets/images/KakaoIcon.png', import.meta.url).href,
   },
   {
-    code: 'IBK',
+    code: 'IB',
     label: '기업은행',
     img: new URL('@/assets/images/IbkIcon.png', import.meta.url).href,
   },
   {
-    code: 'TOSS',
+    code: 'TS',
     label: '토스뱅크',
     img: new URL('@/assets/images/TossIcon.png', import.meta.url).href,
   },
   {
-    code: 'WOORI',
+    code: 'WR',
     label: '우리은행',
     img: new URL('@/assets/images/WooriIcon.png', import.meta.url).href,
   },
   {
-    code: 'HANA',
+    code: 'HN',
     label: '하나은행',
     img: new URL('@/assets/images/HanaIcon.png', import.meta.url).href,
   },
   {
-    code: 'K',
+    code: 'KB',
     label: '케이뱅크',
     img: new URL('@/assets/images/KBankIcon.png', import.meta.url).href,
   },

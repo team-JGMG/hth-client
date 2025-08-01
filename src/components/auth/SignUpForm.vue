@@ -1,3 +1,4 @@
+//signUpForm.vue
 <template>
   <div class="w-full max-w-md mx-auto px-4">
     <BaseTypography class="mb-6" size="xl" weight="bold">
@@ -197,14 +198,19 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router' // ✅ 이 순서로 선언
 import InputField from '@/components/auth/InputField.vue'
 import BankAccountInput from '@/components/auth/BankAccountInput.vue'
 import RrnInput from '@/components/auth/RrnInput.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import BaseButton from '../common/Button/BaseButton.vue'
 import { signUpWithPreAuth } from '@/api/auth'
+
 const router = useRouter()
+const route = useRoute()
+
+const preauthToken = route.query.preauthToken
+
 // const isRrnVerified = ref(false)
 const isPhoneVerified = ref(false)
 const isAccountVerified = ref(false)
@@ -300,13 +306,14 @@ const toggleAgreement = (key) => {
 const handleSubmit = async () => {
   try {
     const userInfo = {
-      name: nickname.value, // nickname → name으로 변경
-      ssn: rrnFront.value + '-' + rrnBack.value, // 주민번호 조합
-      phone: phone.value,
-      bankCode: bankCode.value,
       accountNumber: accountNumber.value,
+      bankCode: bankCode.value,
+      name: nickname.value,
+      phone: phone.value,
+      ssn: rrnFront.value + rrnBack.value,
     }
-
+    console.log('preauthToken:', preauthToken)
+    console.log('userInfo 보내는 값:', userInfo)
     const { data } = await signUpWithPreAuth(userInfo)
 
     localStorage.setItem('accessToken', data.accessToken)
@@ -315,6 +322,7 @@ const handleSubmit = async () => {
     router.push('/')
   } catch (e) {
     console.error('회원가입 실패:', e)
+    alert('회원가입에 실패했습니다. 다시 시도해주세요.')
   }
 }
 </script>
