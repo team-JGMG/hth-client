@@ -15,13 +15,13 @@ export default defineConfig({
   define: {
     global: 'window',
   },
-  // server: {
-  //   proxy: {
-  //     '/api': {
-  //       target: '',
-  //       changeOrigin: true,
-  //       rewrite: (path) => path.replace(/^\/api/, ''),
-  //     },
-  //   },
-  // },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+    },
+    historyApiFallback: true,
+  },
 })

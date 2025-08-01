@@ -39,7 +39,7 @@
 
     <transition name="slide-up">
       <div v-if="isOpen" class="p-4 pt-0 bg-black text-white">
-        <TradeForm :type="activeMode" />
+        <TradeForm :type="activeMode" @completed="$emit('completed')" />
         <div class="mb-18"></div>
       </div>
     </transition>

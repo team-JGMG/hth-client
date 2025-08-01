@@ -8,9 +8,9 @@
 
     <div class="flex-1 overflow-y-auto">
       <OrderbookChart v-if="currentFundingStatus === 'askingPrice'" />
-      <TradeHistoryChart v-if="currentFundingStatus === 'stockChart'" />
+      <TradeHistoryChart ref="tradeHistoryChart" v-if="currentFundingStatus === 'stockChart'" />
     </div>
-    <BuyAndSellAccodian class="fixed bottom-16 left-0 right-0 max-w-md mx-auto">
+    <BuyAndSellAccodian @completed="handleTradeCompleted" class="fixed bottom-16 left-0 right-0 max-w-md mx-auto">
     </BuyAndSellAccodian>
   </BlankLayout>
 </template>
@@ -30,6 +30,14 @@ import { mockTradeListData } from '@/utils/mockTradeListData.js'
 const route = useRoute()
 const tradeId = route.params.id
 const tradeItem = mockTradeListData[tradeId - 1]
+
+const tradeHistoryChart = ref(null)
+
+const handleTradeCompleted = () => {
+  if (tradeHistoryChart.value) {
+    tradeHistoryChart.value.fetchChartData()
+  }
+}
 
 const fundingStatusTabs = [
   { label: '호가', value: 'askingPrice' },

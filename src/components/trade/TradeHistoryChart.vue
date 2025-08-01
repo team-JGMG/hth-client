@@ -34,7 +34,7 @@ echarts.use([
 
 const option = ref({})
 
-onMounted(() => {
+const fetchChartData = () => {
   const times = chartData.map((d) => d.time)
   const prices = chartData.map((d) => d.price)
   const volumes = chartData.map((d) => d.volume)
@@ -200,6 +200,14 @@ onMounted(() => {
       },
     ],
   }
+}
+
+onMounted(() => {
+  fetchChartData()
+})
+
+defineExpose({
+  fetchChartData,
 })
 </script>
 
