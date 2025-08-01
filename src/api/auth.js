@@ -72,3 +72,7 @@ export const logout = async () => {
 export const fetchUserInfo = async () => {
   return api.get('/auth/me')
 }
+// ✅ 🔥 [추가] 마이페이지용 유저 상세 정보 요청 (/api/users/me)
+export const fetchMyUserInfo = async () => {
+  return api.get('/api/users/me') // 이건 인증 필요
+}

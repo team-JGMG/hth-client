@@ -1,7 +1,9 @@
+<!-- myPage.vue -->
 <script setup>
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-
+import { useUserStore } from '@/stores/user'
+import { onMounted } from 'vue'
 import DetailHeader from '@/layouts/DetailHeader.vue'
 import DetailLayout from '@/layouts/DetailLayout.vue'
 import BaseTab from '@/components/common/Tab/BaseTab.vue'
@@ -9,7 +11,12 @@ import LogoutSection from '@/components/account/LogoutSection.vue'
 
 import LoggedInPointSection from '@/components/main/PointSection/LoggedInPointSection.vue'
 import BaseButton from '@/components/common/Button/BaseButton.vue'
-
+const userStore = useUserStore()
+onMounted(async () => {
+  if (userStore.getIsLoggedIn) {
+    await userStore.loadUserInfo()
+  }
+})
 const tabs = [
   { label: '포인트', value: 'points', path: '/account/my-page/points' },
   { label: '내가 올린 매물', value: 'listings', path: '/account/my-page/listings' },

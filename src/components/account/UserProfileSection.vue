@@ -1,3 +1,4 @@
+<!-- UserProfileSection.vue -->
 <template>
   <div class="bg-black text-white p-4 rounded-lg shadow relative">
     <!-- 유저 이름 & 포인트 라벨 -->
