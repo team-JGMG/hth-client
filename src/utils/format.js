@@ -50,3 +50,11 @@ export const dDay = (val) => {
   const diff = Math.ceil((end - today) / (1000 * 60 * 60 * 24))
   return diff > 0 ? diff : 0
 }
+
+// 금액 포맷터 (예: 100000000 → 10억원)
+export function formatAmount(amount) {
+  if (!amount) return ''
+  if (amount >= 100000000) return `${amount / 100000000}억원`
+  if (amount >= 10000) return `${amount / 10000}만원`
+  return `${amount}원`
+}
