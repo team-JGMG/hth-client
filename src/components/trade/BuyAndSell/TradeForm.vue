@@ -59,6 +59,7 @@
       :amount="amount"
       :quantity="quantity"
       :isOpen="isConfirmOpen"
+      :fundingId="1"
       @close="isConfirmOpen = false"
       @confirm="confirmTrade"
     />
