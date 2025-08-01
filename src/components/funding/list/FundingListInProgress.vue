@@ -1,7 +1,16 @@
 <template>
-  <FundingItemCard status="모집 중" />
+  <div class="grid grid-cols-2 sm:grid-cols-2 gap-4">
+    <FundingItemCard v-for="item in items" :key="item.fundingId" :item="item" status="모집 중" />
+  </div>
 </template>
 
 <script setup>
 import FundingItemCard from '@/components/funding/list/FundingItemCard.vue'
+
+defineProps({
+  items: {
+    type: Array,
+    default: () => [],
+  },
+})
 </script>
