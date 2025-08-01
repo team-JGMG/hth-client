@@ -6,7 +6,7 @@
         진행하시겠습니까?
       </BaseTypography>
       <BaseTypography color="gray-1" size="base" class="text-start mb-0">
-        주당 가격: {{ amount.toLocaleString() }}원/주 <br />
+        주당 가격: {{ amount.toLocaleString() }}원 <br />
         수량: {{ quantity }}주 <br />
         총 금액: {{ total.toLocaleString() }}원 <br />
         <!-- 추후 현재 보유 포인트 +- 계산 -->
