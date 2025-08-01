@@ -1,3 +1,4 @@
+//router/modules/auth.js
 import LoginPage from '@/pages/auth/LoginPage.vue'
 import SignUpPage from '@/pages/auth/SignUpPage.vue'
 import LoginCallback from '@/pages/auth/LoginCallback.vue'

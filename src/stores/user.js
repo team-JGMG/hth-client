@@ -1,22 +1,17 @@
-import { computed, ref } from 'vue'
-
+import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import { fetchMyUserInfo } from '@/api/auth'
 
 export const useUserStore = defineStore('user', () => {
   const savedToken = localStorage.getItem('authToken')
-  const userName = ref('')
-  const userPoints = ref(0)
   const authToken = ref(savedToken || '')
 
+  const userInfo = ref(null) // 🔥 전체 유저 정보 저장
+  const userName = computed(() => userInfo.value?.name || '')
+  const userPoints = computed(() => userInfo.value?.point || 0) // 필요시
+  const userId = computed(() => userInfo.value?.userId || null)
+
   const getIsLoggedIn = computed(() => !!authToken.value)
-
-  function setUserName(name) {
-    userName.value = name
-  }
-
-  function setUserPoints(points) {
-    userPoints.value = points
-  }
 
   function setAuthToken(token) {
     authToken.value = token
@@ -28,19 +23,25 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function clearUserData() {
-    userName.value = ''
-    userPoints.value = 0
+    userInfo.value = null
     setAuthToken(null)
   }
 
+  // 🔥 마이페이지용: 전체 사용자 정보 로딩
+  async function loadUserInfo() {
+    const res = await fetchMyUserInfo()
+    userInfo.value = res.data
+  }
+
   return {
+    authToken,
+    userInfo,
     userName,
     userPoints,
-    authToken,
+    userId,
     getIsLoggedIn,
-    setUserName,
-    setUserPoints,
     setAuthToken,
     clearUserData,
+    loadUserInfo,
   }
 })
