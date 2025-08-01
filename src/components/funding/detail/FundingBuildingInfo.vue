@@ -44,29 +44,26 @@ import { format, formatDate } from '@/utils/format' // ✅ 유틸에서 불러�
 const props = defineProps({ item: Object })
 
 const infoList = {
-  address: props.item.address,
-  scale: `${props.item.basementFloors}층(지하) / ${props.item.groundFloors}층(지상)`,
-  propertyType: props.item.propertyType,
-  totalFloorAreaBuilding: props.item.totalFloorAreaBuilding,
-  totalFloorAreaProperty: props.item.totalFloorAreaProperty,
+  usageDistrict: props.item.usageDistrict,
   buildingArea: props.item.buildingArea,
   landArea: props.item.landArea,
-  usageDistrict: props.item.usageDistrict,
+  totalFloorAreaBuilding: props.item.totalFloorAreaBuilding,
+  totalFloorAreaProperty: props.item.totalFloorAreaProperty,
+  scale: `${props.item.basementFloors}층(지하) / ${props.item.groundFloors}층(지상)`,
+
   approvalDate: props.item.approvalDate,
   officialLandPrice: props.item.officialLandPrice,
   unitPricePerPyeong: props.item.unitPricePerPyeong,
 }
 
 const labels = {
-  address: '주소',
-  scale: '규모',
-  propertyType: '거래대상',
+  usageDistrict: '용도지역',
+  buildingArea: '대지 면적(매물)',
+  landArea: '대지 면적(건물)',
   totalFloorAreaBuilding: '연면적(건물)',
   totalFloorAreaProperty: '연면적(매물)',
-  buildingArea: '거래 연면적',
-  landArea: '전체 대지 면적',
-  usageDistrict: '용도지역',
-  approvalDate: '준공년월',
+  scale: '건물 규모',
+  approvalDate: '준공일',
   officialLandPrice: '공시지가',
   unitPricePerPyeong: '연면적 평단가',
 }
