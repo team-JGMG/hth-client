@@ -1,3 +1,47 @@
+<script setup>
+import axios from 'axios'
+import BaseModal from '@/components/common/Modal/BaseModal.vue'
+import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
+import { computed } from 'vue'
+// import { useUserStore } from '@/stores/user'
+
+const props = defineProps({
+  type: String, // 'buy' or 'sell'
+  amount: Number,
+  quantity: Number,
+  isOpen: Boolean,
+  fundingId: Number, // 추가로 펀딩 ID도 받아야 함
+})
+
+const total = computed(() => props.amount * props.quantity)
+// const userStore = useUserStore()
+
+const emit = defineEmits(['close', 'completed'])
+
+const handleConfirm = async () => {
+  try {
+    const response = await axios.post('/api/funding-order', null, {
+      params: {
+        // userId: userStore.userId,
+        userId: 1,
+        fundingId: props.fundingId,
+        price: props.amount,
+        shareCount: props.quantity,
+        orderType: props.type.toUpperCase(),
+      },
+    })
+
+    console.log('✅ 주문 성공:', response.data)
+
+    emit('completed')
+    emit('close')
+  } catch (error) {
+    console.error('❌ 주문 실패:', error)
+    alert(error?.response?.data?.message || '주문 중 오류가 발생했습니다.')
+  }
+}
+</script>
+
 <template>
   <BaseModal :isOpen="isOpen" @close="$emit('close')">
     <div class="p-4">
@@ -9,27 +53,14 @@
         주당 가격: {{ amount.toLocaleString() }}원 <br />
         수량: {{ quantity }}주 <br />
         총 금액: {{ total.toLocaleString() }}원 <br />
-        <!-- 추후 현재 보유 포인트 +- 계산 -->
-        예상 잔여 포인트: 50,000원</BaseTypography
-      >
+        예상 잔여 포인트: 50,000원
+      </BaseTypography>
     </div>
+
     <template #submit>
-      <BaseTypography color="white"> {{ type === 'buy' ? '구매' : '판매' }}하기 </BaseTypography>
+      <button @click="handleConfirm" class="w-full bg-black text-white py-3 rounded-xl mt-6">
+        {{ type === 'buy' ? '구매' : '판매' }}하기
+      </button>
     </template>
   </BaseModal>
 </template>
-
-<script setup>
-import BaseModal from '@/components/common/Modal/BaseModal.vue'
-import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import { computed } from 'vue'
-
-const props = defineProps({
-  type: String, // 'buy' or 'sell'
-  amount: Number,
-  quantity: Number,
-  isOpen: Boolean,
-})
-
-const total = computed(() => props.amount * props.quantity)
-</script>
