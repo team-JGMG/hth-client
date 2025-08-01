@@ -61,7 +61,7 @@
       :isOpen="isConfirmOpen"
       :fundingId="1"
       @close="isConfirmOpen = false"
-      @confirm="confirmTrade"
+      @completed="handleTradeCompleted"
     />
   </div>
 </template>
@@ -88,17 +88,14 @@ const decrementAmount = () => (amount.value = Math.max(0, amount.value - 10))
 const incrementQuantity = () => (quantity.value += 1)
 const decrementQuantity = () => (quantity.value = Math.max(0, quantity.value - 1))
 
-const openConfirmModal = () => {
-  isConfirmOpen.value = true
+const emit = defineEmits(['completed'])
+
+const handleTradeCompleted = () => {
+  emit('completed')
 }
 
-const confirmTrade = () => {
-  console.log(`${props.type === 'buy' ? '구매' : '판매'} 요청`, {
-    amount: amount.value,
-    quantity: quantity.value,
-    total: amount.value * quantity.value,
-  })
-  isConfirmOpen.value = false
+const openConfirmModal = () => {
+  isConfirmOpen.value = true
 }
 
 const buttonText = computed(() => (props.type === 'buy' ? '구매하기' : '판매하기'))
