@@ -10,8 +10,12 @@
         />
         <div class="flex items-center gap-x-1 ml-2 flex-shrink-0">
           <BaseTypography weight="medium" class="text-black text-lg">원</BaseTypography>
-          <button @click="decrementAmount" class="btn-circle">－</button>
-          <button @click="incrementAmount" class="btn-circle">＋</button>
+          <button @click="decrementAmount" class="btn-circle">
+            <span class="material-symbols-outlined"> remove </span>
+          </button>
+          <button @click="incrementAmount" class="btn-circle">
+            <span class="material-symbols-outlined"> add </span>
+          </button>
         </div>
       </div>
     </div>
@@ -26,8 +30,12 @@
         />
         <div class="flex items-center gap-x-1 ml-2 flex-shrink-0">
           <BaseTypography weight="medium" class="text-black text-lg">주</BaseTypography>
-          <button @click="decrementQuantity" class="btn-circle">－</button>
-          <button @click="incrementQuantity" class="btn-circle">＋</button>
+          <button @click="decrementQuantity" class="btn-circle">
+            <span class="material-symbols-outlined"> remove </span>
+          </button>
+          <button @click="incrementQuantity" class="btn-circle">
+            <span class="material-symbols-outlined"> add </span>
+          </button>
         </div>
       </div>
     </div>
