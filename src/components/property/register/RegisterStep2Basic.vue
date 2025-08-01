@@ -162,10 +162,29 @@ const touched = ref({
   period: false,
 })
 
-// 주소 검색 임시 처리
 const searchAddress = () => {
-  store.propertyBasic.zipcode = '12345'
-  store.propertyBasic.address = '서울시 강남구 테헤란로 123'
+  new daum.Postcode({
+    oncomplete: function (data) {
+      // 사용자가 선택한 주소를 구성
+      let fullAddr = data.address
+      let extraAddr = ''
+
+      if (data.addressType === 'R') {
+        if (data.bname !== '') extraAddr += data.bname
+        if (data.buildingName !== '') {
+          extraAddr += extraAddr !== '' ? ', ' + data.buildingName : data.buildingName
+        }
+        fullAddr += extraAddr !== '' ? ' (' + extraAddr + ')' : ''
+      }
+
+      // 입력 필드에 데이터 바인딩
+      store.propertyBasic.zipcode = data.zonecode
+      store.propertyBasic.address = fullAddr
+
+      // 상세 주소는 사용자가 직접 입력
+      touched.value.address = true
+    },
+  }).open()
 }
 
 // 유효성 검사
