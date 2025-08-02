@@ -26,12 +26,13 @@
     </button>
   </BaseCard>
 </template>
-
 <script setup>
 import BaseCard from '@/components/common/Card/BaseCard.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import { useRouter } from 'vue-router'
-import { ref, onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
+
+const router = useRouter()
 
 const props = defineProps({
   items: {
@@ -40,11 +41,10 @@ const props = defineProps({
   },
 })
 
-const router = useRouter()
-
 const tradeItems = ref([])
 
 onMounted(() => {
+  console.log('💡 props.items:', props.items)
   const imagePaths = [
     new URL('../../assets/images/randombuilding/building1.png', import.meta.url).href,
     new URL('../../assets/images/randombuilding/building2.png', import.meta.url).href,
@@ -57,9 +57,9 @@ onMounted(() => {
   let needsUpdate = false
 
   props.items.forEach((item) => {
-    if (!newAssignments[item.id]) {
+    if (!newAssignments[item.fundingId]) {
       const randomIndex = Math.floor(Math.random() * imagePaths.length)
-      newAssignments[item.id] = imagePaths[randomIndex]
+      newAssignments[item.fundingId] = imagePaths[randomIndex]
       needsUpdate = true
     }
   })
@@ -69,8 +69,9 @@ onMounted(() => {
   }
 
   tradeItems.value = props.items.map((item) => ({
-    ...item,
-    image: newAssignments[item.id],
+    id: item.fundingId,
+    name: item.title,
+    image: newAssignments[item.fundingId],
   }))
 })
 
