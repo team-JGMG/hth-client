@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import BaseTab from '@/components/common/Tab/BaseTab.vue'
 import BlankLayout from '@/layouts/BlankLayout.vue'
 import DetailHeader from '@/layouts/DetailHeader.vue'
@@ -37,11 +37,11 @@ import CurrentPrice from '@/components/trade/CurrentPrice.vue'
 import TradeHistoryChart from '@/components/trade/TradeHistoryChart.vue'
 import OrderbookChart from '@/components/trade/Hoga/OrderbookChart.vue'
 import { useRoute } from 'vue-router'
-import { mockTradeListData } from '@/utils/mockTradeListData.js'
+import { fetchEndedFundings } from '@/api/funding'
 
 const route = useRoute()
-const tradeId = route.params.id
-const tradeItem = mockTradeListData[tradeId - 1]
+const tradeId = Number(route.params.id)
+const tradeItem = ref({ name: '' })
 
 const tradeHistoryChart = ref(null)
 const chartRefreshTrigger = ref(0)
@@ -59,6 +59,17 @@ const fundingStatusTabs = [
   { label: '시세', value: 'stockChart' },
 ]
 const currentFundingStatus = ref('askingPrice')
+
+onMounted(async () => {
+  const items = await fetchEndedFundings()
+  const found = items.find((item) => item.fundingId === tradeId)
+  if (found) {
+    tradeItem.value = {
+      name: found.title,
+      ...found,
+    }
+  }
+})
 </script>
 
 <style scoped>
