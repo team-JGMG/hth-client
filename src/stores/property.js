@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
 import { fetchUserProperties } from '@/api/property' // 이 줄만 추가로 필요
+import { ref } from 'vue'
 export const usePropertyStore = defineStore('property', () => {
   const soldProperties = ref([]) // 매각 완료된 매물 목록
   const userProperties = ref([]) // 전체 사용자 매물 목록
