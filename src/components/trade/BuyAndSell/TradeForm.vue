@@ -62,6 +62,7 @@
       :fundingId="1"
       @close="isConfirmOpen = false"
       @completed="handleTradeCompleted"
+      @trade-success="handleTradeCompleted"
     />
   </div>
 </template>
