@@ -33,6 +33,7 @@ const handleConfirm = async () => {
 
     emit('completed')
     emit('close')
+    emit('trade-success')
   } catch (error) {
     console.error('❌ 주문 실패:', error)
     alert(error?.response?.data?.message || '주문 중 오류가 발생했습니다.')
