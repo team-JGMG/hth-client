@@ -57,7 +57,7 @@ const handleConfirm = async () => {
     </div>
 
     <template #submit>
-      <button @click="handleConfirm" class="w-full bg-black text-white py-3 rounded-xl mt-6">
+      <button @click="handleConfirm" class="w-full bg-black text-white rounded-xl mt-0">
         {{ type === 'buy' ? '구매' : '판매' }}하기
       </button>
     </template>
