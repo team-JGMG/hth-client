@@ -1,32 +1,37 @@
 <!-- 매물 목록 페이지 -->
 <template>
   <BlankLayout>
-    <DetailHeader>매물 목록 </DetailHeader>
+    <div class="flex flex-col h-[calc(100vh-3rem)]">
+      <div class="shrink-0">
+        <DetailHeader>매물 목록 </DetailHeader>
 
-    <div class="funding-list-page">
-      <div class="filter-tabs-container mb-2 shrink-0">
-        <BaseTab :tabs="fundingStatusTabs" v-model="currentFundingStatus" />
-      </div>
-      <!-- 정렬 필터 -->
-      <div class="flex justify-end mb-3 pr-4">
-        <select v-model="currentSortOption" class="border px-2 py-1 rounded text-sm">
-          <option v-for="option in sortOptions" :key="option.value" :value="option.value">
-            {{ option.label }}
-          </option>
-        </select>
-      </div>
-    </div>
+        <div class="funding-list-page">
+          <div class="filter-tabs-container mb-2 shrink-0">
+            <BaseTab :tabs="fundingStatusTabs" v-model="currentFundingStatus" />
+          </div>
+        </div>
 
-    <div class="flex-1 overflow-y-auto pb-24">
-      <FundingListInProgress v-if="currentFundingStatus === 'inProgress'" :items="fundingList" />
-      <FundingListCompletedFunding
-        v-if="currentFundingStatus === 'completedFunding'"
-        :items="fundingList"
-      />
-      <FundingListCompletedSale
-        v-if="currentFundingStatus === 'completedSale'"
-        :items="fundingList"
-      />
+        <!-- 정렬 필터 -->
+        <div class="flex justify-end mb-3 pr-4">
+          <select v-model="currentSortOption" class="border px-2 py-1 rounded text-sm">
+            <option v-for="option in sortOptions" :key="option.value" :value="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto pb-24 no-scrollbar">
+        <FundingListInProgress v-if="currentFundingStatus === 'inProgress'" :items="fundingList" />
+        <FundingListCompletedFunding
+          v-if="currentFundingStatus === 'completedFunding'"
+          :items="fundingList"
+        />
+        <FundingListCompletedSale
+          v-if="currentFundingStatus === 'completedSale'"
+          :items="fundingList"
+        />
+      </div>
     </div>
   </BlankLayout>
 </template>
