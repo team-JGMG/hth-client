@@ -8,6 +8,10 @@ export function useOrderBookSocket(fundingId, onUpdate) {
   let stompClient = null
 
   const connectWebSocket = () => {
+    console.log('[WebSocket] connectWebSocket called')
+    if (stompClient && stompClient.active) {
+      stompClient.deactivate()
+    }
     const socket = new SockJS('http://localhost:8080/order-book')
     stompClient = new Client({
       webSocketFactory: () => socket,
@@ -19,10 +23,11 @@ export function useOrderBookSocket(fundingId, onUpdate) {
         // 1. subscribe 먼저
         stompClient.subscribe(`/topic/order-book/${fundingId}`, (message) => {
           const data = JSON.parse(message.body)
-          console.log('[WebSocket 수신]', data)
+          console.log('[WebSocket 수신]', message.body)
           orderBookData.value = data
           if (onUpdate) {
             onUpdate(parseOrderbookData(data))
+            console.log('📡 메시지 파싱 완료', parseOrderbookData(data))
           }
         })
 
@@ -51,7 +56,13 @@ export function useOrderBookSocket(fundingId, onUpdate) {
     }
   })
 
+  const reconnect = () => {
+    console.log('[WebSocket] Reconnecting...')
+    connectWebSocket()
+  }
+
   return {
     orderBookData,
+    reconnect,
   }
 }

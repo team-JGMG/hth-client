@@ -1,5 +1,12 @@
 <script setup>
 import { ref, nextTick, computed } from 'vue'
+
+const props = defineProps({
+  refreshTrigger: { type: Number, default: 0 },
+})
+
+console.log('OrderbookChart - Received refreshTrigger:', props.refreshTrigger)
+
 import AskingPriceComponent from './AskingPriceComponent.vue'
 import { useOrderBookSocket } from '@/hooks/useOrderBookSocket.js'
 
@@ -11,11 +18,11 @@ useOrderBookSocket(1, (data) => {
   parsedData.value = data
 })
 
-const handleCenterIndex = (index) => {
+const handleCenterIndex = (index, prices) => {
   nextTick(() => {
     if (scrollContainer.value) {
-      const rowHeight = 60
       const containerHeight = scrollContainer.value.clientHeight
+      const rowHeight = containerHeight / prices.length
       const scrollTo = index * rowHeight - containerHeight / 2 + rowHeight / 2
       scrollContainer.value.scrollTop = Math.max(scrollTo, 0)
     }
@@ -35,7 +42,7 @@ const lowerLimitPrice = computed(() => parsedData.value?.lowerLimitPrice || 0)
     </div>
 
     <div ref="scrollContainer" class="h-[410px] overflow-y-auto no-scrollbar w-full">
-      <AskingPriceComponent :parsedData="parsedData" @centerIndex="handleCenterIndex" />
+      <AskingPriceComponent :parsedData="parsedData" @centerIndex="handleCenterIndex" :refreshTrigger="props.refreshTrigger" />
     </div>
 
     <div class="text-base text-blue-700 font-semibold">
