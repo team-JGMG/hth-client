@@ -7,10 +7,10 @@
     </div>
 
     <div class="flex-1 overflow-y-auto">
-      <OrderbookChart v-if="currentFundingStatus === 'askingPrice'" />
+      <OrderbookChart v-if="currentFundingStatus === 'askingPrice'" :refreshTrigger="chartRefreshTrigger" />
       <TradeHistoryChart ref="tradeHistoryChart" v-if="currentFundingStatus === 'stockChart'" />
     </div>
-    <BuyAndSellAccodian @completed="handleTradeCompleted" class="fixed bottom-16 left-0 right-0 max-w-md mx-auto">
+    <BuyAndSellAccodian @trade-completed="handleTradeCompleted" class="fixed bottom-16 left-0 right-0 max-w-md mx-auto">
     </BuyAndSellAccodian>
   </BlankLayout>
 </template>
@@ -32,11 +32,14 @@ const tradeId = route.params.id
 const tradeItem = mockTradeListData[tradeId - 1]
 
 const tradeHistoryChart = ref(null)
+const chartRefreshTrigger = ref(0)
 
 const handleTradeCompleted = () => {
   if (tradeHistoryChart.value) {
     tradeHistoryChart.value.fetchChartData()
   }
+  chartRefreshTrigger.value++
+  console.log('TradeOrderPage - chartRefreshTrigger incremented to:', chartRefreshTrigger.value)
 }
 
 const fundingStatusTabs = [
