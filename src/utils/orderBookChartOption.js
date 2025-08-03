@@ -5,9 +5,9 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
 
   return {
     grid: [
-      { left: '0%', right: '60%', containLabel: false },
-      { left: '60%', right: '0%', containLabel: false },
-      { left: '50%', right: '40%', width: '10%', containLabel: false },
+      { top: '0%', bottom: '0%', left: '0%', right: '60%', containLabel: false },
+      { top: '0%', bottom: '0%', left: '60%', right: '0%', containLabel: false },
+      { top: '0%', bottom: '0%', left: '50%', right: '40%', width: '10%', containLabel: false },
     ],
     xAxis: Array(3)
       .fill(0)
