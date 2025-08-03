@@ -6,7 +6,7 @@
           type="number"
           v-model.number="amount"
           class="flex-1 bg-transparent outline-none text-black text-lg min-w-0"
-          placeholder="0원"
+          placeholder="0"
         />
         <div class="flex items-center gap-x-1 ml-2 flex-shrink-0">
           <BaseTypography weight="medium" class="text-black text-lg">원</BaseTypography>
@@ -26,7 +26,7 @@
           type="number"
           v-model.number="quantity"
           class="flex-1 bg-transparent outline-none text-black text-lg min-w-0"
-          placeholder="0주"
+          placeholder="0"
         />
         <div class="flex items-center gap-x-1 ml-2 flex-shrink-0">
           <BaseTypography weight="medium" class="text-black text-lg">주</BaseTypography>
