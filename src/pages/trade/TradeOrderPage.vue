@@ -1,23 +1,32 @@
 <template>
   <BlankLayout>
-    <DetailHeader>{{ tradeItem.name }}</DetailHeader>
-    <CurrentPrice />
-    <div class="filter-tabs-container mb-2 shrink-0">
-      <BaseTab :tabs="fundingStatusTabs" v-model="currentFundingStatus" />
+    <div class="flex flex-col h-[calc(100vh-3rem)]">
+      <!-- 고정 영역 -->
+      <div class="shrink-0">
+        <DetailHeader>{{ tradeItem.name }}</DetailHeader>
+        <div class="bg-white pt-0">
+          <CurrentPrice />
+          <div class="filter-tabs-container mb-2">
+            <BaseTab :tabs="fundingStatusTabs" v-model="currentFundingStatus" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 스크롤 영역 -->
+      <div class="flex-1 overflow-y-auto pb-28 no-scrollbar">
+        <OrderbookChart
+          v-if="currentFundingStatus === 'askingPrice'"
+          :refreshTrigger="chartRefreshTrigger"
+        />
+        <TradeHistoryChart ref="tradeHistoryChart" v-if="currentFundingStatus === 'stockChart'" />
+      </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto pb-28">
-      <OrderbookChart
-        v-if="currentFundingStatus === 'askingPrice'"
-        :refreshTrigger="chartRefreshTrigger"
-      />
-      <TradeHistoryChart ref="tradeHistoryChart" v-if="currentFundingStatus === 'stockChart'" />
-    </div>
+    <!-- 하단 고정 컴포넌트 -->
     <BuyAndSellAccodian
       @trade-completed="handleTradeCompleted"
       class="fixed bottom-16 left-0 right-0 max-w-md mx-auto"
-    >
-    </BuyAndSellAccodian>
+    />
   </BlankLayout>
 </template>
 
@@ -54,3 +63,14 @@ const fundingStatusTabs = [
 ]
 const currentFundingStatus = ref('askingPrice')
 </script>
+
+<style scoped>
+/* ✅ 스크롤바 숨김 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+</style>
