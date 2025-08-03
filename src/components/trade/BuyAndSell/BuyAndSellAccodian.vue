@@ -39,7 +39,7 @@
 
     <transition name="slide-up">
       <div v-if="isOpen" class="p-4 pt-0 bg-black text-white">
-        <TradeForm :type="activeMode" @completed="isOpen = false; emit('trade-completed')" />
+        <TradeForm :type="activeMode" @completed="handleTradeCompleted" />
         <div class="mb-18"></div>
       </div>
     </transition>
@@ -59,7 +59,13 @@ const emit = defineEmits(['trade-completed'])
 const toggleOpen = () => {
   isOpen.value = !isOpen.value
 }
+
 const setActiveMode = (mode) => {
   activeMode.value = mode
+}
+
+const handleTradeCompleted = () => {
+  isOpen.value = false
+  emit('trade-completed')
 }
 </script>

@@ -33,7 +33,7 @@
             <img
               src="@/assets/images/mockup.png"
               alt="앱 화면"
-              class="w-[300px] max-w-full h-auto"
+              class="w-[250px] max-w-full h-auto mb-4"
               @error="handleImageError"
             />
           </div>
