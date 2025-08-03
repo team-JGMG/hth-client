@@ -1,5 +1,5 @@
 <script setup>
-import { ref, nextTick, computed } from 'vue'
+import { ref, nextTick } from 'vue'
 
 const props = defineProps({
   refreshTrigger: { type: Number, default: 0 },
@@ -28,27 +28,15 @@ const handleCenterIndex = (index, prices) => {
     }
   })
 }
-
-// ✅ computed 써야 에러 안남
-const upperLimitPrice = computed(() => parsedData.value?.upperLimitPrice || 0)
-const lowerLimitPrice = computed(() => parsedData.value?.lowerLimitPrice || 0)
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-1 mb-10">
-    <div class="text-sm text-black font-bold">상한가</div>
-    <div class="text-base text-red-500 font-semibold">
-      {{ upperLimitPrice.toLocaleString() }} 원
-    </div>
-
-    <div ref="scrollContainer" class="h-[410px] overflow-y-auto no-scrollbar w-full">
-      <AskingPriceComponent :parsedData="parsedData" @centerIndex="handleCenterIndex" :refreshTrigger="props.refreshTrigger" />
-    </div>
-
-    <div class="text-base text-blue-700 font-semibold">
-      {{ lowerLimitPrice.toLocaleString() }} 원
-    </div>
-    <div class="text-sm text-black font-bold mt-0">하한가</div>
+  <div ref="scrollContainer" class="overflow-y-auto no-scrollbar w-full">
+    <AskingPriceComponent
+      :parsedData="parsedData"
+      @centerIndex="handleCenterIndex"
+      :refreshTrigger="props.refreshTrigger"
+    />
   </div>
 </template>
 
