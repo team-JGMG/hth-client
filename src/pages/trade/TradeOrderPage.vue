@@ -6,11 +6,17 @@
       <BaseTab :tabs="fundingStatusTabs" v-model="currentFundingStatus" />
     </div>
 
-    <div class="flex-1 overflow-y-auto">
-      <OrderbookChart v-if="currentFundingStatus === 'askingPrice'" :refreshTrigger="chartRefreshTrigger" />
+    <div class="flex-1 overflow-y-auto pb-28">
+      <OrderbookChart
+        v-if="currentFundingStatus === 'askingPrice'"
+        :refreshTrigger="chartRefreshTrigger"
+      />
       <TradeHistoryChart ref="tradeHistoryChart" v-if="currentFundingStatus === 'stockChart'" />
     </div>
-    <BuyAndSellAccodian @trade-completed="handleTradeCompleted" class="fixed bottom-16 left-0 right-0 max-w-md mx-auto">
+    <BuyAndSellAccodian
+      @trade-completed="handleTradeCompleted"
+      class="fixed bottom-16 left-0 right-0 max-w-md mx-auto"
+    >
     </BuyAndSellAccodian>
   </BlankLayout>
 </template>
