@@ -4,11 +4,15 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
   const currentPriceIndex = prices.findIndex((p) => p === currentPrice)
 
   return {
+    animationDurationUpdate: 300,
+    animationEasingUpdate: 'linear',
+
     grid: [
       { top: '0%', bottom: '0%', left: '0%', right: '60%', containLabel: false },
       { top: '0%', bottom: '0%', left: '60%', right: '0%', containLabel: false },
       { top: '0%', bottom: '0%', left: '50%', right: '40%', width: '10%', containLabel: false },
     ],
+
     xAxis: Array(3)
       .fill(0)
       .map((_, i) => ({
@@ -21,6 +25,7 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
         axisLabel: { show: false },
         splitLine: { show: false },
       })),
+
     yAxis: [
       {
         type: 'category',
@@ -63,6 +68,7 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
         splitLine: { show: false },
       },
     ],
+
     series: [
       {
         name: '매도',
@@ -81,6 +87,8 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
           formatter: (params) => (params.value === 0 ? '' : params.value),
           fontWeight: 'bold',
         },
+        animationDuration: 300,
+        animationEasing: 'linear',
       },
       {
         name: '매수',
@@ -99,6 +107,8 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
           formatter: (params) => (params.value === 0 ? '' : params.value),
           fontWeight: 'bold',
         },
+        animationDuration: 300,
+        animationEasing: 'linear',
       },
     ],
   }
