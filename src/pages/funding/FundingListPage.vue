@@ -1,19 +1,20 @@
 <!-- 매물 목록 페이지 -->
 <template>
   <BlankLayout>
-    <DetailHeader>매물 목록 </DetailHeader>
-
-    <div class="funding-list-page">
-      <div class="filter-tabs-container mb-2 shrink-0">
-        <BaseTab :tabs="fundingStatusTabs" v-model="currentFundingStatus" />
+    <div class="flex flex-col h-[calc(100vh-3rem)]">
+      <div class="shrink-0">
+        <DetailHeader>매물 목록 </DetailHeader>
+        <div class="filter-tabs-container mb-2">
+          <BaseTab :tabs="fundingStatusTabs" v-model="currentFundingStatus" />
+        </div>
       </div>
-    </div>
 
-    <div class="flex-1 overflow-y-auto pb-24">
-      <FundingListAll v-if="currentFundingStatus === 'all'" />
-      <FundingListInProgress v-if="currentFundingStatus === 'inProgress'" />
-      <FundingListCompletedFunding v-if="currentFundingStatus === 'completedFunding'" />
-      <FundingListCompletedSale v-if="currentFundingStatus === 'completedSale'" />
+      <div class="flex-1 overflow-y-auto pb-24 no-scrollbar">
+        <FundingListAll v-if="currentFundingStatus === 'all'" />
+        <FundingListInProgress v-if="currentFundingStatus === 'inProgress'" />
+        <FundingListCompletedFunding v-if="currentFundingStatus === 'completedFunding'" />
+        <FundingListCompletedSale v-if="currentFundingStatus === 'completedSale'" />
+      </div>
     </div>
   </BlankLayout>
 </template>
@@ -36,3 +37,13 @@ const fundingStatusTabs = [
 ]
 const currentFundingStatus = ref('all')
 </script>
+
+<style scoped>
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+</style>
