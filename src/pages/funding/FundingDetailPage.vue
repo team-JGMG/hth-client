@@ -1,55 +1,3 @@
-<script setup>
-import { ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-
-import BaseTab from '@/components/common/Tab/BaseTab.vue'
-import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import DetailHeader from '@/layouts/DetailHeader.vue'
-import FundingBuildingInfo from '@/components/funding/detail/FundingBuildingInfo.vue'
-import FundingInvestmentInfo from '@/components/funding/detail/FundingInvestmentInfo.vue'
-import FundingFundingInfo from '@/components/funding/detail/FundingFundingInfo.vue'
-
-import { format, formatDate, formatPriceInEokwon, dDay } from '@/utils/format'
-import { mockItems } from './mockData'
-
-const router = useRouter()
-const route = useRoute()
-
-const tabs = [
-  { label: '건물 정보', value: 'building' },
-  { label: '투자 정보', value: 'investment' },
-  { label: '펀딩 정보', value: 'funding' },
-]
-
-const currentTab = ref('building')
-const itemId = Number(route.params.id)
-const item = mockItems.find((f) => f.propertyId === itemId) || {}
-
-const tabComponent = computed(() => {
-  switch (currentTab.value) {
-    case 'building':
-      return FundingBuildingInfo
-    case 'investment':
-      return FundingInvestmentInfo
-    case 'funding':
-      return FundingFundingInfo
-    default:
-      return FundingBuildingInfo
-  }
-})
-
-const goToTradePage = () => {
-  const id = item.propertyId
-  if (item.status === 'PENDING') {
-    router.push(`/trade/${id}`)
-  } else if (item.status === 'FUNDING') {
-    router.push(`/funding/trade/${id}`)
-  } else {
-    alert('현재 거래 가능한 상태가 아닙니다.')
-  }
-}
-</script>
-
 <template>
   <div class="flex flex-col min-h-screen bg-gray-50">
     <!-- 헤더 -->
@@ -60,7 +8,29 @@ const goToTradePage = () => {
     <!-- 콘텐츠 영역 -->
     <div class="flex-1 overflow-y-auto">
       <!-- 썸네일 -->
-      <img :src="item.thumbnail?.photoUrl" class="w-full h-[180px] object-cover" alt="thumbnail" />
+      <div class="relative w-full h-[180px] bg-gray-100">
+        <img
+          :src="item.images[currentImageIndex].photoUrl"
+          class="w-full h-full object-contain"
+          alt="매물 이미지"
+        />
+
+        <!-- 좌우 터치 영역 -->
+        <div class="absolute left-0 top-0 w-1/2 h-full cursor-pointer" @click="prevImage"></div>
+        <div class="absolute right-0 top-0 w-1/2 h-full cursor-pointer" @click="nextImage"></div>
+
+        <!-- 좌우 아이콘 -->
+        <span
+          class="absolute left-2 top-1/2 -translate-y-1/2 material-symbols-outlined text-3xl text-black/30 pointer-events-none select-none"
+        >
+          chevron_left
+        </span>
+        <span
+          class="absolute right-2 top-1/2 -translate-y-1/2 material-symbols-outlined text-3xl text-black/30 pointer-events-none select-none"
+        >
+          chevron_right
+        </span>
+      </div>
 
       <!-- 제목 + 주소 -->
       <div class="px-4 pt-3">
@@ -153,3 +123,70 @@ const goToTradePage = () => {
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+import BaseTab from '@/components/common/Tab/BaseTab.vue'
+import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
+import DetailHeader from '@/layouts/DetailHeader.vue'
+import FundingBuildingInfo from '@/components/funding/detail/FundingBuildingInfo.vue'
+import FundingInvestmentInfo from '@/components/funding/detail/FundingInvestmentInfo.vue'
+import FundingFundingInfo from '@/components/funding/detail/FundingFundingInfo.vue'
+
+import { format, formatDate, formatPriceInEokwon, dDay } from '@/utils/format'
+import { mockItems } from './mockData'
+
+const router = useRouter()
+const route = useRoute()
+
+const tabs = [
+  { label: '건물 정보', value: 'building' },
+  { label: '투자 정보', value: 'investment' },
+  { label: '펀딩 정보', value: 'funding' },
+]
+
+const currentTab = ref('building')
+const itemId = Number(route.params.id)
+const item = mockItems.find((f) => f.propertyId === itemId) || {}
+
+const tabComponent = computed(() => {
+  switch (currentTab.value) {
+    case 'building':
+      return FundingBuildingInfo
+    case 'investment':
+      return FundingInvestmentInfo
+    case 'funding':
+      return FundingFundingInfo
+    default:
+      return FundingBuildingInfo
+  }
+})
+
+const goToTradePage = () => {
+  const id = item.propertyId
+  if (item.status === 'PENDING') {
+    router.push(`/trade/${id}`)
+  } else if (item.status === 'FUNDING') {
+    router.push(`/funding/trade/${id}`)
+  } else {
+    alert('현재 거래 가능한 상태가 아닙니다.')
+  }
+}
+
+const currentImageIndex = ref(0)
+
+function prevImage() {
+  currentImageIndex.value = (currentImageIndex.value - 1 + item.images.length) % item.images.length
+}
+function nextImage() {
+  currentImageIndex.value = (currentImageIndex.value + 1) % item.images.length
+}
+
+item.images = item.images || [
+  { photoUrl: '/src/assets/images/cardtestimage.png' },
+  { photoUrl: '/src/assets/images/sample-buliding.png' },
+  { photoUrl: '/src/assets/images/mockup.png' },
+]
+</script>
