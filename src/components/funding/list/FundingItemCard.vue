@@ -4,7 +4,7 @@
       <!-- 상태 뱃지 -->
       <div
         class="absolute top-2 left-2 px-2 py-1 text-[10px] font-semibold rounded-md text-white"
-        :class="getBadgeColor(item.status)"
+        :class="getBadgeColor(status)"
       >
         {{ status }}
       </div>
