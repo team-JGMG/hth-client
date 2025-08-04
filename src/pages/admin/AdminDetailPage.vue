@@ -5,71 +5,93 @@
         <span class="material-symbols-outlined text-2xl cursor-pointer" @click="goBack">
           chevron_left
         </span>
-        <h2 class="text-xl font-bold">{{ property.title }}</h2>
+        <BaseTypography size="xl" weight="bold">{{ property.title }}</BaseTypography>
       </div>
-      <p class="text-sm text-gray-500 self-end">등록일: {{ formatDateTime(property.updatedAt) }}</p>
+      <BaseTypography class="self-end" size="sm" color="gray-2"
+        >등록일: {{ formatDateTime(property.updatedAt) }}
+      </BaseTypography>
     </div>
 
     <section class="border p-4 rounded-lg bg-white">
-      <h3 class="font-semibold mb-2">매도자 정보</h3>
-      <p>이름: {{ property.seller.name }}</p>
-      <p>전화번호: {{ property.seller.phone }}</p>
-      <p>이메일: {{ property.seller.email }}</p>
+      <BaseTypography class="mb-2" weight="semibold" size="lg">매도자 정보</BaseTypography>
+      <BaseTypography weight="regular">이름: {{ property.seller.name }}</BaseTypography>
+      <BaseTypography weight="regular">전화번호: {{ property.seller.phone }}</BaseTypography>
+      <BaseTypography weight="regular">이메일: {{ property.seller.email }}</BaseTypography>
     </section>
 
     <section class="border p-4 rounded-lg bg-white">
-      <h3 class="font-semibold mb-2">매물 정보</h3>
-      <p>매물명: {{ property.title }}</p>
-      <p>매물 주소: {{ property.address }}</p>
-      <p>매물 면적: {{ property.area }}㎡({{ formatAreaToPyeong(property.area) }})</p>
-      <p>희망 매매가: {{ formatPriceInManwon(property.price) }}</p>
-      <p>희망 공모 기간: {{ property.postingPeriod }}개월</p>
+      <BaseTypography class="mb-2" weight="semibold" size="lg">매물 정보</BaseTypography>
+      <BaseTypography weight="regular">매물명: {{ property.title }}</BaseTypography>
+      <BaseTypography weight="regular">매물 주소: {{ property.address }}</BaseTypography>
+      <BaseTypography weight="regular"
+        >매물 면적: {{ property.area }}㎡({{ formatAreaToPyeong(property.area) }})
+      </BaseTypography>
+      <BaseTypography weight="regular"
+        >희망 매매가: {{ formatPriceInManwon(property.price) }}
+      </BaseTypography>
+      <BaseTypography weight="regular"
+        >희망 공모 기간: {{ property.postingPeriod }}개월
+      </BaseTypography>
     </section>
 
     <section class="border p-4 rounded-lg bg-white">
-      <h3 class="font-semibold mb-2">매물의 건축물 대장 정보</h3>
-      <p>용도지역: {{ property.usageDistrict }}</p>
-      <p>대지 면적(매물): {{ property.landArea }}㎡({{ formatAreaToPyeong(property.landArea) }})</p>
-      <p>
+      <BaseTypography class="mb-2" weight="semibold" size="lg"
+        >매물의 건축물 대장 정보</BaseTypography
+      >
+      <BaseTypography weight="regular">용도지역: {{ property.usageDistrict }}</BaseTypography>
+      <BaseTypography weight="regular">
+        대지 면적(매물): {{ property.landArea }}㎡({{ formatAreaToPyeong(property.landArea) }})
+      </BaseTypography>
+      <BaseTypography weight="regular">
         대지 면적(건물): {{ property.buildingArea }}㎡({{
           formatAreaToPyeong(property.buildingArea)
         }})
-      </p>
-      <p>
+      </BaseTypography>
+      <BaseTypography weight="regular">
         연면적(매물): {{ property.totalFloorAreaProperty }}㎡({{
           formatAreaToPyeong(property.totalFloorAreaProperty)
         }})
-      </p>
-      <p>
+      </BaseTypography>
+      <BaseTypography weight="regular">
         연면적(건물): {{ property.totalFloorAreaBuilding }}㎡({{
           formatAreaToPyeong(property.totalFloorAreaBuilding)
         }})
-      </p>
-      <p>건물 규모: 지하 {{ property.basementFloors }}층 / 지상 {{ property.groundFloors }}층</p>
-      <p>준공일: {{ formatDateTime(property.createdAt) }}</p>
-      <p>공시지가: {{ formatPriceInManwon(property.officialLandPrice) }}</p>
-      <p>연면적 평단가(평/공모금액 기준): {{ formatPriceInManwon(property.unitPricePerPyeong) }}</p>
+      </BaseTypography>
+      <BaseTypography weight="regular"
+        >건물 규모: 지하 {{ property.basementFloors }}층 / 지상
+        {{ property.groundFloors }}층</BaseTypography
+      >
+      <BaseTypography weight="regular"
+        >준공일: {{ formatDateTime(property.createdAt) }}</BaseTypography
+      >
+      <BaseTypography weight="regular"
+        >공시지가: {{ formatPriceInManwon(property.officialLandPrice) }}</BaseTypography
+      >
+      <BaseTypography weight="regular"
+        >연면적 평단가(평/공모금액 기준):
+        {{ formatPriceInManwon(property.unitPricePerPyeong) }}</BaseTypography
+      >
     </section>
 
     <section class="border p-4 rounded-lg bg-white">
-      <h3 class="font-semibold mb-2">매물 상세 정보</h3>
-      <p>방 수: {{ property.roomCount }}개</p>
-      <p>욕실 수: {{ property.bathroomCount }}개</p>
-      <p>해당 층 수: {{ property.floor }}층</p>
-      <p>해시 태그: #역세권 #신축</p>
-      <p>세부 정보: {{ property.description }}</p>
-      <p>
+      <BaseTypography class="mb-2" weight="semibold" size="lg">매물 상세 정보</BaseTypography>
+      <BaseTypography weight="regular">방 수: {{ property.roomCount }}개</BaseTypography>
+      <BaseTypography weight="regular">욕실 수: {{ property.bathroomCount }}개</BaseTypography>
+      <BaseTypography weight="regular">해당 층 수: {{ property.floor }}층</BaseTypography>
+      <BaseTypography weight="regular">해시 태그: #역세권 #신축</BaseTypography>
+      <BaseTypography weight="regular">세부 정보: {{ property.description }}</BaseTypography>
+      <BaseTypography weight="regular">
         이미지:
         <img
           :src="property.thumbnail.photoUrl"
           class="w-full max-w-sm border rounded-md"
           alt="대표 이미지"
         />
-      </p>
+      </BaseTypography>
     </section>
 
     <section class="border p-4 rounded-lg bg-white">
-      <h3 class="font-semibold mb-2">매물 서류</h3>
+      <BaseTypography class="mb-2" weight="semibold" size="lg">매물 서류</BaseTypography>
       <ul>
         <li v-for="doc in property.documents" :key="doc.fileUrl">
           <a
@@ -87,12 +109,11 @@
 </template>
 
 <script setup>
-import { formatDateTime, formatPriceInManwon, formatAreaToPyeong } from '@/utils/format'
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { usePropertyAdmin } from '@/stores/propertyadmin'
-
-import { useRouter } from 'vue-router'
+import { formatDateTime, formatPriceInManwon, formatAreaToPyeong } from '@/utils/format'
+import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 
 const router = useRouter()
 
