@@ -21,27 +21,43 @@
       />
     </div>
 
-    <BaseModal
-      :isOpen="modal.open"
-      @close="modal.open = false"
-      @submit="modal.onSubmit"
-      :submitButtonClass="modal.buttonClass"
-      :confirmText="modal.confirmText"
-    >
-      <p class="text-sm font-medium text-center">{{ modal.message }}</p>
+    <BaseModal :isOpen="modal.open" @close="modal.open = false">
+      <!-- 본문 메시지 -->
+      <template #default>
+        <div class="p-4 pb-0">
+          <BaseTypography class="text-center" size="xl" weight="bold">
+            {{ modal.message }}
+          </BaseTypography>
+        </div>
+      </template>
+
+      <!-- 버튼 영역 -->
+      <template #submit>
+        <CompletedButton
+          color="black"
+          text-color="white"
+          active-color="gray-700"
+          class="w-full font-semibold py-3"
+          @click="modal.onSubmit"
+        >
+          {{ modal.confirmText }}
+        </CompletedButton>
+      </template>
     </BaseModal>
   </AdminLayout>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import { usePropertyAdmin } from '@/stores/propertyadmin'
 import AdminLayout from '@/layouts/AdminLayout.vue'
 import BaseTab from '@/components/common/Tab/BaseTab.vue'
 import AdminList from '@/components/admin/AdminList.vue'
 import AdminListApproved from '@/components/admin/AdminListApproved.vue'
 import AdminListExpired from '@/components/admin/AdminListExpired.vue'
 import BaseModal from '@/components/common/Modal/BaseModal.vue'
-import { usePropertyAdmin } from '@/stores/propertyadmin'
+import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
+import CompletedButton from '@/components/common/Button/CompletedButton.vue'
 
 const propertyadmin = usePropertyAdmin()
 propertyadmin.initializeMockData()
@@ -64,21 +80,19 @@ const AdminTabs = [
 ]
 const currentAdminStatus = ref('pending')
 
-// 모달 관련
+// 모달 상태
 const modal = ref({
   open: false,
   message: '',
   confirmText: '',
-  buttonClass: '',
   onSubmit: () => {},
 })
 
-function showModal(message, confirmText, buttonClass, onSubmit) {
+function showModal({ message, confirmText, onSubmit }) {
   modal.value = {
     open: true,
     message,
     confirmText,
-    buttonClass,
     onSubmit: () => {
       onSubmit()
       modal.value.open = false
@@ -86,25 +100,25 @@ function showModal(message, confirmText, buttonClass, onSubmit) {
   }
 }
 
-// 승인 처리
 function handleApprove(id) {
-  const item = propertyadmin.propertyList.find((p) => p.id === id)
-  if (item) item.status = '승인됨'
-}
-
-// 거절 처리
-function handleReject(id) {
-  showModal('정말 거절하시겠습니까?', '거절하기', () => {
-    const idx = propertyadmin.propertyList.findIndex((p) => p.id === id)
-    if (idx !== -1) propertyadmin.propertyList.splice(idx, 1)
+  showModal({
+    message: '정말 승인하시겠습니까?',
+    confirmText: '승인하기',
+    onSubmit: () => {
+      const item = propertyadmin.propertyList.find((p) => p.id === id)
+      if (item) item.status = '승인됨'
+    },
   })
 }
 
-// 삭제 처리
-function handleDelete(id) {
-  showModal('정말 삭제하시겠습니까?', '삭제하기', () => {
-    const idx = propertyadmin.propertyList.findIndex((p) => p.id === id)
-    if (idx !== -1) propertyadmin.propertyList.splice(idx, 1)
+function handleReject(id) {
+  showModal({
+    message: '정말 거절하시겠습니까?',
+    confirmText: '거절하기',
+    onSubmit: () => {
+      const item = propertyadmin.propertyList.find((p) => p.id === id)
+      if (item) item.status = '거절됨'
+    },
   })
 }
 </script>
