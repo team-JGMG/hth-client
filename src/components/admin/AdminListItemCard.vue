@@ -20,32 +20,38 @@
       </div>
     </div>
 
-    <div class="flex justify-between gap-1 items-center">
+    <div class="flex justify-between gap-2 items-start md:items-center">
       <!-- 왼쪽 텍스트 -->
-      <div class="flex flex-col justify-between flex-1 mr-4">
-        <div>
-          <!-- 주소 -->
-          <BaseTypography size="xs" weight="regular" color="gray-2" class="mt-0.5">
-            {{ address }}
+      <div class="flex flex-col justify-between flex-1 w-0 mr-2">
+        <!-- 주소 (한 줄, ... 처리) -->
+        <BaseTypography
+          size="xs"
+          weight="regular"
+          color="gray-2"
+          class="truncate whitespace-nowrap overflow-hidden w-full"
+          :title="address"
+        >
+          {{ address }}
+        </BaseTypography>
+
+        <!-- 희망 매각가 -->
+        <div class="flex items-center mt-2">
+          <BaseTypography size="xs" weight="regular" color="gray-2" class="min-w-[90px]">
+            희망 매각가
           </BaseTypography>
+          <BaseTypography weight="bold" color="black" class="whitespace-nowrap">
+            {{ formattedPrice }}
+          </BaseTypography>
+        </div>
 
-          <!-- 희망 매각가 -->
-          <div class="flex items-center gap-2 mt-2">
-            <BaseTypography size="xs" weight="regular" color="gray-2" class="min-w-[90px]">
-              희망 매각가
-            </BaseTypography>
-            <BaseTypography weight="bold" color="black">
-              {{ formattedPrice }}
-            </BaseTypography>
-          </div>
-
-          <!-- 희망 공모 기간 -->
-          <div class="flex items-center gap-2 mt-1">
-            <BaseTypography size="xs" weight="regular" color="gray-2" class="min-w-[90px]">
-              희망 공모 기간
-            </BaseTypography>
-            <BaseTypography weight="bold" color="black"> {{ postingPeriod }}개월 </BaseTypography>
-          </div>
+        <!-- 희망 공모 기간 -->
+        <div class="flex items-center mt-1">
+          <BaseTypography size="xs" weight="regular" color="gray-2" class="min-w-[90px]">
+            희망 공모 기간
+          </BaseTypography>
+          <BaseTypography weight="bold" color="black" class="whitespace-nowrap">
+            {{ postingPeriod }}개월
+          </BaseTypography>
         </div>
       </div>
 
@@ -53,7 +59,7 @@
       <img
         :src="image || fallbackImage"
         alt="매물 이미지"
-        class="w-40 h-20 object-cover rounded-md self-end mr-2"
+        class="max-w-[160px] h-20 object-cover rounded-md md:self-end"
       />
     </div>
 
