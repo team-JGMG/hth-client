@@ -23,19 +23,19 @@
   <BaseTypography size="base" weight="bold" class="mb-2">매도자 정보</BaseTypography>
   <!-- 매도자 정보 -->
   <BaseCard class="h-auto flex flex-col mb-0">
-    <div class="flex justify-between">
+    <div class="flex justify-between mb-1">
       <BaseTypography size="xs" weight="medium">이름</BaseTypography>
       <BaseTypography size="xs" weight="medium" class="text-right">
         {{ item.seller?.name || '-' }}
       </BaseTypography>
     </div>
-    <div class="flex justify-between">
+    <div class="flex justify-between mb-1">
       <BaseTypography size="xs" weight="medium">전화번호</BaseTypography>
       <BaseTypography size="xs" weight="medium" class="text-right">
         {{ item.seller?.phone || '-' }}
       </BaseTypography>
     </div>
-    <div class="flex justify-between">
+    <div class="flex justify-between mb-1">
       <BaseTypography size="xs" weight="medium">이메일</BaseTypography>
       <BaseTypography size="xs" weight="medium" class="text-right">
         {{ item.seller?.email || '-' }}

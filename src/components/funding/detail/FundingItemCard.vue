@@ -1,25 +1,34 @@
 <template>
-  <!-- 썸네일 -->
   <div class="relative w-full">
-    <img
-      :src="item.images[currentImageIndex].photoUrl"
-      class="w-full h-full object-contain"
-      alt="매물 이미지"
-    />
-    <div class="absolute left-0 top-0 w-1/2 h-full cursor-pointer" @click="prevImage"></div>
-    <div class="absolute right-0 top-0 w-1/2 h-full cursor-pointer" @click="nextImage"></div>
+    <!-- 썸네일 -->
+    <div class="relative w-full h-[250px] overflow-hidden">
+      <!-- 이미지 슬라이드 -->
+      <transition-group :name="slideDirection" tag="div" class="relative w-full h-full">
+        <img
+          v-for="(img, index) in item.images"
+          v-show="index === currentImageIndex"
+          :key="index"
+          :src="img.photoUrl"
+          class="absolute top-0 left-0 w-full h-full object-contain"
+          alt="매물 이미지"
+        />
+      </transition-group>
 
-    <!-- 좌우 아이콘 -->
-    <span
-      class="absolute left-2 top-1/2 -translate-y-1/2 material-symbols-outlined text-3xl text-black/30 pointer-events-none select-none"
-    >
-      chevron_left
-    </span>
-    <span
-      class="absolute right-2 top-1/2 -translate-y-1/2 material-symbols-outlined text-3xl text-black/30 pointer-events-none select-none"
-    >
-      chevron_right
-    </span>
+      <!-- 클릭 영역: 왼쪽/오른쪽 -->
+      <div
+        class="absolute left-0 top-0 w-1/2 h-full cursor-pointer z-10 select-none touch-manipulation"
+        @click="prevImage"
+      ></div>
+      <div
+        class="absolute right-0 top-0 w-1/2 h-full cursor-pointer z-10 select-none touch-manipulation"
+        @click="nextImage"
+      ></div>
+
+      <!-- 인디케이터 (이미지 위 하단) -->
+      <div class="absolute bottom-3 left-1/2 transform -translate-x-1/2 z-20">
+        <StepIndicator :current-step="currentImageIndex + 1" :total-steps="item.images.length" />
+      </div>
+    </div>
   </div>
 
   <!-- 제목 + 주소 -->
@@ -133,11 +142,11 @@ import BaseCard from '@/components/common/Card/BaseCard.vue'
 import { format, formatDate, formatPriceInEokwon, dDay } from '@/utils/format'
 import { mockItems } from '@/pages/funding/mockData'
 import CompletedButton from '@/components/common/Button/CompletedButton.vue'
+import StepIndicator from '@/components/onboarding/StepIndicator.vue'
 
 const router = useRouter()
 const route = useRoute()
 
-const currentTab = ref('building')
 const itemId = Number(route.params.id)
 const item = mockItems.find((f) => f.propertyId === itemId) || {}
 
@@ -148,13 +157,55 @@ item.images = item.images || [
 ]
 
 const currentImageIndex = ref(0)
-function prevImage() {
-  currentImageIndex.value = (currentImageIndex.value - 1 + item.images.length) % item.images.length
-}
-function nextImage() {
-  currentImageIndex.value = (currentImageIndex.value + 1) % item.images.length
+const slideDirection = ref('slide-right')
+
+let interval = null
+function startAutoSlide() {
+  interval = setInterval(() => {
+    slideDirection.value = 'slide-right'
+    currentImageIndex.value = (currentImageIndex.value + 1) % item.images.length
+  }, 3000)
 }
 
+function stopAutoSlide() {
+  if (interval) clearInterval(interval)
+}
+
+function restartAutoSlide() {
+  stopAutoSlide()
+  startAutoSlide()
+}
+
+function prevImage() {
+  slideDirection.value = 'slide-left'
+  currentImageIndex.value = (currentImageIndex.value - 1 + item.images.length) % item.images.length
+  restartAutoSlide()
+}
+
+function nextImage() {
+  slideDirection.value = 'slide-right'
+  currentImageIndex.value = (currentImageIndex.value + 1) % item.images.length
+  restartAutoSlide()
+}
+
+onMounted(() => {
+  startAutoSlide()
+
+  // 펀딩 마감 D-7 이하이면 색상 깜빡임 시작
+  const remainingDays = dDay(item.fundingEndDate)
+  if (remainingDays <= 7) {
+    blinkInterval = setInterval(() => {
+      blinkColor.value = blinkColor.value === 'red' ? 'orange' : 'red'
+    }, 500)
+  }
+})
+
+onBeforeUnmount(() => {
+  stopAutoSlide()
+  if (blinkInterval) clearInterval(blinkInterval)
+})
+
+const currentTab = ref('building')
 const tabs = [
   { label: '건물 정보', value: 'building' },
   { label: '투자 정보', value: 'investment' },
@@ -185,20 +236,43 @@ function goToTradePage() {
   }
 }
 
-const blinkColor = ref('red') // 초기값은 빨강
+const blinkColor = ref('red')
 let blinkInterval = null
-
-onMounted(() => {
-  const remainingDays = dDay(item.fundingEndDate)
-
-  if (remainingDays <= 7) {
-    blinkInterval = setInterval(() => {
-      blinkColor.value = blinkColor.value === 'red' ? 'orange' : 'red'
-    }, 500)
-  }
-})
-
-onBeforeUnmount(() => {
-  if (blinkInterval) clearInterval(blinkInterval)
-})
 </script>
+
+<style scoped>
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: transform 0.4s ease-in-out;
+}
+
+.slide-right-enter-from {
+  transform: translateX(100%);
+}
+
+.slide-right-leave-to {
+  transform: translateX(-100%);
+}
+
+.slide-left-enter-active,
+.slide-left-leave-active {
+  transition: transform 0.4s ease-in-out;
+}
+
+.slide-left-enter-from {
+  transform: translateX(-100%);
+}
+
+.slide-left-leave-to {
+  transform: translateX(100%);
+}
+
+div {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+</style>
