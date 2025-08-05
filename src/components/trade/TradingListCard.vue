@@ -26,11 +26,13 @@
     </button>
   </BaseCard>
 </template>
+
 <script setup>
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import BaseCard from '@/components/common/Card/BaseCard.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import { useRouter } from 'vue-router'
-import { onMounted, ref } from 'vue'
+import { fetchOrderBookByFundingId } from '@/api/orderbook' // ✅ 추가
 
 const router = useRouter()
 
@@ -45,6 +47,7 @@ const tradeItems = ref([])
 
 onMounted(() => {
   console.log('💡 props.items:', props.items)
+
   const imagePaths = [
     new URL('../../assets/images/randombuilding/building1.png', import.meta.url).href,
     new URL('../../assets/images/randombuilding/building2.png', import.meta.url).href,
@@ -75,7 +78,12 @@ onMounted(() => {
   }))
 })
 
-const tradeOrderPage = (id) => {
-  router.push(`/trade/order/${id}`)
+const tradeOrderPage = async (id) => {
+  try {
+    await fetchOrderBookByFundingId(id)
+    router.push(`/trade/order/${id}`)
+  } catch (e) {
+    console.error('페이지 이동 실패:', e)
+  }
 }
 </script>

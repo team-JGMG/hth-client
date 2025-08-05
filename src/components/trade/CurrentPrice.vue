@@ -1,10 +1,22 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import BaseTypography from '../common/Typography/BaseTypography.vue'
 import { useTradeStore } from '@/stores/tradeStore'
+import api from '@/libs/axios'
 
 const tradeStore = useTradeStore()
 const currentPrice = computed(() => tradeStore.currentPrice)
+
+const fundingId = 1
+
+onMounted(async () => {
+  try {
+    const res = await api.get(`/api/order-books/${fundingId}`)
+    tradeStore.setTradeData(res.data.data)
+  } catch (err) {
+    console.error('데이터 로딩 실패:', err)
+  }
+})
 </script>
 
 <template>
