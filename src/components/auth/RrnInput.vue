@@ -6,6 +6,10 @@ import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 const props = defineProps({
   rrnFront: String,
   rrnBack: String,
+  error: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits(['update:rrnFront', 'update:rrnBack'])
@@ -63,6 +67,10 @@ const isInvalid = computed(() => {
           placeholder="앞 6자리"
           class="w-full border-b border-gray-300 focus:outline-none focus:border-black p-2 text-base"
           :value="props.rrnFront"
+          :class="[
+            'w-full border-b p-2 text-base focus:outline-none focus:border-red-500',
+            props.error ? 'border-red-500' : 'border-gray-300',
+          ]"
           @input="(e) => emit('update:rrnFront', e.target.value.replace(/\D/g, '').slice(0, 6))"
         />
       </div>
@@ -89,6 +97,10 @@ const isInvalid = computed(() => {
           class="w-full border-b border-gray-300 focus:outline-none focus:border-black p-2 tracking-widest text-transparent caret-black bg-transparent text-base"
           :value="rrnBackRaw"
           @input="handleMaskedInput"
+          :class="[
+            'w-full border-b p-2 text-base text-transparent caret-black bg-transparent tracking-widest focus:outline-none focus:border-red-500',
+            props.error ? 'border-red-500' : 'border-gray-300',
+          ]"
         />
       </div>
     </div>
