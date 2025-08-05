@@ -45,7 +45,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
-import { usePropertyAdmin } from '@/stores/propertyAdmin'
+import { usePropertyAdmin } from '@/stores/propertyadmin'
 import AdminLayout from '@/layouts/AdminLayout.vue'
 import BaseTab from '@/components/common/Tab/BaseTab.vue'
 import AdminList from '@/components/admin/AdminList.vue'
