@@ -26,3 +26,14 @@ export const fetchUserProperties = async (userId) => {
     throw error
   }
 }
+
+// 매각 완료된 매물 목록 조회
+export const fetchSoldProperties = async () => {
+  try {
+    const res = await api.get('/api/property/sold')
+    return res.data.data
+  } catch (error) {
+    console.error('매각 완료 매물 조회 실패:', error)
+    return []
+  }
+}

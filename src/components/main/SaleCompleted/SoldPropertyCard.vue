@@ -2,7 +2,7 @@
   <div
     class="relative min-w-[160px] flex-shrink-0 rounded-xl overflow-hidden h-[160px]"
     :style="{
-      backgroundImage: `url(${property.thumbnailUrl || 'https://placehold.co/160x160/cccccc/ffffff?text=No+Image'})`,
+      backgroundImage: `url(${property.thumbnail})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
     }"
@@ -13,7 +13,7 @@
       <BaseTypography class="text-center text-sm leading-tight" weight="semibold" color="white">
         누적 수익률 <br />
         <span class="text-2xl">{{
-          property.yield_rate ? `+${Number(property.yieldRate).toFixed(2)}%` : '정보 없음'
+          property.yieldRate ? `+${Number(property.yieldRate).toFixed(2)}%` : '- %'
         }}</span>
       </BaseTypography>
       <BaseTypography size="sm" class="mt-1">{{ property.title }}</BaseTypography>

@@ -28,11 +28,11 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import BaseCard from '@/components/common/Card/BaseCard.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import { fetchOrderBookByFundingId } from '@/api/orderbook' // ✅ 추가
+import { fetchOrderBookByFundingId } from '@/api/orderbook'
 
 const router = useRouter()
 
@@ -43,9 +43,7 @@ const props = defineProps({
   },
 })
 
-const tradeItems = ref([])
-
-onMounted(() => {
+const tradeItems = computed(() => {
   console.log('💡 props.items:', props.items)
 
   const imagePaths = [
@@ -71,7 +69,7 @@ onMounted(() => {
     localStorage.setItem('tradeItemImages', JSON.stringify(newAssignments))
   }
 
-  tradeItems.value = props.items.map((item) => ({
+  return props.items.map((item) => ({
     id: item.fundingId,
     name: item.title,
     image: newAssignments[item.fundingId],

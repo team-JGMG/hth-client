@@ -13,7 +13,7 @@
           <BaseTypography size="xs" class="mr-1" weight="medium" color="gray-2">
             누적 수익률
           </BaseTypography>
-          <span class="material-symbols-outlined text-xs mt-0.5">info</span>
+          <span class="material-symbols-outlined mt-0.5">info</span>
         </button>
 
         <SaleCompletedInfoAccodian :is-open="showInfoPopover" @close="showInfoPopover = false" />
@@ -29,13 +29,12 @@
           :property="property"
         />
       </div>
-      <BaseTypography v-else class="text-center py-4" color="gray-1" size="sm"
-        >매각 완료된 매물이 없습니다.</BaseTypography
-      >
+      <BaseTypography v-else class="text-center py-4" color="gray-1" size="sm">
+        매각 완료된 매물이 없습니다.
+      </BaseTypography>
     </section>
   </div>
 </template>
-
 <script setup>
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { usePropertyStore } from '@/stores/property'
@@ -63,7 +62,9 @@ const handleClickOutside = (event) => {
 }
 
 const filteredSoldProperties = computed(() =>
-  propertyStore.soldProperties.filter((p) => p.yieldRate !== null),
+  Array.isArray(propertyStore.soldProperties)
+    ? propertyStore.soldProperties.filter((p) => p.yieldRate !== null)
+    : [],
 )
 
 onMounted(() => {
@@ -75,7 +76,6 @@ onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 </script>
-
 <style scoped>
 .no-scrollbar::-webkit-scrollbar {
   display: none;

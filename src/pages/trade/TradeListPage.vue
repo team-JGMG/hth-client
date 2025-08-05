@@ -18,6 +18,5 @@ const tradeItems = ref([])
 
 onMounted(async () => {
   tradeItems.value = await fetchEndedFundings()
-  console.log('✅ tradeItems:', tradeItems.value)
 })
 </script>

@@ -27,7 +27,7 @@ import * as echarts from 'echarts/core'
 import { BarChart } from 'echarts/charts'
 import { GridComponent } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
-
+import { fetchOrderBookByFundingId } from '@/api/orderbook'
 import { useTradeStore } from '@/stores/tradeStore'
 import { useOrderBookSocket } from '@/hooks/useOrderBookSocket'
 import { generateOrderBookChartOption } from '@/utils/orderBookChartOption'
@@ -46,9 +46,22 @@ const tradeStore = useTradeStore()
 const chartRef = ref(null)
 let chartInstance = null
 
-onMounted(() => {
-  chartInstance = echarts.init(chartRef.value)
-})
+const upperLimitPrice = computed(() => tradeStore.upperLimitPrice || 0)
+const lowerLimitPrice = computed(() => tradeStore.lowerLimitPrice || 0)
+
+const initChart = async () => {
+  try {
+    await fetchOrderBookByFundingId(fundingId)
+    const parsed = {
+      currentPrice: tradeStore.currentPrice,
+      upperLimitPrice: tradeStore.upperLimitPrice,
+      lowerLimitPrice: tradeStore.lowerLimitPrice,
+    }
+    updateChart(parsed)
+  } catch (err) {
+    console.error('초기 호가 정보 불러오기 실패:', err)
+  }
+}
 
 const updateChart = (parsed) => {
   console.log('📊 차트 갱신 시작', parsed)
@@ -56,9 +69,14 @@ const updateChart = (parsed) => {
   emit('centerIndex', currentPriceIndex, parsed.prices)
 
   const newOption = generateOrderBookChartOption(parsed)
-  chartInstance?.setOption(newOption, false) // ✅ 부드럽게 업데이트
+  chartInstance?.setOption(newOption, false)
   console.log('✅ 차트 옵션 업데이트 완료:', newOption)
 }
+
+onMounted(async () => {
+  chartInstance = echarts.init(chartRef.value)
+  await initChart()
+})
 
 const { reconnect } = useOrderBookSocket(fundingId, (parsedData) => {
   console.log('📡 WebSocket 수신:', parsedData)
@@ -81,9 +99,6 @@ watch(
     }
   },
 )
-
-const upperLimitPrice = computed(() => tradeStore.upperLimitPrice || 0)
-const lowerLimitPrice = computed(() => tradeStore.lowerLimitPrice || 0)
 </script>
 
 <style scoped>
