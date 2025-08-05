@@ -7,11 +7,11 @@
 
       <section class="bg-white px-2">
         <BaseTypography class="self-end" size="sm" color="gray-2">
-          등록일: {{ formatDateTime(property.updatedAt) }}
+          등록일: {{ formatDateTime(property.createdAt) }}
         </BaseTypography>
       </section>
 
-      <section class="border p-4 rounded-lg bg-white mt-1">
+      <section v-if="property.seller" class="border p-4 rounded-lg bg-white mt-1">
         <BaseTypography class="mb-2" weight="semibold" size="lg">매도자 정보</BaseTypography>
         <BaseTypography weight="regular">이름: {{ property.seller.name }}</BaseTypography>
         <BaseTypography weight="regular">전화번호: {{ property.seller.phone }}</BaseTypography>
@@ -61,7 +61,7 @@
           {{ property.groundFloors }}층</BaseTypography
         >
         <BaseTypography weight="regular"
-          >준공일: {{ formatDateTime(property.createdAt) }}</BaseTypography
+          >준공일: {{ formatDate(property.approvalDate) }}</BaseTypography
         >
         <BaseTypography weight="regular"
           >공시지가: {{ formatPriceInManwon(property.officialLandPrice) }}</BaseTypography
@@ -93,7 +93,7 @@
           <div class="relative w-full max-w-sm h-60 mt-2">
             <!-- 이미지 -->
             <img
-              :src="property.images[currentImageIndex].photoUrl"
+              :src="property.images?.[currentImageIndex]?.photoUrl || '/fallback.png'"
               class="w-full h-full object-contain border rounded-md mx-auto"
               alt="매물 이미지"
             />
@@ -140,26 +140,25 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { usePropertyAdmin } from '@/stores/propertyadmin'
-import { formatDateTime, formatPriceInManwon, formatAreaToPyeong } from '@/utils/format'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { fetchPropertyDetail } from '@/api/admin'
+import { formatDate, formatDateTime, formatPriceInManwon, formatAreaToPyeong } from '@/utils/format'
+
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import BlankLayout from '@/layouts/BlankLayout.vue'
 import DetailHeader from '@/layouts/DetailHeader.vue'
 
-const router = useRouter()
-
-function goBack() {
-  router.back()
-}
-
 const route = useRoute()
-const propertyId = computed(() => Number(route.params.id))
-const { propertyList } = usePropertyAdmin()
+const propertyId = Number(route.params.id)
+console.log('🔍 propertyId:', propertyId)
 
-// current image index
+const property = ref(null)
+const loading = ref(true)
+const error = ref(null)
+
 const currentImageIndex = ref(0)
+
 function prevImage() {
   currentImageIndex.value =
     (currentImageIndex.value - 1 + property.value.images.length) % property.value.images.length
@@ -167,25 +166,6 @@ function prevImage() {
 function nextImage() {
   currentImageIndex.value = (currentImageIndex.value + 1) % property.value.images.length
 }
-
-// property + 이미지 mock 삽입
-const property = computed(() => {
-  const original = propertyList.find((p) => p.id === propertyId.value)
-  if (!original) return null
-
-  const mockImages = [
-    '/src/assets/images/cardtestimage.png',
-    '/src/assets/images/sample-buliding.png',
-    '/src/assets/images/mockup.png',
-    '/src/assets/images/logo.png',
-    '/src/assets/images/DeleteUser.png',
-  ]
-
-  return {
-    ...original,
-    images: mockImages.map((url) => ({ photoUrl: url })),
-  }
-})
 
 function getDocumentName(type) {
   switch (type) {
@@ -207,4 +187,32 @@ function getDocumentName(type) {
       return '기타 문서'
   }
 }
+
+onMounted(async () => {
+  try {
+    const res = await fetchPropertyDetail(propertyId)
+    console.log('✅ 응답 결과:', res)
+
+    const raw = res.data
+
+    const fallbackImages = [
+      '/src/assets/images/cardtestimage.png',
+      '/src/assets/images/sample-buliding.png',
+    ]
+
+    if (!raw.photos || raw.photos.length === 0) {
+      raw.photos = fallbackImages.map((url) => ({ photoUrl: url }))
+    }
+
+    property.value = {
+      ...raw,
+      images: raw.photos,
+    }
+  } catch (err) {
+    error.value = '상세 정보 불러오기 실패'
+    console.error(err)
+  } finally {
+    loading.value = false
+  }
+})
 </script>
