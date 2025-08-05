@@ -28,7 +28,7 @@
     <BaseTypography size="xs" color="gray-1" class="flex items-center text-gray-500">
       <span class="mr-1">
         <span
-          class="material-symbols-outlined align-text-bottom relative top-[1px]"
+          class="material-symbols-rounded align-text-center relative top-[1px]"
           style="font-size: 1rem"
         >
           location_on
@@ -109,14 +109,14 @@
   </div>
 
   <!-- 하단 버튼 -->
-  <div class="fixed bottom-16 left-0 w-full px-4 py-2 z-10">
-    <CompletedButton
-      @click="goToTradePage"
-      class="w-full h-12 bg-black text-white rounded-[10px] font-normal text-sm tracking-tight"
-    >
-      거래하기
-    </CompletedButton>
-  </div>
+  <CompletedButton
+    :color="black"
+    :text-color="white"
+    class="w-full max-w-[340px] fixed bottom-20 left-1/2 transform -translate-x-1/2"
+    @click="goToTradePage"
+  >
+    펀딩하기
+  </CompletedButton>
 </template>
 
 <script setup>
@@ -125,9 +125,9 @@ import { useRoute, useRouter } from 'vue-router'
 
 import BaseTab from '@/components/common/Tab/BaseTab.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import FundingBuildingInfo from './FundingBuildingInfo.vue'
-import FundingInvestmentInfo from './FundingInvestmentInfo.vue'
-import FundingFundingInfo from './FundingFundingInfo.vue'
+import FundingBuildingInfo from './tabSection/tab/FundingBuildingInfo.vue'
+import FundingInvestmentInfo from './tabSection/tab/FundingInvestmentInfo.vue'
+import FundingFundingInfo from './tabSection/tab/FundingFundingInfo.vue'
 import BaseCard from '@/components/common/Card/BaseCard.vue'
 
 import { format, formatDate, formatPriceInEokwon, dDay } from '@/utils/format'
