@@ -1,17 +1,23 @@
 <template>
   <div class="space-y-4">
     <AdminListItemCard
-      v-for="item in filtered"
-      :key="item.id"
-      v-bind="item"
-      @delete="$emit('delete', item.id)"
+      v-for="item in props.list"
+      :key="item.propertyId"
+      :propertyId="item.propertyId"
+      :address="item.address"
+      :postingPeriod="item.postingPeriod"
+      :price="item.price"
+      :status="item.status"
+      :image="item.thumbnail?.photoUrl"
+      :title="item.title"
+      category="failed"
     />
   </div>
 </template>
 
 <script setup>
-import { computed, defineProps } from 'vue'
+import { defineProps } from 'vue'
 import AdminListItemCard from './AdminListItemCard.vue'
+
 const props = defineProps({ list: Array })
-const filtered = computed(() => props.list.filter((p) => p.status === '만료됨'))
 </script>

@@ -1,11 +1,6 @@
 <template>
   <div
     class="flex flex-col p-4 border rounded-xl shadow-sm bg-white w-full transition relative gap-2"
-    :class="{
-      'border-blue-300': status === '승인됨',
-      'border-red-300': status === '거절됨',
-      'border-gray-300': status === '만료됨',
-    }"
     @click="goToDetail"
   >
     <div class="flex justify-between items-center">
@@ -29,7 +24,6 @@
           weight="regular"
           color="gray-2"
           class="truncate whitespace-nowrap overflow-hidden w-full"
-          :title="address"
         >
           {{ address }}
         </BaseTypography>
@@ -65,7 +59,7 @@
 
     <!-- 버튼 -->
     <div class="flex w-full gap-2 mt-2">
-      <template v-if="status === '대기'">
+      <template v-if="category === 'pending'">
         <BaseButton
           variant="outline"
           class="w-1/2"
@@ -86,19 +80,19 @@
         </BaseButton>
       </template>
 
-      <template v-else-if="status === '승인됨'">
+      <template v-else-if="category === 'approved'">
         <BaseButton variant="primary" class="w-full bg-blue-500 hover:bg-blue-500" disabled>
           <BaseTypography size="xs" weight="semibold" color="white"> 매물 승인됨 </BaseTypography>
         </BaseButton>
       </template>
 
-      <template v-else-if="status === '거절됨'">
+      <!-- <template v-else-if="status === 'rejected'">
         <BaseButton variant="primary" class="w-full bg-red-400 hover:bg-red-400" disabled>
           <BaseTypography size="xs" weight="semibold" color="white"> 매물 거절됨 </BaseTypography>
         </BaseButton>
-      </template>
+      </template> -->
 
-      <template v-else-if="status === '만료됨'">
+      <template v-else-if="category === 'failed'">
         <BaseButton variant="primary" class="w-full bg-gray-400 hover:bg-gray-400" disabled>
           <BaseTypography size="xs" weight="semibold" color="white"> 매물 만료됨 </BaseTypography>
         </BaseButton>
@@ -115,14 +109,14 @@ import BaseButton from '@/components/common/Button/BaseButton.vue'
 import fallbackImage from '@/assets/images/cardtestimage.png'
 
 const props = defineProps({
-  id: Number,
-  title: String,
+  propertyId: Number,
   address: String,
-  price: Number,
-  period: String,
   postingPeriod: Number,
-  image: String,
+  price: Number,
   status: String,
+  image: String,
+  title: String,
+  category: String,
 })
 
 const formattedPrice = formatPriceInEokwon(props.price)
@@ -130,6 +124,6 @@ const formattedPrice = formatPriceInEokwon(props.price)
 const router = useRouter()
 
 const goToDetail = () => {
-  router.push(`/admin/property-review/${props.id}`)
+  router.push(`/admin/property-review/${props.propertyId}`)
 }
 </script>
