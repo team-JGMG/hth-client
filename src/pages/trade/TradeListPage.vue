@@ -1,7 +1,9 @@
 <template>
   <BlankLayout>
     <DetailHeader>거래중인 건물</DetailHeader>
-    <TradingListCard :items="tradeItems" />
+    <div class="mb-20">
+      <TradingListCard :items="tradeItems" />
+    </div>
   </BlankLayout>
 </template>
 
