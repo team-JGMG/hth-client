@@ -1,15 +1,15 @@
 // utils/format.js
 
-//날짜+시간 2025.7.23 12:00 형식
-export function formatDateTime(dateString) {
-  if (!dateString) return '-'
-  const date = new Date(dateString)
-  const year = date.getFullYear()
-  const month = date.getMonth() + 1
-  const day = date.getDate()
-  const hour = date.getHours()
-  const minute = date.getMinutes().toString().padStart(2, '0')
-  return `${year}.${month}.${day} ${hour}:${minute}`
+//날짜+시간 2025.7.23 12:00 형식 (배열 받아옴)
+export function formatDateTime(dateArray) {
+  if (!Array.isArray(dateArray) || dateArray.length < 5) return '-'
+  const [year, month, day, hour, minute] = dateArray.map(Number)
+
+  // 유효성 검사
+  if ([year, month, day, hour, minute].some((v) => isNaN(v))) return '-'
+  const date = new Date(year, month - 1, day, hour, minute)
+  if (isNaN(date.getTime())) return '-'
+  return `${year}.${month}.${day} ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
 }
 
 //날짜만 2025.7.23 형식
@@ -24,9 +24,10 @@ export const formatDate = (val) => {
 
 //금액 만원 형식 변환
 export function formatPriceInManwon(val) {
-  return val ? `${(val / 10000).toLocaleString()}만원` : '-'
+  if (!val) return '-'
+  const man = Math.floor(val / 10000)
+  return `${man.toLocaleString()}만원`
 }
-
 //금액 억 변환
 export function formatPriceInEokwon(val) {
   return val ? `${(val / 100000000).toFixed(0)}억` : '-'
