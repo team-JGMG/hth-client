@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { fetchMyUserInfo } from '@/api/auth'
+import { fetchUserInfo } from '@/api/auth'
 
 export const useUserStore = defineStore('user', () => {
   const savedToken = localStorage.getItem('authToken')
@@ -29,7 +29,7 @@ export const useUserStore = defineStore('user', () => {
 
   // 🔥 마이페이지용: 전체 사용자 정보 로딩
   async function loadUserInfo() {
-    const res = await fetchMyUserInfo()
+    const res = await fetchUserInfo()
     userInfo.value = res.data
   }
 

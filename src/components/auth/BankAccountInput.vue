@@ -1,6 +1,8 @@
+//BankAccountInput.vue
 <script setup>
 import { ref, computed } from 'vue'
 import BankSelectModal from '@/components/auth/BankSelectModal.vue'
+import BaseTypography from '../common/Typography/BaseTypography.vue'
 
 const props = defineProps({
   bankCode: String,
@@ -13,7 +15,7 @@ const showModal = ref(false)
 
 const isInvalid = computed(() => {
   const val = props.accountNumber?.trim() ?? ''
-  return val !== '' && !/^\d{6,20}$/.test(val)
+  return val !== '' && !/^\d{10,14}$/.test(val)
 })
 
 // 이미지 경로를 URL로 명시 (정적 import 방식)
@@ -47,21 +49,17 @@ const bankLogos = {
         type="text"
         inputmode="numeric"
         pattern="\d*"
-        maxlength="20"
+        maxlength="14"
         :value="props.accountNumber"
         @input="(e) => emit('update:accountNumber', e.target.value.replace(/\D/g, ''))"
         placeholder="계좌 번호를 입력해주세요."
-        class="flex-1 border-b border-gray-300 focus:outline-none focus:border-black p-2"
+        class="w-full max-w-[240px] border-b border-gray-300 focus:outline-none focus:border-red p-2"
       />
     </div>
 
-    <p
-      v-if="isInvalid"
-      class="absolute left-0 mt-1 text-sm text-red-500"
-      style="top: calc(100% + 0.25rem)"
-    >
-      정확한 계좌 번호를 입력해주세요. (6~20자리 숫자)
-    </p>
+    <BaseTypography v-if="isInvalid" color="red-1" size="xs" class="absolute mt-2 left-0 top-full">
+      *정확한 계좌 번호를 입력해주세요. (10~14자리 숫자)
+    </BaseTypography>
 
     <BankSelectModal
       v-if="showModal"

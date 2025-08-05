@@ -6,10 +6,13 @@ import BlankLayout from '@/layouts/BlankLayout.vue'
 import { getKakaoLoginUrl } from '@/api/auth'
 const handleKakaoLogin = async () => {
   try {
-    const loginUrl = await getKakaoLoginUrl()
-    window.location.href = loginUrl // 카카오 로그인 페이지로 이동
+    const res = await getKakaoLoginUrl()
+    console.log('[카카오 로그인 URL]', res) // 🔍 전체 응답 로그
+    console.log('[리다이렉트 URL]', res.data.loginUrl) // 🔍 실제 URL만
+
+    window.location.href = res.data.loginUrl
   } catch (err) {
-    console.error('카카오 로그인 URL 요청 실패', err)
+    console.error('카카오 로그인 URL 요청 실패:', err)
   }
 }
 </script>

@@ -1,6 +1,6 @@
-//LoginCallback.vue
-
+<!-- LoginCallback.vue -->
 <script setup>
+import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { fetchUserInfo } from '@/api/auth'
 import { useAuthStore } from '@/stores/authStore'
@@ -8,34 +8,50 @@ import { useAuthStore } from '@/stores/authStore'
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
-const preauthToken = route.query.preauthToken // ✅ 쿼리에서 먼저 받음
+
+// ✅ status, email은 query에서 가져옴
 const status = route.query.status
 const email = route.query.email
 
 const handleCallback = async () => {
+  console.log('[소셜 로그인 콜백 시작]')
+  console.log('status:', status)
+  console.log('email:', email)
+
   if (status === 'SUCCESS') {
     try {
-      const res = await fetchUserInfo()
+      const res = await fetchUserInfo() // 서버가 쿠키로 유저 인증
+      console.log('유저 정보:', res.data)
+
       authStore.setUserInfo(res.data)
       authStore.setLoggedIn(true)
-      router.push('/') // 메인 페이지
+
+      router.push('/')
     } catch (err) {
-      console.error('유저 정보 요청 실패:', err)
-      router.push('/auth/login?error=1')
+      console.error('[유저 정보 가져오기 실패]', err)
+      router.push('/auth/login?error=user_fetch_failed')
     }
   } else if (status === 'SIGNUP_REQUIRED') {
-    router.push({
-      path: '/auth/signup',
-      query: { email, preauthToken }, // 쿼리로 이메일 전달
-    })
+    setTimeout(() => {
+      router.push({
+        path: '/auth/signup',
+        query: {
+          email: email || '',
+        },
+      })
+    }, 500) // 0.5초 지연
   } else {
-    router.push('/auth/login?error=1') // 예외 처리
+    console.warn('[잘못된 status]', status)
+    router.push('/auth/login?error=invalid_status')
   }
 }
 
-handleCallback()
+// ✅ 마운트 시 바로 실행
+onMounted(() => {
+  handleCallback()
+})
 </script>
 
 <template>
-  <div>로그인 처리 중입니다...</div>
+  <div class="text-center mt-20 text-lg text-gray-600">로그인 처리 중입니다...</div>
 </template>
