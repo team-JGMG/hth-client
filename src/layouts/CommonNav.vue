@@ -28,7 +28,7 @@
         :class="{ 'material-symbols-fill': activeItem === 'funding' }"
         >payments</span
       >
-      <span class="text-sm mt-1 font-semibold leading-tight">펀딩</span>
+      <span class="text-z mt-1 font-semibold leading-tight">펀딩</span>
     </router-link>
 
     <router-link
