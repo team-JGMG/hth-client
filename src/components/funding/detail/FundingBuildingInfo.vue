@@ -1,8 +1,7 @@
 <template>
-  <div class="py-2"></div>
   <div>
     <!-- 건물 대장 정보 -->
-    <BaseTypography tag="h2" class="text-base !font-bold mb-2">건물 대장 정보</BaseTypography>
+    <BaseTypography size="base" weight="bold" class="mb-2">건물 대장 정보</BaseTypography>
     <div class="border rounded-lg overflow-hidden text-sm mb-6">
       <div class="grid grid-cols-2 border-b p-3" v-for="(value, key, idx) in infoList" :key="idx">
         <BaseTypography class="font-medium">
