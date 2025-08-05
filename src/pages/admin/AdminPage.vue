@@ -9,16 +9,12 @@
     <div class="flex-1 overflow-y-auto pb-24">
       <AdminList
         v-if="currentAdminStatus === 'pending'"
-        :list="pendingList"
+        :list="filteredList"
         @approve="handleApprove"
         @reject="handleReject"
       />
-      <AdminListApproved v-else-if="currentAdminStatus === 'approved'" :list="approvedList" />
-      <AdminListExpired
-        v-else-if="currentAdminStatus === 'expired'"
-        :list="expiredList"
-        @delete="handleDelete"
-      />
+      <AdminListApproved v-else-if="currentAdminStatus === 'approved'" :list="filteredList" />
+      <AdminListExpired v-else-if="currentAdminStatus === 'failed'" :list="filteredList" />
     </div>
 
     <BaseModal :isOpen="modal.open" @close="modal.open = false">
@@ -48,8 +44,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { usePropertyAdmin } from '@/stores/propertyadmin'
+import { ref, computed, watch, onMounted } from 'vue'
+import { usePropertyAdmin } from '@/stores/propertyAdmin'
 import AdminLayout from '@/layouts/AdminLayout.vue'
 import BaseTab from '@/components/common/Tab/BaseTab.vue'
 import AdminList from '@/components/admin/AdminList.vue'
@@ -59,26 +55,31 @@ import BaseModal from '@/components/common/Modal/BaseModal.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import CompletedButton from '@/components/common/Button/CompletedButton.vue'
 
-const propertyadmin = usePropertyAdmin()
-propertyadmin.initializeMockData()
+import { approveProperty, rejectProperty } from '@/api/admin'
 
-const pendingList = computed(() =>
-  (propertyadmin.propertyList || []).filter((p) => p.status === '대기'),
-)
-const approvedList = computed(() =>
-  (propertyadmin.propertyList || []).filter((p) => p.status === '승인됨'),
-)
-const expiredList = computed(() =>
-  (propertyadmin.propertyList || []).filter((p) => p.status === '만료됨'),
-)
+const propertyadmin = usePropertyAdmin()
 
 // 탭 관련
 const AdminTabs = [
   { label: '대기', value: 'pending' },
   { label: '승인 매물 조회', value: 'approved' },
-  { label: '만료', value: 'expired' },
+  { label: '만료', value: 'failed' },
 ]
+
 const currentAdminStatus = ref('pending')
+
+// 초기 로딩
+onMounted(() => {
+  propertyadmin.getPropertyList(currentAdminStatus.value)
+})
+
+// 탭 전환 시 API 호출
+watch(currentAdminStatus, (val) => {
+  propertyadmin.getPropertyList(val)
+})
+
+// 필터링된 리스트
+const filteredList = computed(() => propertyadmin.propertyList || [])
 
 // 모달 상태
 const modal = ref({
@@ -104,9 +105,9 @@ function handleApprove(id) {
   showModal({
     message: '정말 승인하시겠습니까?',
     confirmText: '승인하기',
-    onSubmit: () => {
-      const item = propertyadmin.propertyList.find((p) => p.id === id)
-      if (item) item.status = '승인됨'
+    onSubmit: async () => {
+      await approveProperty(id)
+      await propertyadmin.getPropertyList(currentAdminStatus.value)
     },
   })
 }
@@ -115,9 +116,9 @@ function handleReject(id) {
   showModal({
     message: '정말 거절하시겠습니까?',
     confirmText: '거절하기',
-    onSubmit: () => {
-      const item = propertyadmin.propertyList.find((p) => p.id === id)
-      if (item) item.status = '거절됨'
+    onSubmit: async () => {
+      await rejectProperty(id)
+      await propertyadmin.getPropertyList(currentAdminStatus.value)
     },
   })
 }
