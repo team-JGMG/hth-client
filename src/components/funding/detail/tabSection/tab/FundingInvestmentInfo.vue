@@ -17,11 +17,11 @@
   </div>
   <div>
     <BaseTypography size="base" weight="bold" class="mb-2 mt-4">주변 살펴보기</BaseTypography>
-    <div class="flex items-center gap-1 mb-4">
-      <span class="material-symbols-rounded text-gray-500" style="font-size: 1rem">
+    <div class="flex items-center gap-1 mb-2">
+      <!-- <span class="material-symbols-rounded text-gray-500" style="font-size: 1rem">
         location_on
-      </span>
-      <BaseTypography size="xs" color="gray-1">{{ item.address }}</BaseTypography>
+      </span> -->
+      <!-- <BaseTypography size="xs" color="gray-1">{{ item.address }}</BaseTypography> -->
     </div>
 
     <KakaoMap />
