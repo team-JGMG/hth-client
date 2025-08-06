@@ -65,6 +65,7 @@ export const useAuthStore = defineStore('auth', () => {
     accessToken.value = ''
     refreshToken.value = ''
     userInfo.value = null
+
     localStorage.removeItem('authToken')
     localStorage.removeItem('accessToken')
     localStorage.removeItem('refreshToken')
@@ -73,6 +74,18 @@ export const useAuthStore = defineStore('auth', () => {
   function clearUserData() {
     userInfo.value = null
     setAuthToken(null)
+  }
+  function setLoggedIn(status) {
+    if (!status) {
+      logout()
+    } else {
+      if (!accessToken.value) {
+        authToken.value = 'dummy_token'
+      }
+    }
+  }
+  function setUserInfo(user) {
+    userInfo.value = user
   }
 
   return {
@@ -94,7 +107,9 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     clearUserData,
     loadUserInfo,
-    login, // ✅ 추가된 login
+    login,
+    setUserInfo, // ✅ 이거 추가
+    setLoggedIn, // ✅ 이것도 필요 (LoginCallback.vue에서 사용 중)
   }
 })
 
