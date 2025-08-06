@@ -45,15 +45,11 @@ export const usePropertyRegisterStore = defineStore('propertyRegister', () => {
     memo: '',
   })
 
-  // 서류 파일 + 타입
-  const documentFiles = ref<File[]>([])
-  const documentTypes = ref<string[]>([])
+  const documentFiles = ref([])
+  const documentTypes = ref([])
+  const photoFiles = ref([])
 
-  // 사진 파일
-  const photoFiles = ref<File[]>([])
-
-  // 기존 방식과의 호환을 위해 유지
-  const documents = ref<{ type: string; file: File }[]>([])
+  const documents = ref([])
 
   const goToNextStep = () => {
     if (step.value < 5) step.value++
