@@ -1,6 +1,6 @@
 <!-- components/account/LogoutSection.vue -->
 <template>
-  <div class="px-4 mt-6">
+  <div class="mt-6">
     <LogoutButton />
     <DeleteAccountButton />
     <div class="py-8"></div>

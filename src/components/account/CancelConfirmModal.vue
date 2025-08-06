@@ -32,32 +32,41 @@ const onBackdropClick = (e) => {
     <div
       v-if="isOpen"
       @click="onBackdropClick"
-      class="fixed inset-0 z-[9999] bg-black bg-opacity-40 flex items-center justify-center"
+      class="fixed inset-0 z-[9999] bg-black bg-opacity-50 flex items-center justify-center"
     >
-      <div @click.stop class="max-w-[360px] w-full bg-white rounded-xl px-6 py-7 relative">
+      <div @click.stop class="max-w-[327px] w-full bg-white rounded-xl px-6 py-7 relative">
         <!-- 닫기 버튼 -->
-        <BaseButton
+        <button
           type="button"
           aria-label="닫기"
           @click="emit('close')"
           class="absolute top-4 right-4"
         >
           <span
-            class="material-symbols-outlined text-[#838a9a] text-m w-4 h-4 flex items-center justify-center"
+            class="material-symbols-outlined"
+            style="
+              font-size: 1rem;
+              color: #838a9a;
+              width: 1rem;
+              height: 1rem;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+            "
           >
             close
           </span>
-        </BaseButton>
+        </button>
 
         <!-- 제목 -->
-        <BaseTypography tag="div" size="base" class="text-left mb-3 font-bold">
+        <BaseTypography size="lg" weight="bold" class="text-left mb-3">
           {{ title }}
         </BaseTypography>
 
         <!-- 본문 -->
-        <div class="py-3"></div>
+
         <div class="text-center">
-          <BaseTypography tag="p" class="text-sm !text-gray-500 leading-relaxed mb-6">
+          <BaseTypography size="sm" color="gray-1" class="leading-relaxed mb-6 break-keep">
             <span v-html="description" />
           </BaseTypography>
         </div>
@@ -69,7 +78,7 @@ const onBackdropClick = (e) => {
           @click="emit('submit')"
           class="block w-full h-12 bg-[#ff3b3b] text-white rounded-lg flex items-center justify-center mx-auto mt-7"
         >
-          <span class="text-white font-medium text-base">{{ buttonText }}</span>
+          {{ buttonText }}
         </BaseButton>
       </div>
     </div>

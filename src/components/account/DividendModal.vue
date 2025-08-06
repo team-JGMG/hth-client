@@ -4,9 +4,9 @@
     <div
       v-if="isOpen"
       @click="onBackdropClick"
-      class="fixed inset-0 z-[9999] bg-black bg-opacity-40 flex items-center justify-center"
+      class="fixed inset-0 p-6 z-[9999] bg-black bg-opacity-40 flex items-center justify-center"
     >
-      <div @click.stop class="w-[370px] bg-white rounded-lg p-4 relative box-border">
+      <div @click.stop class="w-[370px] bg-white rounded-lg p-6 relative box-border">
         <!-- 닫기 버튼 -->
         <button
           type="button"
@@ -31,22 +31,22 @@
         </button>
 
         <!-- 제목 -->
-        <BaseTypography class="text-base !font-bold mb-2">
+        <BaseTypography size="xl" weight="bold" class="mb-6">
           {{ buildingName }}
         </BaseTypography>
 
         <!-- 내용 -->
         <div v-if="dividends.length" class="space-y-0">
-          <BaseTypography class="text-sm text-gray-500 mb-2">{{ year }}년</BaseTypography>
+          <BaseTypography size="sm" class="mb-2">{{ year }}년</BaseTypography>
           <div
             v-for="(item, index) in dividends"
             :key="index"
             class="flex items-center justify-between p-4 rounded-md"
             :class="index % 2 === 0 ? 'bg-gray-100' : 'bg-white'"
           >
-            <BaseTypography class="text-sm">{{ item.date }}</BaseTypography>
-            <BaseTypography class="text-sm !font-semibold !text-blue-600">
-              +{{ item.amount }}
+            <BaseTypography size="sm">{{ item.date }}</BaseTypography>
+            <BaseTypography size="sm" color="blue" weight="bold">
+              {{ item.dividendType }}+{{ item.amount }}
             </BaseTypography>
           </div>
           <div class="py-12"></div>
@@ -87,5 +87,3 @@ const onBackdropClick = (e) => {
   if (e.target === e.currentTarget) emit('close')
 }
 </script>
-
-<style scoped></style>

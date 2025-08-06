@@ -1,14 +1,15 @@
 <template>
-  <div class="p-4 min-h-[600px] flex flex-col items-center">
+  <div class="py-3 min-h-[600px] flex flex-col items-center">
     <!-- ✅ 상단 중앙 고정된 매물 등록 버튼 -->
     <div class="mb-6">
       <BaseButton
         @click="goToPropertyRegisterPage"
         variant="secondary"
-        class="px-6 py-3 rounded-lg text-white text-base bg-[#2e3548] hover:bg-[#1f2738]"
+        class="px-6 py-3 rounded-lg bg-[#374152] hover:bg-[#1f2738]"
       >
-        <span class="mr-2 text-xl">+</span>
-        <span>매물 등록하기</span>
+        <div class="flex items-center">
+          <BaseTypography color="white" size="sm" weight="medium">매물 등록하기</BaseTypography>
+        </div>
       </BaseButton>
     </div>
 
