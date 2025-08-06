@@ -5,12 +5,12 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/authStore'
 import { onMounted } from 'vue'
 import DetailHeader from '@/layouts/DetailHeader.vue'
-import DetailLayout from '@/layouts/DetailLayout.vue'
 import BaseTab from '@/components/common/Tab/BaseTab.vue'
 import LogoutSection from '@/components/account/LogoutSection.vue'
 
 import LoggedInPointSection from '@/components/main/PointSection/LoggedInPointSection.vue'
 import BaseButton from '@/components/common/Button/BaseButton.vue'
+import BlankLayout from '@/layouts/BlankLayout.vue'
 const userStore = useUserStore()
 onMounted(async () => {
   if (userStore.getIsLoggedIn) {
@@ -50,27 +50,27 @@ watch(currentTab, (value) => {
 </script>
 
 <template>
-  <DetailLayout>
+  <BlankLayout>
     <DetailHeader>마이 페이지</DetailHeader>
 
     <div class="relative">
       <!-- 포인트 프로필 섹션을 헤더에 겹치도록 조정 -->
-      <div class="absolute -top-24 left-0 w-full z-10">
-        <div class="bg-black rounded-2xl p-4 text-white mx-4 mt-4">
-          <LoggedInPointSection>
-            <BaseButton
-              class="text-sm text-white border border-white !px-2 !py-1 rounded-md hover:bg-white hover:text-black transition"
-              variant="secondary"
-              @click="goToEditProfile"
-            >
-              정보 수정
-            </BaseButton>
-          </LoggedInPointSection>
-        </div>
+      <!-- <div class="absolute -top-24 left-0 w-full z-10"> -->
+      <div class="bg-black rounded-2xl p-4 text-white mx-4 mt-4">
+        <LoggedInPointSection>
+          <BaseButton
+            class="text-sm text-white border border-white !px-2 !py-1 rounded-md hover:bg-white hover:text-black transition"
+            variant="secondary"
+            @click="goToEditProfile"
+          >
+            정보 수정
+          </BaseButton>
+        </LoggedInPointSection>
+        <!-- </div> -->
       </div>
 
       <!-- 하단 영역은 프로필 섹션의 높이만큼 패딩 추가 -->
-      <div class="pt-[180px] px-4 py-1 bg-white">
+      <div class="px-4 py-1 bg-white">
         <BaseTab :tabs="tabs" v-model="currentTab" class="mt-5" />
       </div>
 
@@ -80,5 +80,5 @@ watch(currentTab, (value) => {
       <!-- 항상 하단에 고정되는 로그아웃 섹션 -->
       <LogoutSection />
     </div>
-  </DetailLayout>
+  </BlankLayout>
 </template>
