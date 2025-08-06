@@ -1,6 +1,6 @@
 <template>
   <div class="mb-4">
-    <div class="bg-black rounded-2xl p-6 text-white">
+    <div class="bg-black rounded-2xl p-4 text-white">
       <template v-if="authStore.getIsLoggedIn">
         <LoggedInPointSection />
       </template>
