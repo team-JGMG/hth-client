@@ -6,15 +6,9 @@
     <!-- 포인트 프로필 섹션을 헤더에 겹치도록 조정 -->
     <div class="bg-black rounded-2xl p-4 text-white mt-4">
       <LoggedInPointSection :showManagingButton="false">
-        <CompletedButton
-          :color="'[#374151]'"
-          :activeColor="'[#4b5563]'"
-          :textColor="'white'"
-          class="w-fit px-2 py-1"
-          @click="goToEditProfile"
-        >
-          정보 수정
-        </CompletedButton>
+        <button class="w-fit" @click="goToEditProfile" aria-label="정보 수정">
+          <span class="material-symbols-outlined"> person_edit </span>
+        </button>
       </LoggedInPointSection>
     </div>
 
@@ -37,7 +31,7 @@ import { onMounted } from 'vue'
 import DetailHeader from '@/layouts/DetailHeader.vue'
 import BaseTab from '@/components/common/Tab/BaseTab.vue'
 import LogoutSection from '@/components/account/LogoutSection.vue'
-import CompletedButton from '@/components/common/Button/CompletedButton.vue'
+// import CompletedButton from '@/components/common/Button/CompletedButton.vue'
 import LoggedInPointSection from '@/components/main/PointSection/LoggedInPointSection.vue'
 import BlankLayout from '@/layouts/BlankLayout.vue'
 const userStore = useUserStore()
