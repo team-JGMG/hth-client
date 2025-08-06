@@ -17,9 +17,19 @@
 <script setup>
 import CommonHeader from './CommonHeader.vue'
 import BaseButton from '@/components/common/Button/BaseButton.vue'
-
-const handleLogout = () => {
-  localStorage.removeItem('accessToken')
-  window.location.href = '/auth/login'
+import { useAuthStore } from '@/stores/authStore'
+import { logout as logoutRequest } from '@/api/auth' // 서버 로그아웃 API
+const authStore = useAuthStore()
+const handleLogout = async () => {
+  try {
+    console.log('[로그아웃 시작]')
+    await logoutRequest() // 서버에 로그아웃 요청 (쿠키 삭제 및 DB 정리)
+    authStore.logout() // 클라이언트에서 로컬스토리지 정리
+    console.log('[로그아웃 완료]')
+    window.location.href = '/auth/login'
+  } catch (err) {
+    console.error('[로그아웃 실패]', err)
+    alert('로그아웃 중 오류가 발생했습니다.')
+  }
 }
 </script>
