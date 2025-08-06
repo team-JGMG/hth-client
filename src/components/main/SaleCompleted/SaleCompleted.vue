@@ -10,10 +10,15 @@
           class="flex items-center rounded-full text-gray-400 transition-colors p-1"
           aria-label="매각 완료 정보 보기"
         >
-          <BaseTypography size="xs" class="mr-1" weight="medium" color="gray-2">
+          <BaseTypography size="xs" weight="medium" color="gray-2" class="mr-1">
             누적 수익률
           </BaseTypography>
-          <span class="material-symbols-outlined mt-0.5">info</span>
+          <span
+            class="material-symbols-outlined inline-flex items-center justify-center"
+            style="font-size: 1rem"
+          >
+            info
+          </span>
         </button>
 
         <SaleCompletedInfoAccodian :is-open="showInfoPopover" @close="showInfoPopover = false" />
