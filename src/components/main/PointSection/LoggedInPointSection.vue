@@ -76,7 +76,7 @@
 import { ref } from 'vue'
 import BaseCard from '@/components/common/Card/BaseCard.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import { useUserStore } from '@/stores/user'
+import { useUserStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
 import BaseModal from '@/components/common/Modal/BaseModal.vue'
 import PointChargeModal from './PointModal/PointChargeModel.vue'
