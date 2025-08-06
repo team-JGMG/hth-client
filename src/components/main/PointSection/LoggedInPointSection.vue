@@ -113,6 +113,7 @@ const requestPay = async (amount) => {
 
     IMP.request_pay(
       {
+        // merchant_uid,
         pg: 'kakaopay.TC0ONETIME',
         pay_method: 'card',
         name: '반의 반 집 포인트 충전',
