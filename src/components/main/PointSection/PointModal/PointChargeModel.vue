@@ -11,6 +11,7 @@
           type="number"
           placeholder="금액을 입력해주세요."
           class="w-60 p-2 focus:outline-none placeholder:text-gray-400"
+          v-model.number="localAmount"
         />
       </div>
       <BaseTypography size="base" class="ml-2 mb-2">원</BaseTypography>
@@ -24,5 +25,16 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
+
+const props = defineProps({
+  modelValue: Number,
+})
+const emit = defineEmits(['update:modelValue'])
+
+const localAmount = computed({
+  get: () => props.modelValue,
+  set: (value) => emit('update:modelValue', value),
+})
 </script>
