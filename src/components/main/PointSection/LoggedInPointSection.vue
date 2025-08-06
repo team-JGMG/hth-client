@@ -1,78 +1,75 @@
 <template>
   <div class="relative p-2">
-    <div>
+    <div class="flex items-center justify-between mb-1">
       <BaseTypography class="text-xl mb-1" color="white">
         {{ authStore.userInfo?.name ? `${authStore.userInfo.name}님,` : '???님,' }}
       </BaseTypography>
 
-      <div class="absolute top-0 right-0">
+      <div class="absolute top-1 right-1">
         <slot></slot>
       </div>
-
-      <div class="mb-2 mt-2 flex items-baseline justify-between">
-        <BaseTypography class="text-lg font-medium" color="white">보유 포인트</BaseTypography>
-        <BaseTypography class="text-lg font-medium" color="white">
-          {{ (authStore.userInfo?.point || 0).toLocaleString() }}원
-        </BaseTypography>
-      </div>
     </div>
 
-    <div class="flex space-x-2">
-      <button
-        class="flex-1 bg-green-400 text-black rounded-xl font-medium"
-        @click="isChargeModalOpen = true"
-      >
-        <span class="material-symbols-outlined text-2xl">add</span>
-        <br />
-        <BaseTypography class="font-bold">포인트 충전</BaseTypography>
-      </button>
-      <button
-        class="flex-1 bg-yellow-400 text-black py-2 rounded-xl font-medium"
-        @click="isRefundModalOpen = true"
-      >
-        <span class="material-symbols-outlined text-2xl">remove</span><br />
-        <BaseTypography class="font-bold">포인트 환급</BaseTypography>
-      </button>
+    <div class="mb-2 mt-2 flex items-baseline justify-between">
+      <BaseTypography class="text-lg font-medium" color="white">보유 포인트</BaseTypography>
+      <BaseTypography class="text-lg font-medium" color="white">
+        {{ (authStore.userInfo?.point || 0).toLocaleString() }}원
+      </BaseTypography>
     </div>
-
-    <BaseCard
-      v-if="props.showManagingButton"
-      class="h-6 flex justify-between items-center px-6 mt-4"
-    >
-      <BaseTypography class="font-medium">포인트 관리하러 가기</BaseTypography>
-      <button
-        class="w-8 h-8 flex justify-end items-center text-black active:bg-gray-100 rounded-full transition-colors"
-        @click="myPage"
-        aria-label="투자매물 탐색하기"
-      >
-        <span class="material-symbols-outlined text-2xl">chevron_right</span>
-      </button>
-    </BaseCard>
-
-    <!-- 충전 모달 -->
-    <BaseModal
-      :isOpen="isChargeModalOpen"
-      @close="isChargeModalOpen = false"
-      @submit="() => requestPay(chargeAmount)"
-    >
-      <PointChargeModal v-model="chargeAmount" />
-      <template #submit>
-        <BaseTypography color="white"> 충전하기 </BaseTypography>
-      </template>
-    </BaseModal>
-
-    <!-- 환급 모달 -->
-    <BaseModal
-      :isOpen="isRefundModalOpen"
-      @close="isRefundModalOpen = false"
-      @submit="console.log('환급')"
-    >
-      <PointRefundModal />
-      <template #submit>
-        <BaseTypography color="white"> 환급 신청하기 </BaseTypography>
-      </template>
-    </BaseModal>
   </div>
+
+  <div class="flex space-x-2">
+    <button
+      class="flex-1 bg-green-400 text-black rounded-xl font-medium"
+      @click="isChargeModalOpen = true"
+    >
+      <span class="material-symbols-outlined text-2xl">add</span>
+      <br />
+      <BaseTypography class="font-bold">포인트 충전</BaseTypography>
+    </button>
+    <button
+      class="flex-1 bg-yellow-400 text-black py-2 rounded-xl font-medium"
+      @click="isRefundModalOpen = true"
+    >
+      <span class="material-symbols-outlined text-2xl">remove</span><br />
+      <BaseTypography class="font-bold">포인트 환급</BaseTypography>
+    </button>
+  </div>
+
+  <BaseCard v-if="props.showManagingButton" class="h-6 flex justify-between items-center px-6 mt-4">
+    <BaseTypography class="font-medium">포인트 관리하러 가기</BaseTypography>
+    <button
+      class="w-8 h-8 flex justify-end items-center text-black active:bg-gray-100 rounded-full transition-colors"
+      @click="myPage"
+      aria-label="투자매물 탐색하기"
+    >
+      <span class="material-symbols-outlined text-2xl">chevron_right</span>
+    </button>
+  </BaseCard>
+
+  <!-- 충전 모달 -->
+  <BaseModal
+    :isOpen="isChargeModalOpen"
+    @close="isChargeModalOpen = false"
+    @submit="() => requestPay(chargeAmount)"
+  >
+    <PointChargeModal v-model="chargeAmount" />
+    <template #submit>
+      <BaseTypography color="white"> 충전하기 </BaseTypography>
+    </template>
+  </BaseModal>
+
+  <!-- 환급 모달 -->
+  <BaseModal
+    :isOpen="isRefundModalOpen"
+    @close="isRefundModalOpen = false"
+    @submit="console.log('환급')"
+  >
+    <PointRefundModal />
+    <template #submit>
+      <BaseTypography color="white"> 환급 신청하기 </BaseTypography>
+    </template>
+  </BaseModal>
 </template>
 
 <script setup>
