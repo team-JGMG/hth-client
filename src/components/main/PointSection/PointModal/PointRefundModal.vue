@@ -4,7 +4,7 @@
       <span class="material-symbols-outlined mb-2 mr-2"> remove </span>
       <BaseTypography size="xl" weight="bold" class="mb-2">포인트 환급하기</BaseTypography>
     </div>
-    <BaseTypography size="base" class="mb-2">환급하실 금액을 입력해주세요.</BaseTypography>
+    <BaseTypography size="base" class="mb-2">환급하실 포인트를 입력해주세요.</BaseTypography>
     <div class="flex justify-end items-end w-full mb-4">
       <div class="flex items-end border-b border-gray-300">
         <input
