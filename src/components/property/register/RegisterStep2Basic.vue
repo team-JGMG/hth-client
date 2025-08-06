@@ -24,9 +24,9 @@
     <div class="mb-12 relative">
       <div class="flex items-center gap-2">
         <InputField
-          v-model="store.propertyBasic.zipcode"
+          v-model="store.propertyBasic.rawdCd"
           label="매물 주소 조회"
-          placeholder="우편번호"
+          placeholder="시군구코드"
           class="flex-1"
           readonly
         />
@@ -165,7 +165,6 @@ const touched = ref({
 const searchAddress = () => {
   new daum.Postcode({
     oncomplete: function (data) {
-      // 사용자가 선택한 주소를 구성
       let fullAddr = data.address
       let extraAddr = ''
 
@@ -177,11 +176,11 @@ const searchAddress = () => {
         fullAddr += extraAddr !== '' ? ' (' + extraAddr + ')' : ''
       }
 
-      // 입력 필드에 데이터 바인딩
-      store.propertyBasic.zipcode = data.zonecode
+      // 바인딩
+      // store.propertyBasic.zipcode = data.zonecode
       store.propertyBasic.address = fullAddr
+      store.propertyBasic.rawdCd = data.bcode.slice(0, 5) // 시군구코드 (5자리)
 
-      // 상세 주소는 사용자가 직접 입력
       touched.value.address = true
     },
   }).open()

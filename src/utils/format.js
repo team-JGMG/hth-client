@@ -40,7 +40,7 @@ export function formatAreaToPyeong(area) {
   return `${pyeong.toFixed(1)}평`
 }
 
-//전화번호 '-' 추가
+//숫자 포맷팅 (예: 1000 → 1,000)
 export const format = (val) => (typeof val === 'number' ? val.toLocaleString() : val || '-')
 
 //디데이 계산
@@ -58,4 +58,21 @@ export function formatAmount(amount) {
   if (amount >= 100000000) return `${amount / 100000000}억원`
   if (amount >= 10000) return `${amount / 10000}만원`
   return `${amount}원`
+}
+
+//전화번호 포맷팅 (예: 01012345678 → 010-1234-5678)
+export const formatPhoneNumber = (val) => {
+  if (!val) return '-'
+
+  const cleaned = val.replace(/[^0-9]/g, '')
+
+  if (cleaned.length === 11) {
+    return cleaned.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3')
+  }
+
+  if (cleaned.length === 10) {
+    return cleaned.replace(/(\d{2,3})(\d{3,4})(\d{4})/, '$1-$2-$3')
+  }
+
+  return val
 }
