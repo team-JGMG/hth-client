@@ -1,17 +1,23 @@
 <template>
   <div class="w-full max-w-md mx-auto px-4">
     <BaseTypography class="mb-6" size="xl" weight="bold">
-      매도자 정보를 입력해주세요.
+      매도자 정보를 확인해주세요.
     </BaseTypography>
 
     <!-- 이름 -->
     <div class="mb-12 relative">
-      <InputField
+      <label class="text-base font-medium">이름</label>
+      <div class="mt-1 text-base text-black border-b border-gray-300 p-2">
+        {{ store.ownerInfo.name ? store.ownerInfo.name : '-' }}
+      </div>
+      <!-- 주석 내용 : 기존 수동입력 및 유효성 처리 -->
+      <!-- <InputField
         v-model="store.ownerInfo.name"
         label="이름"
         placeholder="이름을 입력해주세요."
-        @focus="touched.name = true"
+        :readonly="true"
       />
+      @focus="touched.name = true"
       <BaseTypography
         v-if="touched.name && !isNameValid"
         color="red-1"
@@ -19,12 +25,16 @@
         class="absolute mt-1 left-0 top-full"
       >
         * 필수 항목입니다.
-      </BaseTypography>
+      </BaseTypography> -->
     </div>
 
     <!-- 전화번호 -->
     <div class="mb-12 relative">
-      <InputField
+      <label class="text-base font-medium">전화번호</label>
+      <div class="mt-1 text-base text-black border-b border-gray-300 p-2">
+        {{ store.ownerInfo.phone ? formatPhoneNumber(store.ownerInfo.phone) : '-' }}
+      </div>
+      <!-- <InputField
         v-model="store.ownerInfo.phone"
         label="전화번호"
         placeholder="전화번호를 입력해주세요."
@@ -37,12 +47,16 @@
         class="absolute mt-1 left-0 top-full"
       >
         {{ phoneRaw ? '* 전화번호 형식에 맞지 않습니다.' : '* 필수 항목입니다.' }}
-      </BaseTypography>
+      </BaseTypography> -->
     </div>
 
     <!-- 이메일 -->
     <div class="mb-12 relative">
-      <InputField
+      <label class="text-base font-medium">이메일</label>
+      <div class="mt-1 text-base text-black border-b border-gray-300 p-2">
+        {{ store.ownerInfo.email ? store.ownerInfo.email : '-' }}
+      </div>
+      <!-- <InputField
         v-model="store.ownerInfo.email"
         label="이메일"
         placeholder="이메일을 입력해주세요."
@@ -55,7 +69,7 @@
         class="absolute mt-1 left-0 top-full"
       >
         {{ emailRaw ? '* 이메일 형식에 맞지 않습니다.' : '* 필수 항목입니다.' }}
-      </BaseTypography>
+      </BaseTypography> -->
     </div>
 
     <!-- 약관 동의 -->
@@ -149,24 +163,47 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { usePropertyRegisterStore } from '@/stores/propertyRegister'
-import InputField from '@/components/auth/InputField.vue'
 import CompletedButton from '@/components/common/Button/CompletedButton.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
+import { useAuthStore } from '@/stores/authStore'
+import { formatPhoneNumber } from '@/utils/format'
 
+const authStore = useAuthStore()
 const store = usePropertyRegisterStore()
 
-// const submitTried = ref(false)
+//목데이터
+authStore.userInfo = {
+  userId: 1,
+  name: '홍길동',
+  phone: '01012345678',
+  email: 'hong@test.com',
+  isAdmin: false,
+}
+//목데이터 자동 바인딩
+store.ownerInfo.name = authStore.userInfo.name
+store.ownerInfo.phone = authStore.userInfo.phone
+store.ownerInfo.email = authStore.userInfo.email
+store.ownerInfo.userId = authStore.userInfo.userId
 
-const touched = ref({
-  name: false,
-  phone: false,
-  email: false,
+onMounted(async () => {
+  try {
+    if (!authStore.userInfo) {
+      await authStore.loadUserInfo()
+    }
+    store.ownerInfo.name = authStore.userInfo.name
+    store.ownerInfo.phone = authStore.userInfo.phone
+    store.ownerInfo.email = authStore.userInfo.email
+    store.ownerInfo.userId = authStore.userInfo.userId
+  } catch (error) {
+    console.error('자동완성 실패:', error)
+    alert('자동완성에 실패했습니다. 로그인 상태를 확인해주세요.')
+  }
 })
 
+//약관 동의 관련
 const agreements = store.ownerInfo.agreements
-
 const toggle = (key) => {
   agreements[key] = !agreements[key]
 }
@@ -184,25 +221,9 @@ const isPartiallyChecked = computed(() => {
 
 const allChecked = computed(() => agreements.terms && agreements.privacy && agreements.age)
 
-const nameRaw = computed(() => store.ownerInfo.name.trim())
-const phoneRaw = computed(() => store.ownerInfo.phone.trim())
-const emailRaw = computed(() => store.ownerInfo.email.trim())
-
-const isNameValid = computed(() => nameRaw.value.length > 0)
-const isPhoneValid = computed(() => phoneRaw.value !== '' && /^01[0-9]{8,9}$/.test(phoneRaw.value))
-const isEmailValid = computed(
-  () => emailRaw.value !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailRaw.value),
-)
-
-const isStepValid = computed(
-  () => isNameValid.value && isPhoneValid.value && isEmailValid.value && allChecked.value,
-)
+const isStepValid = computed(() => allChecked.value)
 
 const handleNext = () => {
-  // submitTried.value = true
-  // touched.value.name = true
-  // touched.value.phone = true
-  // touched.value.email = true
   if (isStepValid.value) {
     store.goToNextStep()
   }

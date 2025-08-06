@@ -2,6 +2,12 @@
 
 import api from '@/libs/axios' // axios 인스턴스를 가져옴
 
+//매물 등록 post
+export const registerProperty = async (data) => {
+  return api.post('/api/property', data)
+}
+
+//사용자 매물 조회
 export const fetchUserProperties = async (userId) => {
   try {
     const statuses = ['PENDING', 'approved', 'rejected', 'sold']

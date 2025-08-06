@@ -5,9 +5,7 @@ export const usePropertyRegisterStore = defineStore('propertyRegister', () => {
   const step = ref(1)
 
   const ownerInfo = ref({
-    name: '',
-    phone: '',
-    email: '',
+    userId: '', // 로그인한 사용자 ID
     agreements: {
       terms: false,
       privacy: false,
@@ -17,37 +15,45 @@ export const usePropertyRegisterStore = defineStore('propertyRegister', () => {
 
   const propertyBasic = ref({
     title: '',
-    zipcode: '',
+    rawdCd: '',
     address: '',
     detailAddress: '',
     size: '',
     price: '',
-    period: '', // 날짜 문자열 (ex: 2024-08-15)
+    period: '', // 희망 공고 기간
   })
 
   const propertyBuilding = ref({
-    landUsageZone: '', // 용도 지역
-    landSize: '', // 대지 면적 (매물)
-    buildingSize: '', // 대지 면적 (건물)
-    landTotalArea: '', // 연면적 (매물)
-    buildingTotalArea: '', // 연면적 (건물)
-    floorUnder: '', // 지하 층수
-    floorAbove: '', // 지상 층수
-    builtDate: '', // 준공일
-    officialPrice: '', // 공시지가
-    marketPrice: '', // 연면적 평단가
+    landUsageZone: '',
+    landSize: '',
+    buildingSize: '',
+    landTotalArea: '',
+    buildingTotalArea: '',
+    floorUnder: '',
+    floorAbove: '',
+    builtDate: '',
+    officialPrice: '',
+    marketPrice: '',
   })
 
   const propertyDetail = ref({
-    type: '', // 매물 유형
-    roomCount: '', // 방 수
-    bathroomCount: '', // 욕실 수
-    floor: '', // 해당 층 수
-    options: [], // 해시태그 (배열)
-    memo: '', // 세부 설명
+    type: '',
+    roomCount: '',
+    bathroomCount: '',
+    floor: '',
+    options: [],
+    memo: '',
   })
 
-  const documents = ref([])
+  // 서류 파일 + 타입
+  const documentFiles = ref<File[]>([])
+  const documentTypes = ref<string[]>([])
+
+  // 사진 파일
+  const photoFiles = ref<File[]>([])
+
+  // 기존 방식과의 호환을 위해 유지
+  const documents = ref<{ type: string; file: File }[]>([])
 
   const goToNextStep = () => {
     if (step.value < 5) step.value++
@@ -64,6 +70,9 @@ export const usePropertyRegisterStore = defineStore('propertyRegister', () => {
     propertyBuilding,
     propertyDetail,
     documents,
+    documentFiles,
+    documentTypes,
+    photoFiles,
     goToNextStep,
     goToPrevStep,
   }
