@@ -13,7 +13,7 @@
 
 <script setup>
 import { onMounted } from 'vue'
-import { useUserStore } from '@/stores/user'
+import { useUserStore } from '@/stores/authStore'
 import LoggedInPointSection from './LoggedInPointSection.vue'
 import LoggedOutPointSection from './LoggedOutPointSection.vue'
 

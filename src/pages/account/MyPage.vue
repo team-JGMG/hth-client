@@ -2,7 +2,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user'
+import { useUserStore } from '@/stores/authStore'
 import { onMounted } from 'vue'
 import DetailHeader from '@/layouts/DetailHeader.vue'
 import DetailLayout from '@/layouts/DetailLayout.vue'
