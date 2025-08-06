@@ -75,6 +75,7 @@ export const useAuthStore = defineStore('auth', () => {
     userInfo.value = null
     setAuthToken(null)
   }
+
   function setLoggedIn(status) {
     if (!status) {
       logout()
@@ -107,9 +108,12 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     clearUserData,
     loadUserInfo,
+
     login,
     setUserInfo, // ✅ 이거 추가
     setLoggedIn, // ✅ 이것도 필요 (LoginCallback.vue에서 사용 중)
+
+
   }
 })
 
