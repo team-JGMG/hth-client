@@ -20,7 +20,7 @@ export const getFundingList = async (category, sort = 'date', page = 0, size = 2
 }
 
 // 거래 리스트 페이지
-export const fetchEndedFundings = async (page = 0, size = 10) => {
+export const fetchEndedFundings = async (page = 0, size = 100) => {
   try {
     const response = await axios.get('/api/funding/ended', {
       params: { page, size },

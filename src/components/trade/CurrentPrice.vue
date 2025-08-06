@@ -7,35 +7,36 @@
     <BaseTypography>(2.39%)</BaseTypography>
   </div>
 </template>
+
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import BaseTypography from '../common/Typography/BaseTypography.vue'
 import { useTradeStore } from '@/stores/tradeStore'
-import api from '@/libs/axios'
+import { fetchOrderBookByFundingId } from '@/api/orderbook'
 
 const tradeStore = useTradeStore()
 const currentPrice = computed(() => tradeStore.currentPrice)
 
-const fundingId = ref(null)
+const route = useRoute()
+const fundingId = computed(() => Number(route.params.id))
 
 onMounted(async () => {
+  if (!fundingId.value) {
+    console.warn('❌ 유효하지 않은 fundingId')
+    return
+  }
+
+  console.log('📌 상세 페이지 fundingId:', fundingId.value)
+
   try {
-    const listRes = await api.get('/api/funding/ended', {
-      params: { page: 0, size: 10 },
-    })
-
-    const fundings = listRes.data?.data?.content || []
-
-    if (fundings.length > 0) {
-      fundingId.value = fundings[0].fundingId // 첫 번째 fundingId 사용
-      const orderBookRes = await api.get(`/api/order-books/${fundingId.value}`)
-      tradeStore.setTradeData(orderBookRes.data.data)
-      console.log('현재 fundingId:', fundingId.value)
-    } else {
-      console.warn('펀딩 데이터가 없습니다.')
-    }
+    await fetchOrderBookByFundingId(fundingId.value)
   } catch (err) {
     console.error('데이터 로딩 실패:', err)
   }
+})
+
+watch(currentPrice, (val) => {
+  console.log('💰 currentPrice 변경됨:', val)
 })
 </script>
