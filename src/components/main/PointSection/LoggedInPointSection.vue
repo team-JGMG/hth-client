@@ -1,79 +1,79 @@
 <template>
-  <div class="relative p-2">
-    <div class="flex items-center justify-between mb-1">
+  <div class="relative mb-4">
+    <div>
       <BaseTypography class="text-xl mb-1" color="white">
         {{ authStore.userInfo?.name ? `${authStore.userInfo.name}님,` : '???님,' }}
       </BaseTypography>
 
-      <div class="absolute top-1 right-1">
+      <div class="absolute top-0 right-0">
         <slot></slot>
+      </div>
+
+      <div class="mb-4 flex items-baseline justify-between">
+        <BaseTypography class="text-xl font-medium" color="white">보유 포인트</BaseTypography>
+        <BaseTypography class="text-xl font-medium" color="white">
+          {{ (authStore.userInfo?.point || 0).toLocaleString() }}원
+        </BaseTypography>
       </div>
     </div>
 
-    <div class="mb-2 mt-2 flex items-baseline justify-between">
-      <BaseTypography class="text-lg font-medium" color="white">보유 포인트</BaseTypography>
-      <BaseTypography class="text-lg font-medium" color="white">
-        {{ (authStore.userInfo?.point || 0).toLocaleString() }}원
-      </BaseTypography>
+    <div class="flex space-x-3 mb-3">
+      <button
+        class="flex-1 bg-green-400 text-black py-2 rounded-xl font-medium"
+        @click="isChargeModalOpen = true"
+      >
+        <span class="material-symbols-outlined text-2xl">add</span>
+        <br />
+        <BaseTypography class="font-bold">포인트 충전</BaseTypography>
+      </button>
+      <button
+        class="flex-1 bg-yellow-400 text-black py-2 rounded-xl font-medium"
+        @click="isRefundModalOpen = true"
+      >
+        <span class="material-symbols-outlined text-2xl">remove</span><br />
+        <BaseTypography class="font-bold">포인트 환급</BaseTypography>
+      </button>
     </div>
+
+    <BaseCard class="h-6 flex justify-between items-center px-6">
+      <BaseTypography class="font-medium">포인트 관리하러 가기</BaseTypography>
+      <button
+        class="w-8 h-8 flex justify-end items-center text-black active:bg-gray-100 rounded-full transition-colors"
+        @click="myPage"
+        aria-label="투자매물 탐색하기"
+      >
+        <span class="material-symbols-outlined text-2xl">chevron_right</span>
+      </button>
+    </BaseCard>
+
+    <!-- 충전 모달 -->
+    <BaseModal
+      :isOpen="isChargeModalOpen"
+      @close="isChargeModalOpen = false"
+      @submit="() => requestPay(chargeAmount)"
+    >
+      <PointChargeModal v-model="chargeAmount" />
+      <template #submit>
+        <BaseTypography color="white"> 충전하기 </BaseTypography>
+      </template>
+    </BaseModal>
+
+    <!-- 환급 모달 -->
+    <BaseModal
+      :isOpen="isRefundModalOpen"
+      @close="isRefundModalOpen = false"
+      @submit="console.log('환급')"
+    >
+      <PointRefundModal />
+      <template #submit>
+        <BaseTypography color="white"> 환급 신청하기 </BaseTypography>
+      </template>
+    </BaseModal>
   </div>
-
-  <div class="flex space-x-2">
-    <button
-      class="flex-1 bg-green-400 text-black rounded-xl font-medium"
-      @click="isChargeModalOpen = true"
-    >
-      <span class="material-symbols-outlined text-2xl">add</span>
-      <br />
-      <BaseTypography class="font-bold">포인트 충전</BaseTypography>
-    </button>
-    <button
-      class="flex-1 bg-yellow-400 text-black py-2 rounded-xl font-medium"
-      @click="isRefundModalOpen = true"
-    >
-      <span class="material-symbols-outlined text-2xl">remove</span><br />
-      <BaseTypography class="font-bold">포인트 환급</BaseTypography>
-    </button>
-  </div>
-
-  <BaseCard v-if="props.showManagingButton" class="h-6 flex justify-between items-center px-6 mt-4">
-    <BaseTypography class="font-medium">포인트 관리하러 가기</BaseTypography>
-    <button
-      class="w-8 h-8 flex justify-end items-center text-black active:bg-gray-100 rounded-full transition-colors"
-      @click="myPage"
-      aria-label="투자매물 탐색하기"
-    >
-      <span class="material-symbols-outlined text-2xl">chevron_right</span>
-    </button>
-  </BaseCard>
-
-  <!-- 충전 모달 -->
-  <BaseModal
-    :isOpen="isChargeModalOpen"
-    @close="isChargeModalOpen = false"
-    @submit="() => requestPay(chargeAmount)"
-  >
-    <PointChargeModal v-model="chargeAmount" />
-    <template #submit>
-      <BaseTypography color="white"> 충전하기 </BaseTypography>
-    </template>
-  </BaseModal>
-
-  <!-- 환급 모달 -->
-  <BaseModal
-    :isOpen="isRefundModalOpen"
-    @close="isRefundModalOpen = false"
-    @submit="console.log('환급')"
-  >
-    <PointRefundModal />
-    <template #submit>
-      <BaseTypography color="white"> 환급 신청하기 </BaseTypography>
-    </template>
-  </BaseModal>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import BaseCard from '@/components/common/Card/BaseCard.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
@@ -82,26 +82,26 @@ import PointChargeModal from './PointModal/PointChargeModel.vue'
 import PointRefundModal from './PointModal/PointRefundModal.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { requestChargeMerchantUid, verifyPayment } from '@/api/point'
+import { storeToRefs } from 'pinia'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { getIsLoggedIn } = storeToRefs(authStore)
 
 const isChargeModalOpen = ref(false)
 const isRefundModalOpen = ref(false)
 const chargeAmount = ref(0)
-
-const props = defineProps({
-  showManagingButton: {
-    type: Boolean,
-    default: true,
-  },
-})
 
 const myPage = () => {
   router.push('/account/my-page')
 }
 
 const requestPay = async (amount) => {
+  if (!getIsLoggedIn.value) {
+    alert('로그인이 필요합니다.')
+    return
+  }
+
   if (!amount || amount <= 0) {
     alert('충전할 금액을 입력해주세요.')
     return
@@ -120,7 +120,6 @@ const requestPay = async (amount) => {
 
     IMP.request_pay(
       {
-        // merchant_uid,
         pg: 'kakaopay.TC0ONETIME',
         pay_method: 'card',
         name: '반의 반 집 포인트 충전',
@@ -147,7 +146,7 @@ const requestPay = async (amount) => {
             chargeAmount.value = 0
 
             // 포인트 정보 다시 불러오기
-            // await authStore.fetchUserInfo()
+            // await authStore.loadUserInfo()
           } catch (err) {
             alert('❌ 서버 검증 실패: ' + (err.response?.data?.message || err.message))
           }
@@ -160,10 +159,4 @@ const requestPay = async (amount) => {
     alert('❌ 오류 발생: ' + (err.response?.data?.message || err.message))
   }
 }
-
-onMounted(() => {
-  if (!authStore.getIsLoggedIn.value) {
-    authStore.login()
-  }
-})
 </script>
