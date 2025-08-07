@@ -35,6 +35,21 @@ export const registerPropertyWithFormData = async ({
   })
 }
 
+export const fetchUserProperties = async (userId) => {
+  try {
+    const statuses = ['PENDING', 'approved', 'rejected', 'sold']
+    const allResults = await Promise.all(
+      statuses.map((status) =>
+        api.get(`/api/property/user/${userId}`, {
+          params: {
+            page: 0,
+            size: 10,
+            status,
+          },
+        }),
+      ),
+    )
+
     // 응답에서 각각의 데이터(content)만 추출하여 하나의 배열로 합치기
     const merged = allResults.flatMap((res) => res.data?.data?.content || [])
 
