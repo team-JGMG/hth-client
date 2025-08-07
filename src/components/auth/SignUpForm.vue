@@ -213,6 +213,8 @@ import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import BaseButton from '@/components/common/Button/BaseButton.vue'
 import BaseModal from '@/components/common/Modal/BaseModal.vue'
 import { signUpWithPreAuth } from '@/api/auth'
+import { useAuthStore } from '@/stores/authStore'
+const authStore = useAuthStore()
 const agreeAndClose = () => {
   if (activeModal.value) {
     agreements.value[activeModal.value] = true
@@ -348,6 +350,7 @@ const handleSubmit = async () => {
 
     localStorage.setItem('accessToken', data.accessToken)
     localStorage.setItem('refreshToken', data.refreshToken)
+    await authStore.loadUserInfo()
 
     router.push('/')
   } catch (e) {

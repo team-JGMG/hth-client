@@ -4,95 +4,55 @@ import { defineStore } from 'pinia'
 import { fetchUserInfo } from '@/api/auth'
 
 export const useAuthStore = defineStore('auth', () => {
-  // 🔐 토큰 관련
-  const authToken = ref(localStorage.getItem('authToken') || '')
-  const accessToken = ref(localStorage.getItem('accessToken') || '')
-  const refreshToken = ref(localStorage.getItem('refreshToken') || '')
-
   // 👤 유저 정보
   const userInfo = ref(null)
+
   const userName = computed(() => userInfo.value?.name || '')
   const userPoints = computed(() => userInfo.value?.point || 0)
   const userId = computed(() => userInfo.value?.userId || null)
 
-  // ✅ 로그인 여부
-  const getIsLoggedIn = computed(() => !!authToken.value || !!accessToken.value)
+  // ✅ 로그인 여부 (userInfo 값 존재 여부로 판단)
+  const getIsLoggedIn = computed(() => !!userInfo.value)
 
-  // ✅ 유저 정보 불러오기
+  // ✅ 유저 정보 불러오기 (API 요청)
   async function loadUserInfo() {
-    const res = await fetchUserInfo()
-    userInfo.value = res.data
-  }
-
-  // 🔧 토큰 설정
-  function setAuthToken(token) {
-    authToken.value = token
-    if (token) {
-      localStorage.setItem('authToken', token)
-    } else {
-      localStorage.removeItem('authToken')
+    try {
+      const res = await fetchUserInfo()
+      userInfo.value = res.data
+    } catch (error) {
+      console.error('[유저 정보 로딩 실패]', error)
+      userInfo.value = null
+      throw error // 필요 시 로그인 페이지로 리디렉트할 수 있도록 throw
     }
   }
 
-  function setTokens(access, refresh) {
-    accessToken.value = access
-    refreshToken.value = refresh
-    localStorage.setItem('accessToken', access)
-    localStorage.setItem('refreshToken', refresh)
-  }
-
-  // 🔒 로그아웃
-  function logout() {
-    authToken.value = ''
-    accessToken.value = ''
-    refreshToken.value = ''
-    userInfo.value = null
-
-    localStorage.removeItem('authToken')
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('refreshToken')
-  }
-
-  function clearUserData() {
-    userInfo.value = null
-    setAuthToken(null)
-  }
-  function setLoggedIn(status) {
-    if (!status) {
-      logout()
-    } else {
-      if (!accessToken.value) {
-        authToken.value = 'dummy_token'
-      }
-    }
-  }
+  // ✅ 유저 정보 수동 설정
   function setUserInfo(user) {
     userInfo.value = user
   }
 
+  // 🔒 로그아웃 처리
+  function logout() {
+    userInfo.value = null
+    localStorage.removeItem('refreshToken') // ← 사용 중이면 유지, 아니라면 삭제 가능
+  }
+
   return {
-    // state
-    authToken,
-    accessToken,
-    refreshToken,
+    // 상태
     userInfo,
 
-    // computed
+    // 계산된 값
     getIsLoggedIn,
     userName,
     userPoints,
     userId,
 
-    // actions
-    setAuthToken,
-    setTokens,
-    logout,
-    clearUserData,
+    // 액션
     loadUserInfo,
     setUserInfo,
-    setLoggedIn,
+    logout,
   }
 })
 
-// ✨ 이전 useUserStore를 쓰던 컴포넌트들을 위해 별칭 export 제공
+// ✨ 기존 useUserStore 사용 코드 호환용 별칭
 export const useUserStore = useAuthStore
