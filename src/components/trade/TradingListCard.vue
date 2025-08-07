@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import BaseCard from '@/components/common/Card/BaseCard.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
@@ -44,45 +44,48 @@ const props = defineProps({
   },
 })
 
-const router = useRouter()
 const tradeItems = ref([])
+const router = useRouter()
 
-onMounted(() => {
-  const imagePaths = [
-    new URL('../../assets/images/randombuilding/building1.png', import.meta.url).href,
-    new URL('../../assets/images/randombuilding/building2.png', import.meta.url).href,
-    new URL('../../assets/images/randombuilding/building3.png', import.meta.url).href,
-    new URL('../../assets/images/randombuilding/building4.png', import.meta.url).href,
-  ]
+watch(
+  () => props.items,
+  (newItems) => {
+    if (!newItems.length) return
 
-  // ✅ 키 이름에 prefix 추가해서 충돌 방지
-  const oldAssignments = JSON.parse(localStorage.getItem('tradeItemImages')) || {}
-  const newAssignments = { ...oldAssignments }
-  let needsUpdate = false
+    const imagePaths = [
+      new URL('../../assets/images/randombuilding/building1.png', import.meta.url).href,
+      new URL('../../assets/images/randombuilding/building2.png', import.meta.url).href,
+      new URL('../../assets/images/randombuilding/building3.png', import.meta.url).href,
+      new URL('../../assets/images/randombuilding/building4.png', import.meta.url).href,
+    ]
 
-  props.items.forEach((item) => {
-    const key = `funding_${item.fundingId}`
+    const oldAssignments = JSON.parse(localStorage.getItem('tradeItemImages')) || {}
+    const newAssignments = { ...oldAssignments }
+    let needsUpdate = false
 
-    if (!newAssignments[key]) {
-      const randomIndex = Math.floor(Math.random() * imagePaths.length)
-      newAssignments[key] = imagePaths[randomIndex]
-      needsUpdate = true
+    newItems.forEach((item) => {
+      const key = `funding_${item.fundingId}`
+      if (!newAssignments[key]) {
+        const randomIndex = Math.floor(Math.random() * imagePaths.length)
+        newAssignments[key] = imagePaths[randomIndex]
+        needsUpdate = true
+      }
+    })
+
+    if (needsUpdate) {
+      localStorage.setItem('tradeItemImages', JSON.stringify(newAssignments))
     }
-  })
 
-  if (needsUpdate) {
-    localStorage.setItem('tradeItemImages', JSON.stringify(newAssignments))
-  }
-
-  // 최종 데이터 세팅
-  tradeItems.value = props.items.map((item) => {
-    const key = `funding_${item.fundingId}`
-    return {
-      ...item,
-      image: newAssignments[key],
-    }
-  })
-})
+    tradeItems.value = newItems.map((item) => {
+      const key = `funding_${item.fundingId}`
+      return {
+        ...item,
+        image: newAssignments[key],
+      }
+    })
+  },
+  { immediate: true },
+)
 
 const tradeOrderPage = (id) => {
   router.push(`/trade/order/${id}`)

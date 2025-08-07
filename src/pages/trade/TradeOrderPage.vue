@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import BaseTab from '@/components/common/Tab/BaseTab.vue'
 import BlankLayout from '@/layouts/BlankLayout.vue'
@@ -40,21 +40,31 @@ import OrderbookChart from '@/components/trade/Hoga/OrderbookChart.vue'
 import { getFundingById } from '@/api/funding'
 
 const route = useRoute()
-const tradeId = Number(route.params.id)
-console.log('[✅ tradeId]', tradeId)
-
+const tradeId = ref(Number(route.params.id)) // 반응형으로 처리
 const tradeItem = ref({})
 const tradeHistoryChart = ref(null)
 const chartRefreshTrigger = ref(0)
 
-onMounted(async () => {
+const fetchFundingDetail = async (id) => {
   try {
-    const res = await getFundingById(tradeId)
+    const res = await getFundingById(id)
     tradeItem.value = res.data?.data || {}
   } catch (e) {
     console.error('상세 정보 로딩 실패:', e)
   }
+}
+
+onMounted(() => {
+  fetchFundingDetail(tradeId.value)
 })
+
+watch(
+  () => route.params.id,
+  (newId) => {
+    tradeId.value = Number(newId)
+    fetchFundingDetail(tradeId.value)
+  },
+)
 
 const handleTradeCompleted = () => {
   if (tradeHistoryChart.value) {
