@@ -34,6 +34,9 @@
           주소 검색
         </BaseButton>
       </div>
+      <div v-show="show" class="relative w-full h-[400px] border mt-2 rounded overflow-hidden">
+        <div id="daum-postcode" class="absolute top-0 left-0 w-full h-full"></div>
+      </div>
       <InputField
         v-model="store.propertyBasic.address"
         placeholder="주소를 입력해주세요."
@@ -162,28 +165,33 @@ const touched = ref({
   period: false,
 })
 
+const show = ref(false)
+
 const searchAddress = () => {
-  new daum.Postcode({
-    oncomplete: function (data) {
-      let fullAddr = data.address
-      let extraAddr = ''
+  show.value = true
+  setTimeout(() => {
+    new daum.Postcode({
+      oncomplete: function (data) {
+        let fullAddr = data.address
+        let extraAddr = ''
 
-      if (data.addressType === 'R') {
-        if (data.bname !== '') extraAddr += data.bname
-        if (data.buildingName !== '') {
-          extraAddr += extraAddr !== '' ? ', ' + data.buildingName : data.buildingName
+        if (data.addressType === 'R') {
+          if (data.bname !== '') extraAddr += data.bname
+          if (data.buildingName !== '') {
+            extraAddr += extraAddr !== '' ? ', ' + data.buildingName : data.buildingName
+          }
+          fullAddr += extraAddr !== '' ? ' (' + extraAddr + ')' : ''
         }
-        fullAddr += extraAddr !== '' ? ' (' + extraAddr + ')' : ''
-      }
 
-      // 바인딩
-      // store.propertyBasic.zipcode = data.zonecode
-      store.propertyBasic.address = fullAddr
-      store.propertyBasic.rawdCd = data.bcode.slice(0, 5) // 시군구코드 (5자리)
-
-      touched.value.address = true
-    },
-  }).open()
+        store.propertyBasic.address = fullAddr
+        store.propertyBasic.rawdCd = data.bcode?.slice(0, 5) || ''
+        touched.value.address = true
+        show.value = false
+      },
+      width: '100%',
+      height: '100%',
+    }).embed(document.getElementById('daum-postcode'))
+  })
 }
 
 // 유효성 검사
