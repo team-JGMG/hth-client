@@ -20,18 +20,29 @@
         v-if="status === '매각 완료'"
         class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center z-0"
       >
-        <div class="text-white text-lg font-bold mb-1">매각 완료</div>
-        <div class="text-white text-sm">누적 수익률</div>
-        <div class="text-white text-sm">
-          {{ item.yield != null ? (item.yield > 0 ? '+' : '') + item.yield.toFixed(2) + '%' : '-' }}
-        </div>
+        <BaseTypography class="mb-1" size="lg" weight="bold" color="white"
+          >매각 완료</BaseTypography
+        >
+        <BaseTypography size="sm" color="white">누적 수익률</BaseTypography>
+        <BaseTypography size="sm" color="white">
+          {{
+            item.cumulativeReturn != null
+              ? (item.cumulativeReturn > 0 ? '+' : '') + item.cumulativeReturn.toFixed(2) + '%'
+              : '-'
+          }}
+        </BaseTypography>
       </div>
 
       <div class="p-3">
-        <BaseTypography class="text-sm font-semibold text-gray-800">{{
-          item.title
+        <BaseTypography
+          class="truncate whitespace-nowrap overflow-hidden"
+          size="sm"
+          weight="semibold"
+          >{{ item.title }}</BaseTypography
+        >
+        <BaseTypography class="truncate whitespace-nowrap overflow-hidden mt-0.5" size="[10px]">{{
+          item.address
         }}</BaseTypography>
-        <BaseTypography class="text-[10px] text-gray-500 mt-0.5">{{ item.address }}</BaseTypography>
 
         <div class="flex flex-wrap gap-1 mt-1 mb-2">
           <span class="bg-gray-100 text-[10px] text-gray-600 px-2 py-0.5 rounded-full"
@@ -89,7 +100,7 @@ defineProps({
 function getBadgeColor(status) {
   switch (status) {
     case '모집 중':
-      return 'bg-green-500'
+      return 'bg-blue-500'
     case '펀딩 완료':
       return 'bg-red-500'
     case '매각 완료':
