@@ -8,21 +8,46 @@
   </div>
 </template>
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, onMounted } from 'vue'
+
+import AskingPriceComponent from './AskingPriceComponent.vue'
+import { useOrderBookSocket } from '@/hooks/useOrderBookSocket'
+import { getOrderBookByFundingId } from '@/api/orderbook'
 
 const props = defineProps({
   refreshTrigger: { type: Number, default: 0 },
 })
 
-console.log('OrderbookChart - Received refreshTrigger:', props.refreshTrigger)
-
-import AskingPriceComponent from './AskingPriceComponent.vue'
-import { useOrderBookSocket } from '@/hooks/useOrderBookSocket.js'
-
 const scrollContainer = ref(null)
 const parsedData = ref(null)
 
-// 1번 fundingId로 웹소켓 연결하고 파싱된 데이터 받아옴
+onMounted(async () => {
+  try {
+    const res = await getOrderBookByFundingId(1)
+    const data = res.data
+
+    if (!data || !Array.isArray(data.buyOrders) || !Array.isArray(data.sellOrders)) {
+      console.warn('⛔ 불완전한 초기 호가 데이터:', data)
+      return
+    }
+
+    const buyOrders = data.buyOrders
+    const sellOrders = data.sellOrders
+
+    parsedData.value = {
+      currentPrice: data.currentPrice,
+      upperLimitPrice: data.upperLimitPrice,
+      lowerLimitPrice: data.lowerLimitPrice,
+      prices: [...buyOrders.map((o) => o.price), ...sellOrders.map((o) => o.price)],
+      buyVolumes: buyOrders.map((o) => o.quantity),
+      sellVolumes: sellOrders.map((o) => o.quantity),
+    }
+  } catch (e) {
+    console.error('초기 호가 REST 데이터 로딩 실패:', e)
+  }
+})
+
+// 이후 실시간은 WebSocket으로 덮어쓰기
 useOrderBookSocket(1, (data) => {
   parsedData.value = data
 })

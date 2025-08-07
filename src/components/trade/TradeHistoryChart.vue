@@ -32,7 +32,6 @@ echarts.use([
   CanvasRenderer,
 ])
 
-// ✅ 상위 컴포넌트로부터 fundingId를 props로 받음
 const props = defineProps({
   fundingId: {
     type: Number,
@@ -45,7 +44,6 @@ const option = ref({})
 const fetchChartData = async () => {
   try {
     const history = await getFundingTradeHistory(props.fundingId)
-    console.log('[📈history]:', history)
 
     const times = history.map((d) => d.date)
     const prices = history.map((d) => d.closingPrice)
@@ -59,9 +57,9 @@ const fetchChartData = async () => {
       backgroundColor: 'transparent',
       grid: [
         {
-          left: 40, // ← 왼쪽 여백 증가
-          right: 40, // ← 오른쪽 여백 증가
-          top: 40, // ← 위 여백 증가 (최고 레이블 보호)
+          left: 40,
+          right: 40,
+          top: 40,
           height: '65%',
         },
         {
@@ -235,9 +233,3 @@ defineExpose({
   fetchChartData,
 })
 </script>
-
-<style scoped>
-.echarts {
-  font-family: 'Pretendard', sans-serif;
-}
-</style>

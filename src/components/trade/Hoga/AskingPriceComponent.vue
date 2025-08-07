@@ -20,13 +20,13 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref, defineEmits, watch, computed, onMounted } from 'vue'
 import * as echarts from 'echarts/core'
 import { BarChart } from 'echarts/charts'
 import { GridComponent } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
+import { useRoute } from 'vue-router' // ✅ 추가
 
 import { useTradeStore } from '@/stores/tradeStore'
 import { useOrderBookSocket } from '@/hooks/useOrderBookSocket'
@@ -40,7 +40,10 @@ const props = defineProps({
   refreshTrigger: { type: Number, default: 0 },
 })
 
-const fundingId = 1
+// ✅ 동적으로 fundingId 받아오기
+const route = useRoute()
+const fundingId = Number(route.params.id)
+
 const tradeStore = useTradeStore()
 
 const chartRef = ref(null)
@@ -56,7 +59,7 @@ const updateChart = (parsed) => {
   emit('centerIndex', currentPriceIndex, parsed.prices)
 
   const newOption = generateOrderBookChartOption(parsed)
-  chartInstance?.setOption(newOption, false) // ✅ 부드럽게 업데이트
+  chartInstance?.setOption(newOption, false)
   console.log('✅ 차트 옵션 업데이트 완료:', newOption)
 }
 
