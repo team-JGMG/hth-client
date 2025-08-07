@@ -73,7 +73,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import BaseCard from '@/components/common/Card/BaseCard.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
@@ -82,9 +82,11 @@ import PointChargeModal from './PointModal/PointChargeModel.vue'
 import PointRefundModal from './PointModal/PointRefundModal.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { requestChargeMerchantUid, verifyPayment } from '@/api/point'
+import { storeToRefs } from 'pinia'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { getIsLoggedIn } = storeToRefs(authStore)
 
 const isChargeModalOpen = ref(false)
 const isRefundModalOpen = ref(false)
@@ -95,6 +97,11 @@ const myPage = () => {
 }
 
 const requestPay = async (amount) => {
+  if (!getIsLoggedIn.value) {
+    alert('로그인이 필요합니다.')
+    return
+  }
+
   if (!amount || amount <= 0) {
     alert('충전할 금액을 입력해주세요.')
     return
@@ -113,7 +120,6 @@ const requestPay = async (amount) => {
 
     IMP.request_pay(
       {
-        // merchant_uid,
         pg: 'kakaopay.TC0ONETIME',
         pay_method: 'card',
         name: '반의 반 집 포인트 충전',
@@ -140,7 +146,7 @@ const requestPay = async (amount) => {
             chargeAmount.value = 0
 
             // 포인트 정보 다시 불러오기
-            // await authStore.fetchUserInfo()
+            // await authStore.loadUserInfo()
           } catch (err) {
             alert('❌ 서버 검증 실패: ' + (err.response?.data?.message || err.message))
           }
@@ -153,10 +159,4 @@ const requestPay = async (amount) => {
     alert('❌ 오류 발생: ' + (err.response?.data?.message || err.message))
   }
 }
-
-onMounted(() => {
-  if (!authStore.getIsLoggedIn.value) {
-    authStore.login()
-  }
-})
 </script>

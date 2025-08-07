@@ -28,5 +28,5 @@ export const logout = async () => {
 
 // ✅ 유저 정보 요청
 export const fetchUserInfo = async () => {
-  return api.get('/api/users/me') // /api 꼭 붙이기!
+  return api.get('/api/users/me', { withCredentials: true }) // /api 꼭 붙이기!
 }

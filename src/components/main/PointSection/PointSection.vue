@@ -1,7 +1,7 @@
 <template>
   <div class="mb-4">
     <div class="bg-black rounded-2xl p-6 text-white">
-      <template v-if="authStore.getIsLoggedIn">
+      <template v-if="getIsLoggedIn">
         <LoggedInPointSection />
       </template>
       <template v-else>
@@ -12,15 +12,11 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
+import { storeToRefs } from 'pinia'
 import LoggedInPointSection from './LoggedInPointSection.vue'
 import LoggedOutPointSection from './LoggedOutPointSection.vue'
 
 const authStore = useAuthStore()
-
-onMounted(() => {
-  // 테스트용 자동 로그인
-  authStore.login()
-})
+const { getIsLoggedIn } = storeToRefs(authStore) // ✅ computed 값 reactive하게 가져오기
 </script>
