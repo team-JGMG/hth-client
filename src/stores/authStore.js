@@ -24,24 +24,6 @@ export const useAuthStore = defineStore('auth', () => {
     userInfo.value = res.data
   }
 
-  // ✅ 테스트용 로그인 (mock login)
-  function login() {
-    authToken.value = 'dummy_token'
-    accessToken.value = 'dummy_access_token'
-    refreshToken.value = 'dummy_refresh_token'
-
-    userInfo.value = {
-      userId: 1,
-      name: '테스트',
-      point: 1000,
-      email: 'test@example.com',
-    }
-
-    localStorage.setItem('authToken', authToken.value)
-    localStorage.setItem('accessToken', accessToken.value)
-    localStorage.setItem('refreshToken', refreshToken.value)
-  }
-
   // 🔧 토큰 설정
   function setAuthToken(token) {
     authToken.value = token
@@ -107,9 +89,8 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     clearUserData,
     loadUserInfo,
-    login,
-    setUserInfo, // ✅ 이거 추가
-    setLoggedIn, // ✅ 이것도 필요 (LoginCallback.vue에서 사용 중)
+    setUserInfo,
+    setLoggedIn,
   }
 })
 
