@@ -4,7 +4,7 @@
       <div class="shrink-0">
         <DetailHeader>{{ tradeItem.name }}</DetailHeader>
         <div class="bg-white pt-0">
-          <CurrentPrice />
+          <CurrentPrice :fundingId="tradeId" />
           <div class="filter-tabs-container mb-2">
             <BaseTab :tabs="fundingStatusTabs" v-model="currentFundingStatus" />
           </div>
@@ -28,7 +28,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import BaseTab from '@/components/common/Tab/BaseTab.vue'
 import BlankLayout from '@/layouts/BlankLayout.vue'
 import DetailHeader from '@/layouts/DetailHeader.vue'
@@ -36,15 +37,24 @@ import BuyAndSellAccodian from '@/components/trade/BuyAndSell/BuyAndSellAccodian
 import CurrentPrice from '@/components/trade/CurrentPrice.vue'
 import TradeHistoryChart from '@/components/trade/TradeHistoryChart.vue'
 import OrderbookChart from '@/components/trade/Hoga/OrderbookChart.vue'
-import { useRoute } from 'vue-router'
-import { mockTradeListData } from '@/utils/mockTradeListData.js'
+import { getFundingById } from '@/api/funding'
 
 const route = useRoute()
-const tradeId = route.params.id
-const tradeItem = mockTradeListData[tradeId - 1]
+const tradeId = Number(route.params.id)
+console.log('[✅ tradeId]', tradeId)
 
+const tradeItem = ref({})
 const tradeHistoryChart = ref(null)
 const chartRefreshTrigger = ref(0)
+
+onMounted(async () => {
+  try {
+    const res = await getFundingById(tradeId)
+    tradeItem.value = res.data?.data || {}
+  } catch (e) {
+    console.error('상세 정보 로딩 실패:', e)
+  }
+})
 
 const handleTradeCompleted = () => {
   if (tradeHistoryChart.value) {
