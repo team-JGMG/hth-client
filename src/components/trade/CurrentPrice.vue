@@ -1,12 +1,3 @@
-<script setup>
-import { computed } from 'vue'
-import BaseTypography from '../common/Typography/BaseTypography.vue'
-import { useTradeStore } from '@/stores/tradeStore'
-
-const tradeStore = useTradeStore()
-const currentPrice = computed(() => tradeStore.currentPrice)
-</script>
-
 <template>
   <div class="flex items-baseline gap-x-2">
     <BaseTypography size="2xl" weight="bold" class="mb-3">
@@ -16,3 +7,29 @@ const currentPrice = computed(() => tradeStore.currentPrice)
     <BaseTypography>(2.39%)</BaseTypography>
   </div>
 </template>
+<script setup>
+import { ref, onMounted, watch } from 'vue'
+import BaseTypography from '../common/Typography/BaseTypography.vue'
+import { getOrderBookByFundingId } from '@/api/orderbook'
+
+const props = defineProps({
+  fundingId: {
+    type: [String, Number],
+    required: true,
+  },
+})
+
+const currentPrice = ref(0)
+
+const fetchCurrentPrice = async () => {
+  try {
+    const res = await getOrderBookByFundingId(props.fundingId)
+    currentPrice.value = res.data?.data?.currentPrice || 0
+  } catch (err) {
+    console.error('📉 현재가 조회 실패:', err)
+  }
+}
+
+onMounted(fetchCurrentPrice)
+watch(() => props.fundingId, fetchCurrentPrice)
+</script>

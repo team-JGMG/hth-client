@@ -53,3 +53,8 @@ export const getEndedFundings = async (page = 0, size = 100) => {
     params: { page, size },
   })
 }
+
+// 거래 상세 페이지
+export const getFundingById = (id) => {
+  return axios.get(`/api/funding/${id}`)
+}
