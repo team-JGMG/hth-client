@@ -20,9 +20,10 @@
       </BaseTypography>
     </div>
   </div>
+
   <BaseTypography size="base" weight="bold" class="mb-2">매도자 정보</BaseTypography>
   <!-- 매도자 정보 -->
-  <BaseCard class="h-auto flex flex-col mb-0">
+  <BaseCard class="h-auto flex flex-col mb-5">
     <div class="flex justify-between mb-1">
       <BaseTypography size="xs" weight="medium">이름</BaseTypography>
       <BaseTypography size="xs" weight="medium" class="text-right">
@@ -46,8 +47,42 @@
       <BaseTypography size="xs" weight="medium" class="text-right">
         {{ formatDate(item.soldAt) }}
       </BaseTypography>
-    </div></BaseCard
-  >
+    </div>
+  </BaseCard>
+
+  <BaseTypography tag="h2" size="base" weight="bold" class="mb-2">배당금</BaseTypography>
+  <BaseCard class="flex-col space-y-3">
+    <!-- 지급 월 -->
+    <BaseTypography size="base" weight="bold">{{ dividendData.month }}</BaseTypography>
+
+    <!-- 기준일/지급일 -->
+    <!-- 기준일 / 지급일 -->
+    <div
+      class="space-y-1 text-xs text-black w-full pb-2"
+      style="
+        border-bottom: 2px dotted #d1d5db;
+        border-style: dotted;
+        border-image: none;
+        border-bottom-style: dotted;
+      "
+    >
+      <div class="flex justify-between">
+        <BaseTypography size="xs">배당 기준일</BaseTypography>
+        <BaseTypography size="xs">{{ dividendData.referenceDate }}</BaseTypography>
+      </div>
+
+      <div class="flex justify-between">
+        <BaseTypography size="xs">배당 지급일</BaseTypography>
+        <BaseTypography size="xs">{{ dividendData.paymentDate }}</BaseTypography>
+      </div>
+    </div>
+
+    <!-- 금액 박스 -->
+    <div class="bg-gray-100 rounded-lg py-4 text-center w-full">
+      <BaseTypography size="lg" weight="bold">{{ dividendData.amount }}원</BaseTypography>
+      <BaseTypography size="xs" class="text-gray-500 mt-1">1주당 배당금 (세전)</BaseTypography>
+    </div>
+  </BaseCard>
 </template>
 
 <script setup>
@@ -79,5 +114,11 @@ const labels = {
   approvalDate: '준공일',
   officialLandPrice: '공시지가',
   unitPricePerPyeong: '연면적 평단가',
+}
+const dividendData = {
+  month: '2024년 08월',
+  referenceDate: '2024년 08월 30일',
+  paymentDate: '2024년 09월 30일',
+  amount: 25,
 }
 </script>
