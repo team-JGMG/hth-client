@@ -1,3 +1,12 @@
+<template>
+  <div ref="scrollContainer" class="overflow-y-auto no-scrollbar w-full">
+    <AskingPriceComponent
+      :parsedData="parsedData"
+      @centerIndex="handleCenterIndex"
+      :refreshTrigger="props.refreshTrigger"
+    />
+  </div>
+</template>
 <script setup>
 import { ref, nextTick } from 'vue'
 
@@ -29,16 +38,6 @@ const handleCenterIndex = (index, prices) => {
   })
 }
 </script>
-
-<template>
-  <div ref="scrollContainer" class="overflow-y-auto no-scrollbar w-full">
-    <AskingPriceComponent
-      :parsedData="parsedData"
-      @centerIndex="handleCenterIndex"
-      :refreshTrigger="props.refreshTrigger"
-    />
-  </div>
-</template>
 
 <style scoped>
 .no-scrollbar::-webkit-scrollbar {

@@ -7,8 +7,9 @@
     <BaseTypography>(2.39%)</BaseTypography>
   </div>
 </template>
+
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, watch } from 'vue'
 import BaseTypography from '../common/Typography/BaseTypography.vue'
 import { getOrderBookByFundingId } from '@/api/orderbook'
 
@@ -21,15 +22,21 @@ const props = defineProps({
 
 const currentPrice = ref(0)
 
-const fetchCurrentPrice = async () => {
+const fetchCurrentPrice = async (id) => {
   try {
-    const res = await getOrderBookByFundingId(props.fundingId)
+    const res = await getOrderBookByFundingId(Number(id))
     currentPrice.value = res.data?.data?.currentPrice || 0
   } catch (err) {
     console.error('📉 현재가 조회 실패:', err)
   }
 }
 
-onMounted(fetchCurrentPrice)
-watch(() => props.fundingId, fetchCurrentPrice)
+// ✅ fundingId 변경 시 즉시 호출
+watch(
+  () => props.fundingId,
+  (newId) => {
+    fetchCurrentPrice(newId)
+  },
+  { immediate: true },
+)
 </script>
