@@ -1,19 +1,23 @@
 <template>
-  <BaseCard v-for="item in tradeItems" :key="item.id" class="h-auto py-5 mb-2 flex flex-col gap-4">
+  <BaseCard
+    v-for="item in tradeItems"
+    :key="item.fundingId"
+    class="h-auto py-5 mb-2 flex flex-col gap-4"
+  >
     <button
-      @click="tradeOrderPage(item.id)"
-      :aria-label="item.name + ' 매물 보기'"
+      @click="tradeOrderPage(item.fundingId)"
+      :aria-label="item.title + ' 매물 보기'"
       class="w-full text-left"
     >
       <div class="flex justify-between items-center">
         <div class="flex items-center justify-start">
           <img
             :src="item.image"
-            :alt="item.name + ' 건물 이미지'"
+            :alt="item.title + ' 건물 이미지'"
             class="w-14 h-auto mr-2 rounded-md"
           />
           <BaseTypography class="text-lg text-left leading-tight" weight="bold">
-            {{ item.name }}
+            {{ item.title }}
           </BaseTypography>
         </div>
         <div
@@ -28,10 +32,10 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import BaseCard from '@/components/common/Card/BaseCard.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import { useRouter } from 'vue-router'
-import { ref, onMounted } from 'vue'
 
 const props = defineProps({
   items: {
@@ -41,7 +45,6 @@ const props = defineProps({
 })
 
 const router = useRouter()
-
 const tradeItems = ref([])
 
 onMounted(() => {
@@ -52,14 +55,17 @@ onMounted(() => {
     new URL('../../assets/images/randombuilding/building4.png', import.meta.url).href,
   ]
 
+  // ✅ 키 이름에 prefix 추가해서 충돌 방지
   const oldAssignments = JSON.parse(localStorage.getItem('tradeItemImages')) || {}
   const newAssignments = { ...oldAssignments }
   let needsUpdate = false
 
   props.items.forEach((item) => {
-    if (!newAssignments[item.id]) {
+    const key = `funding_${item.fundingId}`
+
+    if (!newAssignments[key]) {
       const randomIndex = Math.floor(Math.random() * imagePaths.length)
-      newAssignments[item.id] = imagePaths[randomIndex]
+      newAssignments[key] = imagePaths[randomIndex]
       needsUpdate = true
     }
   })
@@ -68,10 +74,14 @@ onMounted(() => {
     localStorage.setItem('tradeItemImages', JSON.stringify(newAssignments))
   }
 
-  tradeItems.value = props.items.map((item) => ({
-    ...item,
-    image: newAssignments[item.id],
-  }))
+  // 최종 데이터 세팅
+  tradeItems.value = props.items.map((item) => {
+    const key = `funding_${item.fundingId}`
+    return {
+      ...item,
+      image: newAssignments[key],
+    }
+  })
 })
 
 const tradeOrderPage = (id) => {

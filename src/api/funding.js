@@ -46,3 +46,10 @@ export const refundFundingOrder = (fundingId, orderId, orderPrice) => {
 export const getAllocations = (fundingId) => {
   return axios.get(`/api/allocations/${fundingId}`, { withCredentials: true })
 }
+
+// 거래 리스트 페이지
+export const getEndedFundings = async (page = 0, size = 100) => {
+  return axios.get('/api/funding/ended', {
+    params: { page, size },
+  })
+}
