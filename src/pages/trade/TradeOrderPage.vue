@@ -15,14 +15,20 @@
         <OrderbookChart
           v-if="currentFundingStatus === 'askingPrice'"
           :refreshTrigger="chartRefreshTrigger"
+          :fundingId="tradeId"
         />
-        <TradeHistoryChart ref="tradeHistoryChart" v-if="currentFundingStatus === 'stockChart'" />
+        <TradeHistoryChart
+          ref="tradeHistoryChart"
+          v-if="currentFundingStatus === 'stockChart'"
+          :fundingId="tradeId"
+        />
       </div>
     </div>
 
     <BuyAndSellAccodian
       @trade-completed="handleTradeCompleted"
       class="fixed bottom-16 left-0 right-0 max-w-md mx-auto"
+      :fundingId="tradeId"
     />
   </BlankLayout>
 </template>

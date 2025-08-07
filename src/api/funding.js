@@ -1,4 +1,4 @@
-import axios from '@/libs/axios'
+import api from '@/libs/axios'
 
 //   펀딩 목록 API 호출
 //  @param {string} category - funding | ended | sold
@@ -7,7 +7,7 @@ import axios from '@/libs/axios'
 //   @param {number} size - 기본값: 20
 
 export const getFundingList = async (category, sort = 'date', page = 0, size = 20) => {
-  return axios.get('/api/funding', {
+  return api.get('/api/funding', {
     params: {
       category,
       sort,
@@ -49,12 +49,25 @@ export const getAllocations = (fundingId) => {
 
 // 거래 리스트 페이지
 export const getEndedFundings = async (page = 0, size = 1000) => {
-  return axios.get('/api/funding/ended', {
+  return api.get('/api/funding/ended', {
     params: { page, size },
   })
 }
 
 // 거래 상세 페이지
 export const getFundingById = (id) => {
-  return axios.get(`/api/funding/${id}`)
+  return api.get(`/api/funding/${id}`)
+}
+
+// 거래 체결 내역
+export const getFundingTradeHistory = async (fundingId) => {
+  const res = await api.get(`/api/fundings/${fundingId}/trades`, {
+    params: {
+      startDate: '2025-06-01',
+      endDate: '2025-06-20',
+      limit: 100,
+      offset: 0,
+    },
+  })
+  return res.data.data?.history || []
 }
