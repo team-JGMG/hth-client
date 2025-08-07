@@ -1,19 +1,10 @@
-//LoginPage.vue
 <script setup>
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import SocialLoginButton from '@/components/common/Button/SocialLoginButton.vue'
 import BlankLayout from '@/layouts/BlankLayout.vue'
-import { getKakaoLoginUrl } from '@/api/auth'
-const handleKakaoLogin = async () => {
-  try {
-    const res = await getKakaoLoginUrl()
-    console.log('[카카오 로그인 URL]', res) // 🔍 전체 응답 로그
-    console.log('[리다이렉트 URL]', res.data.loginUrl) // 🔍 실제 URL만
 
-    window.location.href = res.data.loginUrl
-  } catch (err) {
-    console.error('카카오 로그인 URL 요청 실패:', err)
-  }
+const handleKakaoLogin = () => {
+  window.location.href = 'http://localhost:8080/oauth2/authorization/kakao'
 }
 </script>
 

@@ -1,32 +1,25 @@
 // src/api/auth.js
 
 import api from '@/libs/axios'
-import axios from 'axios'
-// ✅ 카카오 로그인 URL 요청
-export const getKakaoLoginUrl = async () => {
-  const response = await axios.get('http://localhost:8080/api/auth/login/kakao', {
-    withCredentials: true,
-  })
-  return response.data
-}
+
+// ✅ 로그인은 axios로 하지 않고, 직접 브라우저에서 리다이렉트하므로 이 함수는 제거 가능
+// export const getKakaoLoginUrl = async () => { ... }
+
 // ✅ 회원가입 요청 (preauthToken 쿠키 사용)
 export const signUpWithPreAuth = async (userInfo) => {
-  return api.post('/api/auth/signup', userInfo, {
+  return api.post('/auth/signup', userInfo, {
     withCredentials: true,
   })
 }
 
-// ✅ 토큰 갱신
 export const refreshAccessToken = async () => {
-  return api.post('/api/auth/oauth/token-refresh') // api 인스턴스 사용
+  return api.post('/auth/oauth/token-refresh')
 }
 
-// ✅ 로그아웃 요청
 export const logout = async () => {
-  return api.post('/api/auth/oauth/logout')
+  return api.post('/auth/oauth/logout')
 }
 
-// ✅ 유저 정보 요청
 export const fetchUserInfo = async () => {
-  return api.get('/api/users/me') // /api 꼭 붙이기!
+  return api.get('/users/me')
 }
