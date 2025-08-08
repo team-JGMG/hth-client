@@ -1,73 +1,111 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import CancelConfirmModal from './CancelConfirmModal.vue'
 import { formatDateTime } from '@/utils/format.js'
+import { getOrderHistory } from '@/api/trade'
+import { useAuthStore } from '@/stores/authStore'
 
+// ===== 안전 유틸 =====
+// 'YYYY-MM-DD HH:mm:ss' -> 'YYYY-MM-DDTHH:mm:ss' (iOS/Safari 파싱 대응)
+function toIso(dateStr) {
+  return typeof dateStr === 'string' ? dateStr.replace(' ', 'T') : dateStr
+}
+function parseDate(dateStr) {
+  return new Date(toIso(dateStr))
+}
+function n(v, d = 0) {
+  const num = Number(v)
+  return Number.isFinite(num) ? num : d
+}
+function nfmt(v) {
+  return n(v).toLocaleString()
+}
+
+// 날짜 포맷 유틸 (기존 유지)
 function formatToMMDD(dateStr) {
-  const [datePart] = formatDateTime(dateStr).split(' ')
-  const [, mm, dd] = datePart.split('.')
-  return `${mm.padStart(2, '0')}.${dd.padStart(2, '0')}`
+  const [datePart] = formatDateTime(toIso(dateStr)).split(' ')
+  const [, mm, dd] = (datePart || '').split('.')
+  return `${String(mm || '00').padStart(2, '0')}.${String(dd || '00').padStart(2, '0')}`
 }
-
 function formatToHHMM(dateStr) {
-  const [, timePart] = formatDateTime(dateStr).split(' ')
-  return timePart
+  const [, timePart] = formatDateTime(toIso(dateStr)).split(' ')
+  return timePart || ''
 }
 
+// UI 보조 필드 세팅
 const prepareOrders = (orderArray) =>
   orderArray.map((o) => ({
     ...o,
     _ui: { dragX: 0, touchStartX: 0 },
   }))
 
-const orders = ref(
-  prepareOrders([
-    {
-      itemName: '대전 한화 스타트업 파크',
-      shares: 2,
-      totalPrice: 11250,
-      status: '매도',
-      createdAt: '2025-07-14T11:11:00',
-      pendingShares: 1, // ← 미체결량
-    },
-    {
-      itemName: '대전 한화 스타트업 파크',
-      shares: 2,
-      totalPrice: 11250,
-      status: '매수',
-      createdAt: '2025-07-14T11:11:00',
-      pendingShares: 2, // ← 미체결량
-    },
-    {
-      itemName: '대전 한화 스타트업 파크',
-      shares: 2,
-      totalPrice: 11250,
-      status: '매도',
-      createdAt: '2024-07-14T11:11:00',
-      pendingShares: 0, // ← 미체결량
-    },
-    {
-      itemName: '대전 한화 스타트업 파크',
-      shares: 2,
-      totalPrice: 11250,
-      status: '매수',
-      createdAt: '2024-06-14T11:11:00',
-      pendingShares: 1, // ← 미체결량
-    },
-    {
-      itemName: '대전 한화 스타트업 파크',
-      shares: 2,
-      totalPrice: 11250,
-      status: '매도',
-      createdAt: '2024-05-14T11:11:00',
-      pendingShares: 3, // ← 미체결량
-    },
-  ]),
-)
+// 유저 ID (지금은 4로 고정, 나중에 authStore로 전환)
+const authStore = useAuthStore()
+const FALLBACK_USER_ID = 4
+// 나중에 전환 시 주석 해제:
+// const resolvedUserId = computed(() => authStore.userId || FALLBACK_USER_ID)
 
+const orders = ref([])
+const isLoading = ref(false)
+const loadError = ref(null)
+const debugInfo = ref('')
+
+// 서버 응답 -> UI 모델 매핑 (안전)
+function mapApiOrderToUi(o) {
+  const pricePer = n(o?.orderPricePerShare)
+  const shareCnt = n(o?.orderShareCount)
+  return {
+    itemName: o?.propertyTitle ?? '',
+    shares: shareCnt,
+    totalPrice: pricePer * shareCnt,
+    status:
+      o?.orderType === 'BUY' ? '매수' : o?.orderType === 'SELL' ? '매도' : (o?.orderType ?? ''),
+
+    createdAt: toIso(o?.createdAt),
+    pendingShares: n(o?.remainingShareCount, 0),
+
+    _raw: o,
+  }
+}
+
+// 응답에서 배열 추출 (이번 API는 {status, data:[...]} 고정)
+function unwrapToArray(res) {
+  if (Array.isArray(res?.data)) return res.data
+  if (Array.isArray(res?.data?.data)) return res.data.data // 방어
+  return []
+}
+
+async function loadOrders() {
+  isLoading.value = true
+  loadError.value = null
+  debugInfo.value = ''
+  try {
+    const userId = FALLBACK_USER_ID
+    // 나중에 전환: const userId = resolvedUserId.value
+
+    const res = await getOrderHistory(userId)
+    const list = unwrapToArray(res)
+
+    debugInfo.value = `status=${res?.data?.status || res?.status} | isArray=${Array.isArray(list)} | len=${list.length}`
+
+    const mapped = list.map(mapApiOrderToUi)
+    orders.value = prepareOrders(mapped)
+  } catch (err) {
+    console.error('❌ 거래 내역 불러오기 실패:', err)
+    loadError.value = err
+    orders.value = []
+    debugInfo.value = `error=${err?.message || err}`
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(loadOrders)
+
+// 정렬/연도 헤더/슬라이드/모달 로직 (기존 유지)
 const sortedOrders = computed(() =>
-  [...orders.value].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
+  [...orders.value].sort((a, b) => parseDate(b.createdAt) - parseDate(a.createdAt)),
 )
 
 const isModalOpen = ref(false)
@@ -80,6 +118,7 @@ function openDeleteModal(order) {
 
 function confirmDelete() {
   if (!selectedOrder.value) return
+  // 실제 취소 API 연동 전까지는 UI에서만 제거
   orders.value = orders.value.filter(
     (o) =>
       !(
@@ -90,28 +129,24 @@ function confirmDelete() {
 }
 
 function getYear(dateStr) {
-  return new Date(dateStr).getFullYear()
+  return parseDate(dateStr).getFullYear()
 }
-
 function isNewYear(index) {
   if (index === 0) return true
   const currentYear = getYear(sortedOrders.value[index].createdAt)
   const prevYear = getYear(sortedOrders.value[index - 1].createdAt)
   return currentYear !== prevYear
 }
-
 function handleTouchStart(e, order) {
   orders.value.forEach((o) => {
     if (o !== order) o._ui.dragX = 0
   })
   order._ui.touchStartX = e.touches[0].clientX
 }
-
 function handleTouchMove(e, order) {
   const deltaX = e.touches[0].clientX - order._ui.touchStartX
   if (deltaX < 0) order._ui.dragX = Math.max(deltaX, -60)
 }
-
 function handleTouchEnd(order) {
   if (order._ui.dragX <= -60) {
     order._ui.dragX = -60
@@ -124,9 +159,16 @@ function handleTouchEnd(order) {
   }
 }
 </script>
+
 <template>
+  <div class="py-3"></div>
   <div class="p-4 min-h-[600px] space-y-0">
-    <template v-if="sortedOrders.length">
+    <div v-if="isLoading" class="py-10 text-center text-gray-400">불러오는 중…</div>
+    <div v-else-if="loadError" class="py-10 text-center text-red-500">
+      거래 내역을 불러오지 못했습니다.
+    </div>
+
+    <template v-else-if="sortedOrders.length">
       <template v-for="(order, index) in sortedOrders" :key="index">
         <BaseTypography v-if="isNewYear(index)" class="text-sm text-gray-500">
           {{ getYear(order.createdAt) }}년
@@ -170,37 +212,33 @@ function handleTouchEnd(order) {
                   {{ order.itemName }}
                 </BaseTypography>
               </div>
-              <!-- 설명 영역: 금액은 검정, 매수/매도는 색상 적용 -->
               <div class="h-[18px] overflow-hidden flex gap-1 items-center">
-                <!-- 매수/매도 텍스트 먼저 -->
                 <BaseTypography
                   class="text-xs !font-semibold"
                   :color="order.status === '매수' ? 'red' : 'blue'"
                 >
                   {{ order.status }}
                 </BaseTypography>
-
-                <!-- 금액 텍스트는 검은색 그대로 -->
                 <BaseTypography class="text-xs !font-semibold">
-                  {{ order.totalPrice.toLocaleString() }}원
+                  {{ nfmt(order.totalPrice) }}원
                 </BaseTypography>
               </div>
             </div>
 
             <!-- 주문량/상태 -->
-            <!-- 주문량/상태 -->
             <div class="text-sm !font-black text-right min-w-[70px]">
               <BaseTypography class="text-xs text-gray-500">
-                주문량 {{ order.shares }}주
+                주문량 {{ nfmt(order.shares) }}주
               </BaseTypography>
               <BaseTypography class="text-xs !font-bold mt-1" :color="'red'">
-                미체결량 {{ order.pendingShares }}주
+                미체결량 {{ nfmt(order.pendingShares) }}주
               </BaseTypography>
             </div>
           </div>
         </div>
       </template>
     </template>
+
     <div v-else class="py-10 text-center text-gray-400">주문 내역이 없습니다.</div>
   </div>
 
