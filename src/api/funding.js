@@ -54,8 +54,10 @@ export const getEndedFundings = async (page = 0, size = 10) => {
 }
 
 // 거래 상세 페이지
-export const getFundingById = (id) => {
-  return api.get(`/api/funding/${id}`)
+export const getFundingById = async (id) => {
+  const res = await api.get(`/api/funding/${id}`)
+  if (import.meta.env.DEV) console.log('[API] getFundingById raw', id, res.status, res.data)
+  return res
 }
 
 // 거래 체결 내역
