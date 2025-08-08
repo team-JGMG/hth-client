@@ -21,12 +21,11 @@
   </div>
 </template>
 <script setup>
-import { ref, defineEmits, watch, computed, onMounted } from 'vue'
+import { ref, defineEmits, watch, computed, onMounted, toRefs } from 'vue'
 import * as echarts from 'echarts/core'
 import { BarChart } from 'echarts/charts'
 import { GridComponent } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
-import { useRoute } from 'vue-router' // ✅ 추가
 
 import { useTradeStore } from '@/stores/tradeStore'
 import { useOrderBookSocket } from '@/hooks/useOrderBookSocket'
@@ -38,11 +37,11 @@ const emit = defineEmits(['centerIndex'])
 
 const props = defineProps({
   refreshTrigger: { type: Number, default: 0 },
+  fundingId: { type: Number, required: true },
+  parsedData: { type: Object, default: null },
 })
 
-// ✅ 동적으로 fundingId 받아오기
-const route = useRoute()
-const fundingId = Number(route.params.id)
+const { fundingId, parsedData } = toRefs(props)
 
 const tradeStore = useTradeStore()
 
@@ -51,6 +50,9 @@ let chartInstance = null
 
 onMounted(() => {
   chartInstance = echarts.init(chartRef.value)
+  if (parsedData.value) {
+    updateChart(parsedData.value)
+  }
 })
 
 const updateChart = (parsed) => {
@@ -63,7 +65,7 @@ const updateChart = (parsed) => {
   console.log('✅ 차트 옵션 업데이트 완료:', newOption)
 }
 
-const { reconnect } = useOrderBookSocket(fundingId, (parsedData) => {
+const { reconnect } = useOrderBookSocket(fundingId.value, (parsedData) => {
   console.log('📡 WebSocket 수신:', parsedData)
   tradeStore.setTradeData(parsedData)
   updateChart(parsedData)
@@ -84,6 +86,12 @@ watch(
     }
   },
 )
+
+watch(parsedData, (newData) => {
+  if (newData) {
+    updateChart(newData)
+  }
+})
 
 const upperLimitPrice = computed(() => tradeStore.upperLimitPrice || 0)
 const lowerLimitPrice = computed(() => tradeStore.lowerLimitPrice || 0)

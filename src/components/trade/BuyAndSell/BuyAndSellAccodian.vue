@@ -39,7 +39,11 @@
 
     <transition name="slide-up">
       <div v-if="isOpen" class="p-4 pt-0 bg-black text-white">
-        <TradeForm :type="activeMode" @completed="handleTradeCompleted" />
+        <TradeForm
+          :type="activeMode"
+          @completed="handleTradeCompleted"
+          :fundingId="props.fundingId"
+        />
         <div class="mb-18"></div>
       </div>
     </transition>
@@ -47,9 +51,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, defineProps } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import TradeForm from './TradeForm.vue'
+
+const props = defineProps({
+  fundingId: { type: Number, required: true },
+})
 
 const isOpen = ref(false)
 const activeMode = ref('buy')

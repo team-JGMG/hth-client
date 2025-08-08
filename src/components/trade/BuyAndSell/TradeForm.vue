@@ -59,7 +59,7 @@
       :amount="amount"
       :quantity="quantity"
       :isOpen="isConfirmOpen"
-      :fundingId="1"
+      :fundingId="props.fundingId"
       @close="isConfirmOpen = false"
       @completed="handleTradeCompleted"
       @trade-success="handleTradeCompleted"
@@ -68,7 +68,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, defineProps } from 'vue'
 import CompletedButton from '@/components/common/Button/CompletedButton.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import TradeConfirmModal from './Modal/TradeConfirmModal.vue'
@@ -78,6 +78,7 @@ const props = defineProps({
     type: String,
     default: 'buy',
   },
+  fundingId: { type: Number, required: true },
 })
 
 const amount = ref(0)
