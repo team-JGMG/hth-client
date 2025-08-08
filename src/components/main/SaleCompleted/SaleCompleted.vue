@@ -91,7 +91,7 @@ const fetchSoldProperties = async () => {
 }
 
 const goToSaleCompletedPage = () => {
-  router.push('/funding/list/completed-sale') // 실제 경로에 맞게 수정하세요
+  router.push('/funding/list/completed-sale')
 }
 
 onMounted(() => {
