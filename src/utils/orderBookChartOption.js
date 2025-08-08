@@ -26,48 +26,32 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
         splitLine: { show: false },
       })),
 
-    yAxis: [
-      {
+    yAxis: Array(3)
+      .fill(0)
+      .map((_, i) => ({
         type: 'category',
-        gridIndex: 0,
+        gridIndex: i,
         inverse: false,
         data: prices,
         axisLine: { show: false },
         axisTick: { show: false },
-        axisLabel: { show: false },
+        axisLabel:
+          i === 2
+            ? {
+                show: true,
+                align: 'center',
+                margin: 12,
+                formatter: (value, index) => {
+                  if (index === currentPriceIndex) return `{highlight|${value}}`
+                  else if (buyVolumes[index] > 0) return `{blue|${value}}`
+                  else if (sellVolumes[index] > 0) return `{red|${value}}`
+                  else return value
+                },
+                rich: labelStyles,
+              }
+            : { show: false },
         splitLine: { show: false },
-      },
-      {
-        type: 'category',
-        gridIndex: 1,
-        inverse: false,
-        data: prices,
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: { show: false },
-        splitLine: { show: false },
-      },
-      {
-        type: 'category',
-        gridIndex: 2,
-        inverse: false,
-        data: prices,
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: {
-          show: true,
-          align: 'center',
-          formatter: (value, index) => {
-            if (index === currentPriceIndex) return `{highlight|${value}}`
-            else if (buyVolumes[index] > 0) return `{blue|${value}}`
-            else if (sellVolumes[index] > 0) return `{red|${value}}`
-            else return value
-          },
-          rich: labelStyles,
-        },
-        splitLine: { show: false },
-      },
-    ],
+      })),
 
     series: [
       {
@@ -77,18 +61,18 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
         yAxisIndex: 0,
         data: sellVolumes,
         barWidth: 30,
+        barCategoryGap: '40%',
         itemStyle: {
-          color: '#cce5ff',
+          color: '#fbd5d5',
           borderRadius: [4, 4, 4, 4],
         },
         label: {
           show: true,
-          position: 'inside',
+          position: 'left',
+          align: 'right',
           formatter: (params) => (params.value === 0 ? '' : params.value),
           fontWeight: 'bold',
         },
-        animationDuration: 300,
-        animationEasing: 'linear',
       },
       {
         name: '매수',
@@ -97,18 +81,18 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
         yAxisIndex: 1,
         data: buyVolumes,
         barWidth: 30,
+        barCategoryGap: '40%',
         itemStyle: {
-          color: '#fbd5d5',
+          color: '#cce5ff',
           borderRadius: [4, 4, 4, 4],
         },
         label: {
           show: true,
-          position: 'inside',
+          position: 'right',
+          align: 'left',
           formatter: (params) => (params.value === 0 ? '' : params.value),
           fontWeight: 'bold',
         },
-        animationDuration: 300,
-        animationEasing: 'linear',
       },
     ],
   }
