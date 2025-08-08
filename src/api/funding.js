@@ -48,7 +48,7 @@ export const getAllocations = (fundingId) => {
 }
 
 // 거래 리스트 페이지
-export const getEndedFundings = async (page = 0, size = 1000) => {
+export const getEndedFundings = async (page = 0, size = 10) => {
   return api.get('/api/funding/ended', {
     params: { page, size },
   })

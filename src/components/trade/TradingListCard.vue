@@ -1,6 +1,6 @@
 <template>
   <BaseCard
-    v-for="item in tradeItems"
+    v-for="item in itemsWithImages"
     :key="item.fundingId"
     class="h-auto py-5 mb-2 flex flex-col gap-4"
   >
@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import BaseCard from '@/components/common/Card/BaseCard.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
@@ -44,49 +44,45 @@ const props = defineProps({
   },
 })
 
-const tradeItems = ref([])
-const router = useRouter()
+const imagePaths = [
+  new URL('@/assets/images/randombuilding/building1.png', import.meta.url).href,
+  new URL('@/assets/images/randombuilding/building2.png', import.meta.url).href,
+  new URL('@/assets/images/randombuilding/building3.png', import.meta.url).href,
+  new URL('@/assets/images/randombuilding/building4.png', import.meta.url).href,
+]
 
-watch(
-  () => props.items,
-  (newItems) => {
-    if (!newItems.length) return
+const getRandomImageMap = (items) => {
+  const oldAssignments = JSON.parse(localStorage.getItem('tradeItemImages')) || {}
+  const newAssignments = { ...oldAssignments }
+  let updated = false
 
-    const imagePaths = [
-      new URL('../../assets/images/randombuilding/building1.png', import.meta.url).href,
-      new URL('../../assets/images/randombuilding/building2.png', import.meta.url).href,
-      new URL('../../assets/images/randombuilding/building3.png', import.meta.url).href,
-      new URL('../../assets/images/randombuilding/building4.png', import.meta.url).href,
-    ]
-
-    const oldAssignments = JSON.parse(localStorage.getItem('tradeItemImages')) || {}
-    const newAssignments = { ...oldAssignments }
-    let needsUpdate = false
-
-    newItems.forEach((item) => {
-      const key = `funding_${item.fundingId}`
-      if (!newAssignments[key]) {
-        const randomIndex = Math.floor(Math.random() * imagePaths.length)
-        newAssignments[key] = imagePaths[randomIndex]
-        needsUpdate = true
-      }
-    })
-
-    if (needsUpdate) {
-      localStorage.setItem('tradeItemImages', JSON.stringify(newAssignments))
+  items.forEach((item) => {
+    const key = `funding_${item.fundingId}`
+    if (!newAssignments[key]) {
+      const randomIndex = Math.floor(Math.random() * imagePaths.length)
+      newAssignments[key] = imagePaths[randomIndex]
+      updated = true
     }
+  })
 
-    tradeItems.value = newItems.map((item) => {
-      const key = `funding_${item.fundingId}`
-      return {
-        ...item,
-        image: newAssignments[key],
-      }
-    })
-  },
-  { immediate: true },
-)
+  if (updated) {
+    localStorage.setItem('tradeItemImages', JSON.stringify(newAssignments))
+  }
 
+  return newAssignments
+}
+
+const itemsWithImages = computed(() => {
+  if (!props.items?.length) return []
+  const imageMap = getRandomImageMap(props.items)
+
+  return props.items.map((item) => ({
+    ...item,
+    image: imageMap[`funding_${item.fundingId}`],
+  }))
+})
+
+const router = useRouter()
 const tradeOrderPage = (id) => {
   router.push(`/trade/order/${id}`)
 }
