@@ -6,7 +6,10 @@
       <TradingListCard :items="tradeItems" />
       <div ref="bottomRef" class="h-2" />
       <div v-if="isLoading" class="flex justify-center py-4">
-        <img src="@/assets/images/character/HOMEch.png" class="w-12 h-12 animate-spin opacity-70" />
+        <img
+          src="@/assets/images/character/loading.png"
+          class="w-12 h-12 animate-spin opacity-70"
+        />
       </div>
     </div>
   </BlankLayout>
