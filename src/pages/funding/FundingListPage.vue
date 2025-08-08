@@ -38,7 +38,7 @@
         <div ref="bottomRef" class="h-2" />
         <div v-if="isLoading" class="flex justify-center py-4">
           <img
-            src="@/assets/images/character/HOMEch.png"
+            src="@/assets/images/character/loading.png"
             alt="로딩 캐릭터"
             class="w-12 h-12 animate-spin opacity-70"
           />
