@@ -66,3 +66,15 @@ export const getSoldProperties = async () => {
   console.log('API Response:', response)
   return response.data
 }
+
+// 매물 ID 기반 실거래가 위치 정보 조회
+export const getPropertyMapData = async (propertyId) => {
+  const response = await api.get(`/api/property/map/${propertyId}`)
+  return response.data
+}
+
+// 매물 ID 기반 좌표 조회
+export const getPropertyCoordinates = async (propertyId) => {
+  const response = await api.get(`/api/property/map/coordinate/${propertyId}`)
+  return response.data
+}
