@@ -144,7 +144,8 @@ const fetchChartData = async () => {
         {
           type: 'line',
           data: prices,
-          smooth: true,
+          // smooth:true,
+          smooth: false,
           showSymbol: true,
           symbolSize: 0,
           hoverAnimation: true,
@@ -152,19 +153,19 @@ const fetchChartData = async () => {
             color: '#0057FF',
             width: 2,
           },
-          areaStyle: {
-            color: {
-              type: 'linear',
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [
-                { offset: 0, color: 'rgba(0, 87, 255, 0.25)' },
-                { offset: 1, color: 'rgba(0, 87, 255, 0)' },
-              ],
-            },
-          },
+          // areaStyle: {
+          //   color: {
+          //     type: 'linear',
+          //     x: 0,
+          //     y: 0,
+          //     x2: 0,
+          //     y2: 1,
+          //     colorStops: [
+          //       { offset: 0, color: 'rgba(0, 87, 255, 0.25)' },
+          //       { offset: 1, color: 'rgba(0, 87, 255, 0)' },
+          //     ],
+          //   },
+          // },
           markPoint: {
             symbol: 'circle',
             symbolSize: 6,
