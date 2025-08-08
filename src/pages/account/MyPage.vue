@@ -32,7 +32,7 @@ import DetailHeader from '@/layouts/DetailHeader.vue'
 import BaseTab from '@/components/common/Tab/BaseTab.vue'
 import LogoutSection from '@/components/account/LogoutSection.vue'
 // import CompletedButton from '@/components/common/Button/CompletedButton.vue'
-import LoggedInPointSection from '@/components/main/PointSection/LoggedInPointSection.vue'
+import LoggedInPointSection from '@/components/main/PointSection/LoggedInStatus/LoggedInPointSection.vue'
 import BlankLayout from '@/layouts/BlankLayout.vue'
 const userStore = useUserStore()
 onMounted(async () => {
