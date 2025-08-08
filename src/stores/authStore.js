@@ -56,9 +56,9 @@ export const useAuthStore = defineStore(
     }
   },
   {
-    // 💾 페이지 새로고침 시 상태 유지 (pinia-plugin-persistedstate)
+    // 페이지 새로고침 시 상태 유지 (pinia-plugin-persistedstate)
     persist: {
-      storage: localStorage, // localStorage에 저장
+      storage: localStorage,
       // paths: ['userInfo'], // `userInfo`만 저장 (선택 사항)
     },
   },
