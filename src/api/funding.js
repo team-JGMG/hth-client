@@ -1,5 +1,5 @@
 import api from '@/libs/axios'
-
+import axios from 'axios'
 //   펀딩 목록 API 호출
 //  @param {string} category - funding | ended | sold
 //   @param {string} sort - date | timeLeft | rate
