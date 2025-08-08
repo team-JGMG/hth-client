@@ -2,7 +2,7 @@
   <BlankLayout>
     <div class="flex flex-col h-[calc(100vh-3rem)]">
       <div class="shrink-0">
-        <DetailHeader>{{ tradeItem.name }}</DetailHeader>
+        <DetailHeader>{{ tradeItem.title }}</DetailHeader>
         <div class="bg-white pt-0">
           <CurrentPrice :fundingId="tradeId" />
           <div class="filter-tabs-container mb-2">
