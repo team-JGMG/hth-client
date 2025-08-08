@@ -4,7 +4,8 @@ import SocialLoginButton from '@/components/common/Button/SocialLoginButton.vue'
 import BlankLayout from '@/layouts/BlankLayout.vue'
 
 const handleKakaoLogin = () => {
-  window.location.href = 'http://localhost:8080/oauth2/authorization/kakao'
+  const redirectUrl = `${import.meta.env.VITE_API_URL}/oauth2/authorization/kakao`
+  window.location.href = redirectUrl
 }
 </script>
 

@@ -73,7 +73,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import BaseCard from '@/components/common/Card/BaseCard.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
@@ -83,6 +83,7 @@ import PointRefundModal from './PointModal/PointRefundModal.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { requestChargeMerchantUid, verifyPayment } from '@/api/point'
 import { storeToRefs } from 'pinia'
+import { getPointBalance } from '@/api/point'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -95,6 +96,18 @@ const chargeAmount = ref(0)
 const myPage = () => {
   router.push('/account/my-page')
 }
+
+onMounted(async () => {
+  try {
+    const point = await getPointBalance()
+    authStore.userInfo = {
+      ...authStore.userInfo,
+      point,
+    }
+  } catch (e) {
+    console.error('포인트 불러오기 실패:', e)
+  }
+})
 
 const requestPay = async (amount) => {
   if (!getIsLoggedIn.value) {
