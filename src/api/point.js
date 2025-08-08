@@ -13,3 +13,9 @@ export const verifyPayment = async ({ impUid, amount }) => {
   const res = await api.post('/api/point/verify', { impUid, amount })
   return res.data
 }
+
+// 현재 포인트 보유량 조회
+export const getPointBalance = async () => {
+  const res = await api.get('/api/point/balance')
+  return res.data.data
+}
