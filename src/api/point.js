@@ -24,3 +24,9 @@ export const getPointBalance = async () => {
   })
   return res.data.data
 }
+
+// 포인트 환급 요청
+export const requestPointRefund = async (refundData) => {
+  const res = await api.post('/api/point/refund', refundData)
+  return res.data.data
+}

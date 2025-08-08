@@ -62,9 +62,9 @@
     <BaseModal
       :isOpen="isRefundModalOpen"
       @close="isRefundModalOpen = false"
-      @submit="console.log('환급')"
+      @submit="handleRefund"
     >
-      <PointRefundModal />
+      <PointRefundModal v-model="refundAmount" />
       <template #submit>
         <BaseTypography color="white"> 환급 신청하기 </BaseTypography>
       </template>
@@ -84,6 +84,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { requestChargeMerchantUid, verifyPayment } from '@/api/point'
 import { storeToRefs } from 'pinia'
 import { getPointBalance } from '@/api/point'
+import { requestPointRefund } from '@/api/point'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -92,6 +93,8 @@ const { getIsLoggedIn } = storeToRefs(authStore)
 const isChargeModalOpen = ref(false)
 const isRefundModalOpen = ref(false)
 const chargeAmount = ref(0)
+
+const refundAmount = ref(0)
 
 const myPage = () => {
   router.push('/account/my-page')
@@ -170,6 +173,26 @@ const requestPay = async (amount) => {
     )
   } catch (err) {
     alert('❌ 오류 발생: ' + (err.response?.data?.message || err.message))
+  }
+}
+
+// 환급 처리 로직
+const handleRefund = async () => {
+  try {
+    await requestPointRefund({
+      refundAmount: refundAmount.value,
+    })
+
+    alert('환급 신청이 완료되었습니다.')
+    isRefundModalOpen.value = false
+
+    const point = await getPointBalance()
+    authStore.userInfo = {
+      ...authStore.userInfo,
+      point,
+    }
+  } catch (err) {
+    alert('❌ 환급 실패: ' + (err.response?.data?.message || err.message))
   }
 }
 </script>

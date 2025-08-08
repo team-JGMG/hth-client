@@ -13,6 +13,7 @@
           type="number"
           placeholder="금액을 입력해주세요."
           class="w-60 p-2 focus:outline-none placeholder:text-gray-400"
+          v-model="modelValue"
         />
       </div>
       <BaseTypography size="base" class="ml-2 mb-2">원</BaseTypography>
@@ -38,6 +39,8 @@
 import { onMounted, ref, computed } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import { fetchUserInfo } from '@/api/auth' // ✅ API 재사용
+
+const modelValue = defineModel()
 
 const accountInfo = ref(null)
 
