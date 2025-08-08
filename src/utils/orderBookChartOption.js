@@ -2,10 +2,11 @@ import { labelStyles } from '@/components/constants/chartStyles'
 
 export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, currentPrice }) => {
   const currentPriceIndex = prices.findIndex((p) => p === currentPrice)
+  const maxVolume = Math.max(...buyVolumes, ...sellVolumes)
 
   return {
-    animationDurationUpdate: 300,
-    animationEasingUpdate: 'linear',
+    animationDurationUpdate: 1000,
+    animationEasingUpdate: 'cubicOut',
 
     grid: [
       { top: '0%', bottom: '0%', left: '0%', right: '60%', containLabel: false },
@@ -20,6 +21,7 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
         position: 'top',
         inverse: i === 0,
         gridIndex: i,
+        max: i < 2 ? maxVolume : null,
         axisLine: { show: false },
         axisTick: { show: false },
         axisLabel: { show: false },
@@ -68,7 +70,7 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
         },
         label: {
           show: true,
-          position: 'left',
+          position: 'insideRight',
           align: 'right',
           formatter: (params) => (params.value === 0 ? '' : params.value),
           fontWeight: 'bold',
@@ -88,7 +90,7 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
         },
         label: {
           show: true,
-          position: 'right',
+          position: 'insideLeft',
           align: 'left',
           formatter: (params) => (params.value === 0 ? '' : params.value),
           fontWeight: 'bold',
