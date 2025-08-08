@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div @click="goToDetail" class="cursor-pointer">
     <div class="relative border rounded-xl overflow-hidden shadow-sm bg-white">
       <!-- 상태 뱃지 -->
       <div
@@ -71,7 +71,7 @@
         <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
           <div
             class="h-full transition-all duration-500"
-            :class="item.fundingRate === 100 ? 'bg-red-500' : 'bg-blue-600'"
+            :class="item.fundingRate === 100 ? 'text-red-500' : 'bg-blue-600'"
             :style="{ width: item.fundingRate + '%' }"
           ></div>
         </div>
@@ -84,8 +84,9 @@
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import testImage from '@/assets/images/cardtestimage.png'
 import { formatAmount } from '@/utils/format.js'
+import { useRouter } from 'vue-router'
 
-defineProps({
+const props = defineProps({
   item: {
     type: Object,
     required: true,
@@ -95,6 +96,13 @@ defineProps({
     required: true,
   },
 })
+
+const router = useRouter()
+
+const goToDetail = () => {
+  router.push({ name: 'funding-detail', params: { id: props.item.fundingId } })
+}
+
 
 // 상태 뱃지 색상
 function getBadgeColor(status) {
