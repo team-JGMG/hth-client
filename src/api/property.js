@@ -2,7 +2,7 @@
 
 import api from '@/libs/axios'
 
-// ✅ 매물 등록 (multipart/form-data 방식)
+// 매물 등록 (multipart/form-data 방식)
 export const registerPropertyWithFormData = async ({
   requestData,
   photoFiles,
@@ -35,9 +35,10 @@ export const registerPropertyWithFormData = async ({
   })
 }
 
+// 매물 목록 조회
 export const fetchUserProperties = async (userId) => {
   try {
-    const statuses = ['PENDING', 'approved', 'rejected', 'sold']
+    const statuses = ['pending', 'approved', 'rejected', 'sold']
     const allResults = await Promise.all(
       statuses.map((status) =>
         api.get(`/api/property/user/${userId}`, {
@@ -50,7 +51,6 @@ export const fetchUserProperties = async (userId) => {
       ),
     )
 
-    // 응답에서 각각의 데이터(content)만 추출하여 하나의 배열로 합치기
     const merged = allResults.flatMap((res) => res.data?.data?.content || [])
 
     return merged
