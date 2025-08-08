@@ -37,9 +37,11 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { usePropertyStore } from '@/stores/property'
+import { getSoldProperties } from '@/api/property'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import SoldPropertyCard from './SoldPropertyCard.vue'
 import SaleCompletedInfoAccodian from './SaleCompletedInfoAccodian.vue'
+
 const propertyStore = usePropertyStore()
 const showInfoPopover = ref(false)
 const infoButtonRef = ref(null)
@@ -59,80 +61,31 @@ const handleClickOutside = (event) => {
   }
 }
 
+const fetchSoldProperties = async () => {
+  try {
+    const response = await getSoldProperties()
+    const parsedData = response.data?.map((item) => ({
+      id: item.propertyId,
+      title: item.title,
+      yield_rate: item.cumulativeReturn,
+      thumbnail_url: item.thumbnail?.photoUrl || '', // fallback
+    }))
+    propertyStore.setSoldProperties(parsedData)
+  } catch (error) {
+    console.error('매각 완료 매물 가져오기 실패:', error)
+    propertyStore.setSoldProperties([])
+  }
+}
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
-
-  // 목 데이터
-  const mockSoldProperties = [
-    {
-      id: 1,
-      title: '강남 아파트 매물',
-      thumbnail_url: 'https://placehold.co/160x160/282828/ffffff?text=Property1',
-      yield_rate: 7.76,
-    },
-    {
-      id: 2,
-      title: '서초 빌라 매물',
-      thumbnail_url: 'https://placehold.co/160x160/333333/ffffff?text=Property2',
-      yield_rate: 9.72,
-    },
-    {
-      id: 3,
-      title: '송파 오피스텔',
-      thumbnail_url: 'https://placehold.co/160x160/444444/ffffff?text=Property3',
-      yield_rate: 5.5,
-    },
-    {
-      id: 4,
-      title: '분당 상가',
-      thumbnail_url: 'https://placehold.co/160x160/555555/ffffff?text=Property4',
-      yield_rate: 12.15,
-    },
-    {
-      id: 5,
-      title: '판교 주택',
-      thumbnail_url: 'https://placehold.co/160x160/666666/ffffff?text=Property5',
-      yield_rate: 8.9,
-    },
-  ]
-  propertyStore.setSoldProperties(mockSoldProperties)
+  fetchSoldProperties()
 })
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
 })
-
-// fetchSoldProperties 함수는 필요에 따라 주석 해제하여 사용
-/*
-const fetchSoldProperties = async () => {
-  try {
-    const response = await fetch(
-      '/properties?status=SOLD&sort=created_at&order=desc&limit=10&skip=0',
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-    )
-
-    if (!response.ok) {
-      console.error(`HTTP 에러! 상태: ${response.status}`)
-      propertyStore.setSoldProperties([])
-      return
-    }
-
-    const data = await response.json()
-    const soldItems = data.content || []
-    propertyStore.setSoldProperties(soldItems)
-  } catch (error) {
-    console.error('매각 완료 매물을 가져오지 못했습니다:', error)
-    propertyStore.setSoldProperties([])
-  }
-}
-*/
 </script>
-
 <style scoped>
 .no-scrollbar::-webkit-scrollbar {
   display: none;

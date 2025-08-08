@@ -59,3 +59,10 @@ export const fetchUserProperties = async (userId) => {
     throw error
   }
 }
+
+// 매각 완료된 매물 목록 조회 (메인용)
+export const getSoldProperties = async () => {
+  const response = await api.get('/api/property/sold')
+  console.log('API Response:', response)
+  return response.data
+}
