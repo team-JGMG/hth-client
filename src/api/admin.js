@@ -1,4 +1,6 @@
 // 관리자용 api
+// src/api/admin.js
+
 import api from '@/libs/axios'
 
 // 매물 목록 조회

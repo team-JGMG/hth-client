@@ -1,10 +1,12 @@
+//호가 api
+// src/api/orderbook.js
+
 import api from '@/libs/axios'
 
-/**
- * 펀딩 ID로 현재 호가 정보 조회
- * @param {number|string} fundingId
- * @returns {Promise}
- */
+//  @param {number|string} fundingId
+//  @returns {Promise}
+
+//현재 호가 정보 조회
 export const getOrderBookByFundingId = (fundingId) => {
   return api.get(`/api/order-books/${fundingId}`)
 }

@@ -1,3 +1,6 @@
+// 포인트/결제 api
+// src/api/payment.js
+
 import api from '@/libs/axios'
 
 // merchant_uid 발급
