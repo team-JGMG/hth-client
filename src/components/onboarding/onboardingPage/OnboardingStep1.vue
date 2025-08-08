@@ -1,26 +1,24 @@
 <template>
   <div class="flex flex-col items-center justify-between min-h-[80vh] text-center">
     <div class="relative w-full h-80 top-5">
-      <transition name="fade" appear>
-        <img
-          v-if="show1"
-          src="@/assets/images/character/onboarding2.png"
-          alt="집뒤"
-          class="w-56 absolute top-28 left-1"
-        />
-      </transition>
-
-      <transition name="fade" appear>
-        <img
-          v-if="show2"
-          src="@/assets/images/character/onboarding1.png"
-          alt="집옆"
-          class="w-36 absolute top-12 right-12"
-          style="transform: scaleX(-1) rotate(10deg)"
-        />
+      <img
+        src="@/assets/images/character/onboarding2.png"
+        alt="집뒤"
+        class="w-56 absolute top-40 left-1"
+      />
+      <img
+        src="@/assets/images/character/onboarding1.png"
+        alt="집옆"
+        class="w-36 absolute top-12 right-12"
+        style="transform: scaleX(-1) rotate(10deg)"
+      />
+      <!--
       </transition>
 
       <transition name="slide-fade" appear>
+      -->
+      <!-- 로고 + 앱 화면 영역 전체 주석 처리 -->
+      <!--
         <div v-if="show3" class="flex flex-col items-end mr-4 absolute inset-0 justify-center">
           <img
             src="@/assets/images/logo/longlogo.png"
@@ -38,7 +36,7 @@
             />
           </div>
         </div>
-      </transition>
+        -->
     </div>
 
     <div class="mt-10">
@@ -55,48 +53,6 @@
 
 <script setup>
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import { ref, onMounted } from 'vue'
 
 defineOptions({ name: 'OnboardingStep1' })
-
-const show1 = ref(false)
-const show2 = ref(false)
-const show3 = ref(false)
-
-const handleImageError = (event) => {
-  console.error('이미지 로드 실패:', event.target.src)
-}
-
-onMounted(() => {
-  setTimeout(() => (show1.value = true), 200)
-  setTimeout(() => (show2.value = true), 800)
-  setTimeout(() => {
-    show1.value = false
-    show2.value = false
-  }, 1800)
-  setTimeout(() => (show3.value = true), 2000)
-})
 </script>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease-out;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.slide-fade-enter-active {
-  transition: all 0.3s ease-out;
-}
-.slide-fade-enter-from {
-  opacity: 0;
-  transform: translateY(10px); /* 더 작게 올라오게 */
-}
-
-img {
-  display: block;
-}
-</style>

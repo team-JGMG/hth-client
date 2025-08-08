@@ -1,13 +1,11 @@
 <template>
   <div class="flex flex-col items-center justify-between min-h-[80vh] text-center">
     <div class="relative w-full h-80 top-12">
-      <transition name="slide-fade-up" appear>
-        <img
-          src="@/assets/images/onboarding/onboarding7.png"
-          alt="펀딩"
-          class="w-48 absolute top-2/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-        />
-      </transition>
+      <img
+        src="@/assets/images/onboarding/onboarding7.png"
+        alt="펀딩"
+        class="w-48 absolute top-2/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+      />
     </div>
 
     <div class="mt-20">
@@ -31,19 +29,6 @@ defineOptions({ name: 'OnboardingStep1' })
 <style scoped>
 .image-center {
   @apply w-[260px] absolute left-1/2 top-2/3;
-  transform: translate(-50%, -50%);
-}
-.slide-fade-up-enter-active {
-  transition:
-    opacity 0.3s ease-out 0.1s,
-    transform 0.3s ease-out 0.1s;
-}
-.slide-fade-up-enter-from {
-  opacity: 0;
-  transform: translate(-50%, -30%);
-}
-.slide-fade-up-enter-to {
-  opacity: 1;
   transform: translate(-50%, -50%);
 }
 </style>
