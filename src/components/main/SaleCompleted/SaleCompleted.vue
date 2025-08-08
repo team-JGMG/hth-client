@@ -10,9 +10,9 @@
           class="flex items-center rounded-full text-gray-400 transition-colors p-1"
           aria-label="매각 완료 정보 보기"
         >
-          <BaseTypography class="text-xs mr-1" weight="medium" color="gray-2"
-            >누적 수익률</BaseTypography
-          >
+          <BaseTypography class="text-xs mr-1" weight="medium" color="gray-2">
+            누적 수익률
+          </BaseTypography>
           <span class="material-symbols-outlined text-base mt-0.5">info</span>
         </button>
 
@@ -23,12 +23,22 @@
         v-if="propertyStore.soldProperties.length > 0"
         class="flex gap-4 overflow-x-auto no-scrollbar px-2"
       >
+        <!-- 최대 5개까지 카드 표시 -->
         <SoldPropertyCard
-          v-for="property in propertyStore.soldProperties"
+          v-for="property in propertyStore.soldProperties.slice(0, 5)"
           :key="property.id"
           :property="property"
         />
+
+        <!-- 더보기 카드 -->
+        <div
+          class="min-w-[160px] h-[160px] flex-shrink-0 rounded-xl bg-gray-100 hover:bg-gray-200 transition cursor-pointer flex items-center justify-center text-sm font-medium text-gray-600"
+          @click="goToSaleCompletedPage"
+        >
+          더보기
+        </div>
       </div>
+
       <div v-else class="text-gray-500 text-center py-4">매각 완료된 매물이 없습니다.</div>
     </section>
   </div>
@@ -36,6 +46,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { usePropertyStore } from '@/stores/property'
 import { getSoldProperties } from '@/api/property'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
@@ -43,6 +54,8 @@ import SoldPropertyCard from './SoldPropertyCard.vue'
 import SaleCompletedInfoAccodian from './SaleCompletedInfoAccodian.vue'
 
 const propertyStore = usePropertyStore()
+const router = useRouter()
+
 const showInfoPopover = ref(false)
 const infoButtonRef = ref(null)
 
@@ -68,13 +81,17 @@ const fetchSoldProperties = async () => {
       id: item.propertyId,
       title: item.title,
       yield_rate: item.cumulativeReturn,
-      thumbnail_url: item.thumbnail?.photoUrl || '', // fallback
+      thumbnail_url: item.thumbnail?.photoUrl || '',
     }))
     propertyStore.setSoldProperties(parsedData)
   } catch (error) {
     console.error('매각 완료 매물 가져오기 실패:', error)
     propertyStore.setSoldProperties([])
   }
+}
+
+const goToSaleCompletedPage = () => {
+  router.push('/funding?tab=completedSale') // 실제 경로에 맞게 수정하세요
 }
 
 onMounted(() => {
@@ -86,6 +103,7 @@ onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 </script>
+
 <style scoped>
 .no-scrollbar::-webkit-scrollbar {
   display: none;
