@@ -14,7 +14,7 @@
 <script setup>
 import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
-import LoggedInPointSection from './LoggedInPointSection.vue'
+import LoggedInPointSection from './LoggedInStatus/LoggedInPointSection.vue'
 import LoggedOutPointSection from './LoggedOutPointSection.vue'
 
 const authStore = useAuthStore()
