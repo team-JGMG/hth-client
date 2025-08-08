@@ -27,7 +27,7 @@
     <div class="mt-4 flex items-baseline gap-1 mb-4">
       <BaseTypography size="lg" weight="bold"> 총 투자 금액: </BaseTypography>
       <BaseTypography size="lg" weight="bold">
-        {{ formatPriceInEokwon(item.price) }}
+        {{ formatAmount(item.targetAmount) }}
       </BaseTypography>
     </div>
 
@@ -50,11 +50,11 @@
         </div>
         <BaseTypography color="gray-1" size="xs" class="flex justify-between mb-1">
           현재 모집액
-          <span>{{ formatPriceInEokwon((item.price * (item.percent || 0)) / 100) }}</span>
+          <span>{{ formatAmount(item.currentAmount) }}</span>
         </BaseTypography>
         <BaseTypography color="gray-1" size="xs" class="flex justify-between mb-1">
           <span>목표 모집액</span>
-          <span>{{ formatPriceInEokwon(item.price) }}</span>
+          <span>{{ formatAmount(item.targetAmount) }}</span>
         </BaseTypography>
         <BaseTypography
           size="xs"
@@ -62,7 +62,7 @@
           class="mt-2 text-right transition-colors duration-300"
           :style="{ color: blinkColor }"
         >
-          모집 마감: {{ formatDate(item.fundingEndDate) }} (D-{{ dDay(item.fundingEndDate) }})
+          모집 마감: {{ formatDate(item.fundingEndDate) }} (D-{{ item.daysLeft }})
         </BaseTypography>
       </div>
     </BaseCard>
@@ -74,7 +74,7 @@
         <div class="flex justify-between text-sm text-gray-700">
           <BaseTypography size="sm" class="items-center mb-1">1주당 가격</BaseTypography>
           <BaseTypography size="sm" class="items-center mb-1"
-            >{{ format(item.orderPricePerShare) }}원</BaseTypography
+            >{{ format(item.currentShareAmount) }}원</BaseTypography
           >
         </div>
       </div>
@@ -86,7 +86,8 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import BaseCard from '@/components/common/Card/BaseCard.vue'
-import { format, formatDate, formatPriceInEokwon, dDay } from '@/utils/format'
+import { format, formatDate, formatAmount } from '@/utils/format'
+import { watch } from 'vue'
 
 const props = defineProps({
   item: {
@@ -95,12 +96,26 @@ const props = defineProps({
   },
 })
 
+watch(
+  () => props.item,
+  (nv) => {
+    console.log('[Overview] fields', {
+      title: nv?.title,
+      currentAmount: nv?.currentAmount,
+      targetAmount: nv?.price ?? nv?.targetAmount,
+      fundingRate: nv?.percent ?? nv?.fundingRate,
+      fundingEndDate: nv?.fundingEndDate,
+    })
+  },
+  { immediate: true },
+)
+
 const blinkColor = ref('red')
 let blinkInterval = null
 
 onMounted(() => {
   // 펀딩 마감 D-7 이하이면 색상 깜빡임 시작
-  const remainingDays = dDay(props.item.fundingEndDate)
+  const remainingDays = props.item.daysLeft
   if (remainingDays <= 7) {
     blinkInterval = setInterval(() => {
       blinkColor.value = blinkColor.value === 'red' ? 'orange' : 'red'
