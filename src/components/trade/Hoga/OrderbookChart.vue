@@ -9,6 +9,7 @@
 </template>
 <script setup>
 import { ref, nextTick, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 
 import AskingPriceComponent from './AskingPriceComponent.vue'
 import { useOrderBookSocket } from '@/hooks/useOrderBookSocket'
@@ -18,12 +19,15 @@ const props = defineProps({
   refreshTrigger: { type: Number, default: 0 },
 })
 
+const route = useRoute()
+const fundingId = Number(route.params.id)
+
 const scrollContainer = ref(null)
 const parsedData = ref(null)
 
 onMounted(async () => {
   try {
-    const res = await getOrderBookByFundingId(1)
+    const res = await getOrderBookByFundingId(fundingId)
     const data = res.data
 
     if (!data || !Array.isArray(data.buyOrders) || !Array.isArray(data.sellOrders)) {
@@ -48,7 +52,7 @@ onMounted(async () => {
 })
 
 // 이후 실시간은 WebSocket으로 덮어쓰기
-useOrderBookSocket(1, (data) => {
+useOrderBookSocket(fundingId, (data) => {
   parsedData.value = data
 })
 
