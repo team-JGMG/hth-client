@@ -7,7 +7,26 @@ export default [
     path: '/funding/list',
     name: 'funding-list',
     component: FundingListPage,
+    redirect: '/funding/list/in-progress',
+    children: [
+      {
+        path: 'in-progress',
+        name: 'funding-in-progress',
+        component: FundingListPage,
+      },
+      {
+        path: 'completed-funding',
+        name: 'funding-completed-funding',
+        component: FundingListPage,
+      },
+      {
+        path: 'completed-sale',
+        name: 'funding-completed-sale',
+        component: FundingListPage,
+      },
+    ],
   },
+
   {
     path: '/funding/detail/:id?', // ? : optional ID
     name: 'funding-detail',

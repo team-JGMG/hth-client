@@ -50,6 +50,7 @@
 
 <script setup>
 import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import BaseTab from '@/components/common/Tab/BaseTab.vue'
 import FundingListInProgress from '@/components/funding/list/FundingListInProgress.vue'
 import FundingListCompletedFunding from '@/components/funding/list/FundingListCompletedFunding.vue'
@@ -58,13 +59,37 @@ import BlankLayout from '@/layouts/BlankLayout.vue'
 import DetailHeader from '@/layouts/DetailHeader.vue'
 import { getFundingList } from '@/api/funding'
 
-// 필터 설정
+// 라우터 설정
+const route = useRoute()
+const router = useRouter()
+
+// 탭 설정
 const fundingStatusTabs = [
   { label: '모집 중', value: 'inProgress' },
   { label: '펀딩 완료', value: 'completedFunding' },
   { label: '매각 완료', value: 'completedSale' },
 ]
-const currentFundingStatus = ref('inProgress')
+
+// route 경로로부터 상태 추출
+function getStatusFromPath(path) {
+  if (path.includes('in-progress')) return 'inProgress'
+  if (path.includes('completed-funding')) return 'completedFunding'
+  if (path.includes('completed-sale')) return 'completedSale'
+  return 'inProgress'
+}
+const currentFundingStatus = ref(getStatusFromPath(route.path))
+
+// 탭이 바뀌면 라우터 이동
+watch(currentFundingStatus, (newStatus) => {
+  const pathMap = {
+    inProgress: '/funding/list/in-progress',
+    completedFunding: '/funding/list/completed-funding',
+    completedSale: '/funding/list/completed-sale',
+  }
+  router.push(pathMap[newStatus])
+})
+
+// 정렬 옵션
 const sortOptions = [
   { label: '등록일', value: 'createdAt' },
   { label: '남은 시간', value: 'remainingTime' },
@@ -95,7 +120,7 @@ const scrollContainerRef = ref(null)
 const bottomRef = ref(null)
 let observer = null
 
-// 딜레이 넣기
+// 딜레이
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 // 펀딩 목록 불러오기
@@ -111,7 +136,7 @@ const fetchFundingList = async () => {
       size,
     )
 
-    await delay(300) // 0.3초 대기
+    await delay(300)
 
     fundingList.value.push(...res.data.data.content)
     hasNextPage.value = !res.data.data.last
@@ -123,33 +148,26 @@ const fetchFundingList = async () => {
   }
 }
 
+// 옵저버 연결
 const setupObserver = async () => {
   await nextTick()
   if (observer) observer.disconnect()
 
   observer = new IntersectionObserver(
     ([entry]) => {
-      console.log('👁️ 옵저버 감지됨:', entry.isIntersecting)
-      console.log('🧪 isLoading:', isLoading.value, 'hasNextPage:', hasNextPage.value)
-
       if (entry.isIntersecting && hasNextPage.value && !isLoading.value) {
-        console.log('🔥 조건 만족 → fetchFundingList 실행')
         fetchFundingList()
       }
     },
     {
       threshold: 1.0,
-      root: scrollContainerRef.value, // ✅ 스크롤 기준을 지정
+      root: scrollContainerRef.value,
     },
   )
 
-  if (bottomRef.value) {
-    console.log('🎯 옵저버 등록됨')
-    observer.observe(bottomRef.value)
-  }
+  if (bottomRef.value) observer.observe(bottomRef.value)
 }
 
-// 필터 변경 시 초기화
 watch([currentFundingStatus, currentSortOption], async () => {
   page.value = 0
   hasNextPage.value = true
@@ -161,7 +179,6 @@ watch([currentFundingStatus, currentSortOption], async () => {
   await setupObserver()
 })
 
-// 진입 시 초기 데이터 + 옵저버 연결
 onMounted(async () => {
   await fetchFundingList()
   await setupObserver()
@@ -173,7 +190,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-/* 회전 애니메이션 Tailwind 기본 */
 .animate-spin {
   animation: spin 0.4s linear infinite;
 }
