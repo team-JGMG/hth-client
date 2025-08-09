@@ -5,7 +5,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { getPropertyMapData, getPropertyCoordinates } from '@/api/property'
+import { getPropertyMapData } from '@/api/property'
+// import { getPropertyMapData, getPropertyCoordinates } from '@/api/property'
 
 const mapContainer = ref(null)
 const route = useRoute()
@@ -28,21 +29,25 @@ const loadMap = async () => {
     const propertyId = Number(route.params.id)
     console.log('요청할 propertyId:', propertyId)
 
+    // 중심 좌표 고정
+    const latitude = 37.57448614998234
+    const longitude = 126.96660956765075
+
     // 중심 좌표 조회
-    const { latitude, longitude } = await getPropertyCoordinates(propertyId)
-    if (!latitude || !longitude) {
-      console.warn('잘못된 좌표입니다:', latitude, longitude)
-      return
-    }
+    // const { latitude, longitude } = await getPropertyCoordinates(propertyId)
+    // if (!latitude || !longitude) {
+    //   console.warn('잘못된 좌표입니다:', latitude, longitude)
+    //   return
+    // }
 
     // 주변 시세 조회
     const mapData = await getPropertyMapData(propertyId)
 
     await loadKakaoScript()
 
-    const center = new window.kakao.maps.LatLng(latitude, longitude)
+    const center = new window.kakao.maps.LatLng(latitude, longitude) // ✅ 고정 좌표 사용
     const map = new window.kakao.maps.Map(mapContainer.value, {
-      center,
+      center, // ✅ 지도 중심 고정
       level: 3,
     })
 
@@ -53,7 +58,7 @@ const loadMap = async () => {
 
     new window.kakao.maps.Marker({
       map,
-      position: center,
+      position: center, // ✅ 고정 좌표에 마커 표시
       image: markerImage,
     })
 
