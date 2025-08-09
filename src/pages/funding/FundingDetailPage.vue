@@ -32,6 +32,7 @@ const mapToViewModel = (d) => ({
   approvalDate: d.approvalDate,
   officialLandPrice: d.officialLandPrice,
   unitPricePerPyeong: d.unitPricePerPyeong,
+  createdAt: d.createdAt,
 
   seller: d.seller,
   description: d.description,
