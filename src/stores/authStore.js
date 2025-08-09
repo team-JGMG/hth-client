@@ -33,6 +33,14 @@ export const useAuthStore = defineStore(
       userInfo.value = user
     }
 
+    // ✅ 포인트 정보만 업데이트
+    function setUserPoint(point) {
+      if (userInfo.value) {
+        userInfo.value.point = point
+      }
+    }
+    
+
     // 🔒 로그아웃 처리
     function logout() {
       userInfo.value = null
@@ -52,6 +60,7 @@ export const useAuthStore = defineStore(
       // 액션
       loadUserInfo,
       setUserInfo,
+      setUserPoint,
       logout,
     }
   },
