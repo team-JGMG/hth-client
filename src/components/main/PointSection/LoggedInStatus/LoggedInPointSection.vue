@@ -1,14 +1,15 @@
 <template>
   <div class="relative mb-4">
     <PointSummarySection
-      :userName="authStore.userInfo?.name || '???'"
-      :point="authStore.userInfo?.point || 0"
-    />
+  :userName="authStore.userInfo?.name ?? '???'"
+  :point="authStore.userInfo?.point ?? '???'"
+/>
 
     <div class="absolute top-0 right-0">
       <slot></slot>
     </div>
 
+  
     <PointActionButtons @charge="isChargeModalOpen = true" @refund="isRefundModalOpen = true" />
     <PointManageCard />
 
@@ -58,14 +59,25 @@ const isRefundModalOpen = ref(false)
 const chargeAmount = ref(0)
 const refundAmount = ref(0)
 
+const handleLogout = () => {
+  authStore.logout()
+}
+
 onMounted(async () => {
+  if (!getIsLoggedIn.value) return
   try {
-    const point = await getPointBalance()
-    authStore.userInfo = { ...authStore.userInfo, point }
+    const point = await getPointBalance(authStore.userId)
+    console.log('API에서 받은 포인트:', point, typeof point)
+    console.log('userId:', authStore.userId)
+    console.log('authStore.userInfo before:', authStore.userInfo)
+    console.log('authStore.userInfo.point before:', authStore.userInfo?.point)
+
+    authStore.setUserPoint(point)
   } catch (e) {
     console.error('포인트 불러오기 실패:', e)
   }
 })
+
 
 const requestPay = async (amount) => {
   if (!getIsLoggedIn.value) return alert('로그인이 필요합니다.')

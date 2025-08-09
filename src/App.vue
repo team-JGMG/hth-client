@@ -5,7 +5,13 @@ import { useAuthStore } from '@/stores/authStore'
 const authStore = useAuthStore()
 
 onMounted(() => {
-  authStore.loadUserInfo()
+  const refreshToken = localStorage.getItem('refreshToken')
+  if (refreshToken) {
+    authStore.loadUserInfo()
+  } else {
+    // 토큰이 없으면 authStore의 상태를 확실하게 로그아웃 처리합니다.
+    authStore.logout()
+  }
 })
 </script>
 

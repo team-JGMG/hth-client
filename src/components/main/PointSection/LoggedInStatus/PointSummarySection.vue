@@ -4,7 +4,7 @@
     <div class="mb-4 flex items-baseline justify-between">
       <BaseTypography class="text-xl font-medium" color="white">보유 포인트</BaseTypography>
       <BaseTypography class="text-xl font-medium" color="white">
-        {{ (point || 0).toLocaleString() }}원
+        {{ (point).toLocaleString() }}원
       </BaseTypography>
     </div>
   </div>
