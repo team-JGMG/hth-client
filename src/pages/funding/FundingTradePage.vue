@@ -13,7 +13,7 @@
       <div class="flex justify-between items-center text-sm text-black font-medium mb-4">
         <BaseTypography size="sm" weight="medium">주당 가격</BaseTypography>
         <BaseTypography weight="bold">
-          {{ item.orderPricePerShare?.toLocaleString() || 0 }}원/주
+          {{ item.orderPricePerShare?.toLocaleString() || 5000 }}원/주
         </BaseTypography>
       </div>
 
@@ -221,7 +221,7 @@ const route = useRoute()
 const itemId = Number(route.params.id)
 const item = mockItems.find((f) => f.propertyId === itemId) || {
   title: '알 수 없음',
-  orderPricePerShare: 0,
+  orderPricePerShare: 5000,
 }
 
 const quantity = ref('')

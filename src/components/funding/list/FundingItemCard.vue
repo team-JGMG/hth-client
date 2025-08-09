@@ -71,7 +71,7 @@
         <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
           <div
             class="h-full transition-all duration-500"
-            :class="item.fundingRate === 100 ? 'text-red-500' : 'bg-blue-600'"
+            :class="item.fundingRate === 100 ? 'bg-red-500' : 'bg-blue-600'"
             :style="{ width: item.fundingRate + '%' }"
           ></div>
         </div>
@@ -102,7 +102,6 @@ const router = useRouter()
 const goToDetail = () => {
   router.push({ name: 'funding-detail', params: { id: props.item.fundingId } })
 }
-
 
 // 상태 뱃지 색상
 function getBadgeColor(status) {

@@ -36,14 +36,14 @@
     <div class="flex justify-between">
       <BaseTypography size="xs" weight="medium">등록일</BaseTypography>
       <BaseTypography size="xs" weight="medium" class="text-right">
-        {{ formatDate(item.soldAt) }}
+        {{ formatDate(item.createdAt) }}
       </BaseTypography>
     </div>
   </BaseCard>
 
   <BaseTypography tag="h2" size="base" weight="bold" class="mb-2">배당금</BaseTypography>
   <BaseCard class="flex-col space-y-3">
-    <BaseTypography size="base" weight="bold">{{ dividendData.month }}</BaseTypography>
+    <!-- <BaseTypography size="base" weight="bold">{{ dividendData.month }}</BaseTypography>
 
     <div
       class="space-y-1 text-xs text-black w-full pb-2"
@@ -57,10 +57,10 @@
         <BaseTypography size="xs">배당 지급일</BaseTypography>
         <BaseTypography size="xs">{{ dividendData.paymentDate }}</BaseTypography>
       </div>
-    </div>
+    </div> -->
 
     <div class="bg-gray-100 rounded-lg py-4 text-center w-full">
-      <BaseTypography size="lg" weight="bold">{{ dividendData.amount }}원</BaseTypography>
+      <BaseTypography size="lg" weight="bold">{{ item.expectedDividendPerShare }}원</BaseTypography>
       <BaseTypography size="xs" class="text-gray-500 mt-1">1주당 배당금 (세전)</BaseTypography>
     </div>
   </BaseCard>
@@ -150,7 +150,7 @@ const dividendData = ref({
   month: '-',
   referenceDate: '-',
   paymentDate: '-',
-  amount: null,
+  expectedDividendPerShare: null,
 })
 
 // 년월 포멧 함수
@@ -178,7 +178,7 @@ function applyLatestAllocation(a) {
     month: toKRMonth(a.paymentDate),
     referenceDate: getPrevMonthEnd(a.paymentDate),
     paymentDate: formatDate(a.paymentDate),
-    amount: a.dividendPerShare ?? '-',
+    expectedDividendPerShare: a.expectedDividendPerShare ?? '-',
   }
 }
 

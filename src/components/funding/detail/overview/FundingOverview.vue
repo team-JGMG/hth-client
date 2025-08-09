@@ -12,6 +12,7 @@
             location_on
           </span>
         </span>
+
         {{ item.address }}
       </BaseTypography>
     </div>
@@ -62,7 +63,7 @@
           class="mt-2 text-right transition-colors duration-300"
           :style="{ color: blinkColor }"
         >
-          모집 마감: {{ formatDate(item.fundingEndDate) }} (D-{{ item.daysLeft }})
+          모집 마감: {{ formatDate(item.fundingEndDate) }} (D-{{ Math.max(0, item.daysLeft) }})
         </BaseTypography>
       </div>
     </BaseCard>
@@ -114,8 +115,10 @@ const blinkColor = ref('red')
 let blinkInterval = null
 
 onMounted(() => {
+  // daysLeft가 음수면 0으로 처리
+  const remainingDays = Math.max(0, props.item.daysLeft)
+
   // 펀딩 마감 D-7 이하이면 색상 깜빡임 시작
-  const remainingDays = props.item.daysLeft
   if (remainingDays <= 7) {
     blinkInterval = setInterval(() => {
       blinkColor.value = blinkColor.value === 'red' ? 'orange' : 'red'
