@@ -26,37 +26,43 @@
           {{ group.title }}
         </BaseTypography>
 
-        <div
+        <!-- ✅ 카드 전체를 RouterLink로 변경 -->
+        <RouterLink
           v-for="item in listings[group.key]"
-          :key="item.id"
-          class="flex bg-white rounded-lg border px-3 py-2 items-center"
+          :key="getItemId(item)"
+          class="block"
+          :to="`/admin/property-review/${getItemId(item)}`"
         >
-          <img
-            :src="item.thumbnail?.photoUrl || defaultImg"
-            alt="매물"
-            class="w-16 h-16 object-cover rounded-md mr-3"
-          />
-          <div class="flex-1">
-            <BaseTypography class="font-semibold text-sm !font-bold">
-              {{ item.title }}
-            </BaseTypography>
-            <div class="flex items-center mt-1">
-              <div class="w-1/2 h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  class="h-full bg-indigo-500 transition-all duration-300"
-                  :style="{ width: (item.achievementRate || 0) + '%' }"
-                ></div>
+          <div
+            class="flex bg-white rounded-lg border px-3 py-2 items-center cursor-pointer hover:bg-gray-50 transition-colors"
+          >
+            <img
+              :src="item.thumbnail?.photoUrl || defaultImg"
+              alt="매물"
+              class="w-16 h-16 object-cover rounded-md mr-3"
+            />
+            <div class="flex-1">
+              <BaseTypography class="font-semibold text-sm !font-bold">
+                {{ item.title }}
+              </BaseTypography>
+              <div class="flex items-center mt-1">
+                <div class="w-1/2 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    class="h-full bg-indigo-500 transition-all duration-300"
+                    :style="{ width: (item.achievementRate || 0) + '%' }"
+                  ></div>
+                </div>
+                <BaseTypography class="text-xs !font-extrabold !text-indigo-500 ml-2">
+                  {{ item.achievementRate ?? 0 }}%
+                </BaseTypography>
               </div>
-              <BaseTypography class="text-xs !font-extrabold !text-indigo-500 ml-2">
-                {{ item.achievementRate ?? 0 }}%
+              <BaseTypography class="text-xs !text-gray-500">
+                남은 주(금액): {{ format(item.remainingShares ?? 0) }} /
+                {{ formatAmount(item.price) }}
               </BaseTypography>
             </div>
-            <BaseTypography class="text-xs !text-gray-500">
-              남은 주(금액): {{ format(item.remainingShares ?? 0) }} /
-              {{ formatAmount(item.price) }}
-            </BaseTypography>
           </div>
-        </div>
+        </RouterLink>
 
         <!-- 📌 무한스크롤 트리거 -->
         <div :ref="(el) => (bottomRefs[group.key] = el)" class="h-2"></div>
@@ -75,14 +81,13 @@
 </template>
 
 <script setup>
-import { reactive, onMounted, nextTick, computed, ref } from 'vue' // 👈 ref 추가
-import { useRouter } from 'vue-router'
+import { reactive, onMounted, nextTick, computed, ref } from 'vue'
+import { useRouter, RouterLink } from 'vue-router'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import BaseButton from '../common/Button/BaseButton.vue'
 import NoTradeItems from './NoTradeItems.vue'
 import { format, formatAmount } from '@/utils/format'
 import api from '@/libs/axios'
-// import { useAuthStore } from '@/stores/authStore' // ← 나중에 실제 로그인 연동 시 주석 해제
 
 // ✅ 그룹 설정
 const groupConfig = [
@@ -120,12 +125,24 @@ const PAGE_SIZE = 5
 // ✅ 딜레이(요청 후 2초)
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-// ✅ ★ 테스트용 userId=3 (ref로 관리) ★
+// ✅ 테스트용 userId
 const userId = ref(1)
 
-// ✅ 실제 로그인 연동 시 (나중에 주석만 바꿔서 사용)
-// const authStore = useAuthStore()
-// const userId = computed(() => authStore.userId)
+// ✅ 라우터
+const router = useRouter()
+
+// ✅ id 안전 추출 헬퍼
+const getItemId = (item) =>
+  item?.id ?? item?.propertyId ?? item?.fundingId ?? item?.funding?.id ?? item?.property?.id
+
+const goToPropertyRegisterPage = () => {
+  router.push('/property/register')
+}
+
+// ✅ 모든 그룹 비어있는지 체크
+const isEmpty = computed(() => {
+  return Object.values(listings).every((list) => list.length === 0)
+})
 
 // ✅ API 호출
 const fetchProperties = async (groupKey, statusParam) => {
@@ -138,7 +155,7 @@ const fetchProperties = async (groupKey, statusParam) => {
       params: { page: info.page, size: PAGE_SIZE, status: statusParam },
     })
 
-    await delay(2000) // 요청 후 2초 대기 (펀딩 페이지 느낌 맞춤)
+    await delay(2000) // 요청 후 2초 대기
 
     const content = res.data?.data?.content || []
 
@@ -174,19 +191,12 @@ const setupObserverForGroup = (groupKey, statusParam) => {
   )
 
   if (bottomRefs[groupKey]) {
+    console.log('👀 observe attach:', groupKey, bottomRefs[groupKey])
     observerMap[groupKey].observe(bottomRefs[groupKey])
+  } else {
+    console.warn('⚠️ sentinel not ready for', groupKey)
   }
 }
-
-const router = useRouter()
-const goToPropertyRegisterPage = () => {
-  router.push('/property/register')
-}
-
-// ✅ 모든 그룹 비어있는지 체크
-const isEmpty = computed(() => {
-  return Object.values(listings).every((list) => list.length === 0)
-})
 
 // ✅ onMounted에서 초기 로딩 + 옵저버 등록
 onMounted(async () => {
