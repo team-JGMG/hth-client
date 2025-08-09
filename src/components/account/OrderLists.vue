@@ -3,11 +3,9 @@ import { ref, computed, onMounted } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import CancelConfirmModal from './CancelConfirmModal.vue'
 import { formatDateTime } from '@/utils/format.js'
-import { getOrderHistory } from '@/api/trade'
-import { useAuthStore } from '@/stores/authStore'
+import { getOrderHistory, cancelOrder } from '@/api/trade'
 
 // ===== 안전 유틸 =====
-// 'YYYY-MM-DD HH:mm:ss' -> 'YYYY-MM-DDTHH:mm:ss' (iOS/Safari 파싱 대응)
 function toIso(dateStr) {
   return typeof dateStr === 'string' ? dateStr.replace(' ', 'T') : dateStr
 }
@@ -21,8 +19,6 @@ function n(v, d = 0) {
 function nfmt(v) {
   return n(v).toLocaleString()
 }
-
-// 날짜 포맷 유틸 (기존 유지)
 function formatToMMDD(dateStr) {
   const [datePart] = formatDateTime(toIso(dateStr)).split(' ')
   const [, mm, dd] = (datePart || '').split('.')
@@ -32,47 +28,40 @@ function formatToHHMM(dateStr) {
   const [, timePart] = formatDateTime(toIso(dateStr)).split(' ')
   return timePart || ''
 }
-
-// UI 보조 필드 세팅
 const prepareOrders = (orderArray) =>
   orderArray.map((o) => ({
     ...o,
     _ui: { dragX: 0, touchStartX: 0 },
   }))
 
-// 유저 ID (지금은 4로 고정, 나중에 authStore로 전환)
-const authStore = useAuthStore()
 const FALLBACK_USER_ID = 4
-// 나중에 전환 시 주석 해제:
-// const resolvedUserId = computed(() => authStore.userId || FALLBACK_USER_ID)
 
 const orders = ref([])
 const isLoading = ref(false)
 const loadError = ref(null)
 const debugInfo = ref('')
+const isSubmitting = ref(false)
 
-// 서버 응답 -> UI 모델 매핑 (안전)
+// 서버 응답 -> UI 모델 매핑
 function mapApiOrderToUi(o) {
   const pricePer = n(o?.orderPricePerShare)
   const shareCnt = n(o?.orderShareCount)
   return {
+    id: o?.orderId ?? o?.id,
     itemName: o?.propertyTitle ?? '',
     shares: shareCnt,
     totalPrice: pricePer * shareCnt,
     status:
       o?.orderType === 'BUY' ? '매수' : o?.orderType === 'SELL' ? '매도' : (o?.orderType ?? ''),
-
     createdAt: toIso(o?.createdAt),
     pendingShares: n(o?.remainingShareCount, 0),
-
     _raw: o,
   }
 }
 
-// 응답에서 배열 추출 (이번 API는 {status, data:[...]} 고정)
 function unwrapToArray(res) {
   if (Array.isArray(res?.data)) return res.data
-  if (Array.isArray(res?.data?.data)) return res.data.data // 방어
+  if (Array.isArray(res?.data?.data)) return res.data.data
   return []
 }
 
@@ -82,13 +71,9 @@ async function loadOrders() {
   debugInfo.value = ''
   try {
     const userId = FALLBACK_USER_ID
-    // 나중에 전환: const userId = resolvedUserId.value
-
     const res = await getOrderHistory(userId)
     const list = unwrapToArray(res)
-
     debugInfo.value = `status=${res?.data?.status || res?.status} | isArray=${Array.isArray(list)} | len=${list.length}`
-
     const mapped = list.map(mapApiOrderToUi)
     orders.value = prepareOrders(mapped)
   } catch (err) {
@@ -103,7 +88,6 @@ async function loadOrders() {
 
 onMounted(loadOrders)
 
-// 정렬/연도 헤더/슬라이드/모달 로직 (기존 유지)
 const sortedOrders = computed(() =>
   [...orders.value].sort((a, b) => parseDate(b.createdAt) - parseDate(a.createdAt)),
 )
@@ -116,16 +100,31 @@ function openDeleteModal(order) {
   isModalOpen.value = true
 }
 
-function confirmDelete() {
-  if (!selectedOrder.value) return
-  // 실제 취소 API 연동 전까지는 UI에서만 제거
-  orders.value = orders.value.filter(
-    (o) =>
-      !(
-        o.createdAt === selectedOrder.value.createdAt && o.itemName === selectedOrder.value.itemName
-      ),
-  )
-  isModalOpen.value = false
+// ✅ 성공 후 삭제로 변경
+async function confirmDelete() {
+  if (!selectedOrder.value || isSubmitting.value) return
+  const targetId = selectedOrder.value.id
+  if (!targetId) {
+    alert('주문 ID를 찾을 수 없습니다.')
+    return
+  }
+
+  isSubmitting.value = true
+  console.log('[confirmDelete] cancel targetId=', targetId)
+
+  try {
+    const res = await cancelOrder(targetId)
+    console.log('[confirmDelete] cancel success:', res)
+    // 성공 시만 삭제
+    orders.value = orders.value.filter((o) => o.id !== targetId)
+    isModalOpen.value = false
+    selectedOrder.value = null
+  } catch (e) {
+    console.error('[confirmDelete] cancel failed:', e?.response?.status, e?.response?.data, e)
+    alert(e?.response?.data?.message || e?.message || '주문 취소에 실패했습니다.')
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
 function getYear(dateStr) {
@@ -169,13 +168,16 @@ function handleTouchEnd(order) {
     </div>
 
     <template v-else-if="sortedOrders.length">
-      <template v-for="(order, index) in sortedOrders" :key="index">
+      <template
+        v-for="(order, index) in sortedOrders"
+        :key="order.id ?? `${order.createdAt}-${order.itemName}-${index}`"
+      >
         <BaseTypography v-if="isNewYear(index)" class="text-sm text-gray-500">
           {{ getYear(order.createdAt) }}년
         </BaseTypography>
 
         <div class="relative rounded-md overflow-hidden">
-          <!-- 삭제 아이콘 영역 -->
+          <!-- 삭제 아이콘 -->
           <div
             class="absolute top-0 bottom-0 right-1 w-[60px] bg-[#FC2E6C] flex items-center justify-center z-0 rounded-md"
             @click="openDeleteModal(order)"
@@ -205,7 +207,7 @@ function handleTouchEnd(order) {
               </BaseTypography>
             </div>
 
-            <!-- 제목/설명 -->
+            <!-- 제목/가격 -->
             <div class="flex-1 flex flex-col justify-center h-full overflow-hidden">
               <div class="h-[20px] overflow-hidden">
                 <BaseTypography class="!font-bold text-sm truncate whitespace-nowrap">
@@ -225,7 +227,7 @@ function handleTouchEnd(order) {
               </div>
             </div>
 
-            <!-- 주문량/상태 -->
+            <!-- 주문량/미체결량 -->
             <div class="text-sm !font-black text-right min-w-[70px]">
               <BaseTypography class="text-xs text-gray-500">
                 주문량 {{ nfmt(order.shares) }}주
@@ -249,5 +251,6 @@ function handleTouchEnd(order) {
     title="정말 취소하시겠습니까?"
     description="주문 취소 시<br/>미체결 된 주식 전량이 취소됩니다."
     buttonText="취소하기"
+    :disabled="isSubmitting"
   />
 </template>
