@@ -1,4 +1,5 @@
 <script setup>
+import BaseButton from '../common/Button/BaseButton.vue'
 import BaseTypography from '../common/Typography/BaseTypography.vue'
 
 const props = defineProps({
@@ -75,6 +76,7 @@ const onBackdropClick = (e) => {
         <BaseButton
           type="button"
           aria-label="제출"
+          variant="danger"
           @click="emit('submit')"
           class="block w-full h-12 bg-[#ff3b3b] text-white rounded-lg flex items-center justify-center mx-auto mt-7"
         >
