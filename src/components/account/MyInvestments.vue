@@ -1,6 +1,5 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-// import { useUserStore } from '@/store/user'
 import {
   getUserFundingOrders,
   getUserShares,
@@ -14,33 +13,46 @@ import CancelConfirmModal from '@/components/account/CancelConfirmModal.vue'
 import DividendModal from './DividendModal.vue'
 import NoInvestmentItems from './NoInvestmentItems.vue'
 
+/** ---------------- 상태 ---------------- **/
+const userId = ref(3)
+const fundingItems = ref([])
+const ownedItems = ref([])
+
+const isModalOpen = ref(false)
 const isCancelLoading = ref(false)
-const selectedOrder = ref(null) // ← 어떤 주문을 취소할지 담아둠
-// const userStore = useUserStore()
-const userId = ref(4) // 🐛 임시: 실제 연동 시 아래 줄로 교체
-// const userId = userStore.userId
+const selectedOrder = ref(null)
 
 const isDividendModalOpen = ref(false)
+const isDividendLoading = ref(false)
 const selectedBuildingName = ref('')
 const selectedDividends = ref([])
-const isDividendLoading = ref(false)
+
+function toImg(src) {
+  if (!src) return '/default-img.png'
+  return /^https?:\/\//i.test(src) ? src : `https://half-to-half.site${src}`
+}
+
 const openDividendModal = async (item) => {
   try {
     isDividendLoading.value = true
     selectedBuildingName.value = item.name
-    selectedDividends.value = [] // 초기화
+    selectedDividends.value = []
 
-    // 1) 배당금 리스트 가져오기
     const res = await getAllocations(item.fundingId)
-    const list = res.data?.data ?? []
+    const root = res?.data
+    const list = Array.isArray(root?.data?.content)
+      ? root.data.content
+      : Array.isArray(root?.data)
+        ? root.data
+        : Array.isArray(root)
+          ? root
+          : []
 
-    // 2) 모달 표시용으로 매핑
     selectedDividends.value = list.map((a) => ({
-      // 모달에서 쓰고 싶은 포맷으로 맞춰주세요
-      date: a.paymentDate, // "2025-09-06"
-      perShare: a.dividendPerShare, // 주당 배당금
-      total: a.totalDividendAmount, // 총 배당금
-      status: a.paymentStatusKorean || a.paymentStatus, // 지급완료/지급예정
+      date: a.paymentDate,
+      perShare: a.dividendPerShare,
+      total: a.totalDividendAmount,
+      status: a.paymentStatusKorean || a.paymentStatus,
     }))
 
     isDividendModalOpen.value = true
@@ -52,25 +64,25 @@ const openDividendModal = async (item) => {
   }
 }
 
-const isModalOpen = ref(false)
-
-const closeModal = () => (isModalOpen.value = false)
-
 const openCancelModal = (item) => {
   const payload = {
     fundingId: item.fundingId,
     orderId: item.orderId,
     orderPrice: Number(item.orderPrice),
   }
-  console.log('[refund payload prepared]', payload, 'raw item:', item)
-
   if (!payload.fundingId || !payload.orderId || !payload.orderPrice) {
-    alert('환불에 필요한 주문 정보가 없습니다. (orderId/orderPrice) 서버 응답 필드를 확인하세요.')
+    alert('환불에 필요한 주문 정보가 없습니다. (fundingId / orderId / orderPrice)')
     return
   }
   selectedOrder.value = payload
   isModalOpen.value = true
 }
+
+const closeModal = () => {
+  isModalOpen.value = false
+  selectedOrder.value = null
+}
+
 const confirmCancel = async () => {
   try {
     if (!selectedOrder.value) return
@@ -79,95 +91,78 @@ const confirmCancel = async () => {
     const { fundingId, orderId, orderPrice } = selectedOrder.value
     const res = await refundFundingOrder(fundingId, orderId, orderPrice)
 
-    // 응답 예시: { code, message, status }  -> status === 'success' 기대
-    if (res.data?.status === 'success') {
-      // 화면에서 해당 아이템 제거
+    if (res?.data?.status === 'success') {
+      // 환불 성공 시 목록에서 제거
       fundingItems.value = fundingItems.value.filter((x) => x.orderId !== orderId)
+      alert('주문이 취소(환불)되었습니다.')
     } else {
-      console.warn('환불 응답:', res.data)
-      alert(res.data?.message || '환불 처리에 실패했습니다.')
+      console.warn('환불 응답:', res?.data)
+      alert(res?.data?.message || '환불 처리에 실패했습니다.')
     }
   } catch (e) {
     console.error('환불 실패', e)
     alert('환불 처리 중 오류가 발생했습니다.')
   } finally {
     isCancelLoading.value = false
-    isModalOpen.value = false
-    selectedOrder.value = null
+    closeModal()
   }
 }
-const fundingItems = ref([])
-const ownedItems = ref([])
 
-// ✅ 응답 구조 안전하게 꺼내는 함수
-function pickShareList(resData) {
-  if (Array.isArray(resData?.data)) return resData.data
-  if (Array.isArray(resData)) return resData
-  return resData?.data?.content ?? resData?.content ?? []
-}
-
-// ✅ API 호출
 onMounted(async () => {
   try {
-    const [fundingRes, shareRes] = await Promise.all([
+    const [pendingRes, refundedRes, shareRes] = await Promise.all([
       getUserFundingOrders(userId.value, 'pending', 0, 10),
+      getUserFundingOrders(userId.value, 'refunded', 0, 10),
       getUserShares(userId.value, 0, 10),
     ])
 
-    const fundingData = fundingRes.data?.data?.content ?? []
-    console.log('[orders RAW sample]', fundingData[0]) // ← 요거 추가
-    fundingItems.value = fundingData.map((item) => ({
-      // ✅ 환불 API용(실제 키 확인 후 하나로 확정해 주세요)
-      fundingId: item.fundingId ?? item.funding?.id ?? item.fundingID ?? item.funding_id,
-      orderId: item.orderId ?? item.fundingOrderId ?? item.id ?? item.orderID ?? item.order_id,
-      orderPrice: Number(
-        item.orderPrice ??
-          item.orderAmount ??
-          item.totalAmount ??
-          item.totalPrice ??
-          item.amount ??
-          item.paidAmount ??
-          item.price ??
-          0,
-      ),
+    const pending = pendingRes?.data?.data?.content ?? []
+    const refunded = refundedRes?.data?.data?.content ?? []
+    const fundingData = [...pending, ...refunded]
 
-      // 👇 화면 표시용
-      name: item.title ?? '',
-      percent: Number(item.achievementRate ?? 0),
-      left: Number(item.remainingShares ?? 0),
-      total: Number(item.targetAmount ?? 0),
-      img: item.thumbnail?.photoUrl
-        ? `https://half-to-half.site${item.thumbnail.photoUrl}`
-        : '/default-img.png',
-      status: item.status === 'refunded' ? '펀딩 만료' : '펀딩 중',
-    }))
-    console.log('[mapped order sample]', fundingItems.value[0]) // ← 확인
-    // ✅ 보유 지분 리스트 꺼내기
-    const shareList = pickShareList(shareRes.data)
-    // 한 번 확인해보기
-    console.log('[shares RAW sample]', shareList[0])
+    // ✅ refunded 건 제외
+    fundingItems.value = fundingData
+      .filter(
+        (item) =>
+          String(item.status ?? 'pending')
+            .trim()
+            .toLowerCase() !== 'refunded',
+      )
+      .map((item) => {
+        const normalized = String(item.status ?? 'pending')
+          .trim()
+          .toLowerCase()
+        return {
+          fundingId: item.fundingId,
+          orderId: item.orderId,
+          orderPrice: Number(item.orderPrice ?? 0),
+          name: item.title ?? '',
+          percent: Number(item.achievementRate ?? 0),
+          left: Number(item.remainingShares ?? item.remainingAmount ?? 0),
+          total: Number(item.targetAmount ?? 0),
+          img: toImg(item.thumbnail?.photoUrl),
+          status: normalized,
+          shareCount: Number(item.shareCount ?? 0),
+        }
+      })
 
+    const shareList = shareRes?.data?.data?.content ?? []
     ownedItems.value = shareList.map((item) => ({
-      // ⬇️ allocations 호출에 꼭 필요
-      fundingId: item.fundingId ?? item.funding?.id ?? item.fundingID ?? item.funding_id,
-
+      fundingId: item.fundingId ?? item.funding?.id,
       name: item.propertyTitle ?? item.title ?? '',
       ownedAmount: Number(item.shareCount ?? 0),
       avgPrice: Number(item.averageAmount ?? 0),
-      price: Number(item.currentShareAmount ?? 0),
-      img: item.thumbnailUrl || '/default-img.png',
+      price: Number(item.currentShareAmount ?? item.currentAmount ?? 0),
+      img: toImg(item.thumbnailUrl ?? item.thumbnail?.photoUrl),
       status: '보유 중',
     }))
-
-    console.log('[shares] list:', ownedItems.value)
-  } catch (error) {
-    console.error('❌ 투자 목록 불러오기 실패:', error)
-    if (error.response) {
-      console.error('status:', error.response.status, 'data:', error.response.data)
-    }
+  } catch (e) {
+    console.error('❌ 투자 목록 불러오기 실패:', e)
+    if (e.response) console.error('status:', e.response.status, 'data:', e.response.data)
   }
 })
 </script>
+
 <template>
   <div class="p-4 min-h-[600px]">
     <NoInvestmentItems v-if="!fundingItems.length && !ownedItems.length" />
@@ -187,7 +182,10 @@ onMounted(async () => {
             <BaseTypography class="font-semibold text-sm !font-bold">
               {{ item.name }}
             </BaseTypography>
-            <BaseTypography class="text-xs !text-gray-500 mt-1">10주 보유</BaseTypography>
+
+            <BaseTypography v-if="item.shareCount" class="text-xs !text-gray-500 mt-1">
+              보유 수량: {{ item.shareCount }}주
+            </BaseTypography>
 
             <div class="flex items-center mt-1">
               <div class="w-1/2 h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -202,7 +200,8 @@ onMounted(async () => {
             </div>
 
             <BaseTypography class="text-xs !text-gray-500 mt-1">
-              남은 주(금액): {{ item.left.toLocaleString() }} / {{ formatAmount(item.total) }}
+              남은 주(금액): {{ Number(item.left).toLocaleString() }} /
+              {{ formatAmount(item.total) }}
             </BaseTypography>
           </div>
         </div>
@@ -210,21 +209,29 @@ onMounted(async () => {
         <div class="flex flex-col justify-between items-end ml-2 h-full">
           <div class="h-14"></div>
 
+          <!-- 상태별 버튼: pending → 취소하기 / refunded → 거래 만료 -->
           <BaseButton
-            v-if="item.status === '펀딩 만료'"
-            disabled
-            class="text-xs bg-gray-300 text-white rounded-md px-3 py-2 cursor-not-allowed"
-          >
-            <span class="text-xs font-medium">기간만료</span>
-          </BaseButton>
-
-          <BaseButton
-            v-else
+            v-if="item.status === 'pending'"
+            :disabled="isCancelLoading && selectedOrder?.orderId === item.orderId"
             @click="openCancelModal(item)"
             variant="danger"
             class="text-xs text-white rounded-md px-3 py-2 hover:bg-[#e63232] transition-colors duration-150"
           >
-            <span class="text-xs font-medium">취소하기</span>
+            <span class="text-xs font-medium">
+              {{
+                isCancelLoading && selectedOrder?.orderId === item.orderId
+                  ? '취소 중...'
+                  : '취소하기'
+              }}
+            </span>
+          </BaseButton>
+
+          <BaseButton
+            v-else-if="item.status === 'refunded'"
+            disabled
+            class="text-xs bg-gray-300 text-white rounded-md px-3 py-2 cursor-not-allowed"
+          >
+            <span class="text-xs font-medium">거래 만료</span>
           </BaseButton>
         </div>
       </div>
@@ -261,12 +268,11 @@ onMounted(async () => {
             class="text-xs px-0.5 mb-1 !py-0.5"
           >
             <BaseTypography class="text-[10px] font-medium !text-white px-1">
-              {{ '내 배당금' }}
+              내 배당금
             </BaseTypography>
           </BaseButton>
 
           <BaseTypography class="text-xs text-gray-500 mb-0.5">현재 시세</BaseTypography>
-
           <BaseTypography class="text-base font-semibold" style="color: #ff3b3b">
             {{ formatAmount(item.price) }}원
           </BaseTypography>
@@ -282,5 +288,7 @@ onMounted(async () => {
     :dividends="selectedDividends"
     @close="isDividendModalOpen = false"
   />
+
+  <!-- ✅ 환불 확인 모달 -->
   <CancelConfirmModal :isOpen="isModalOpen" @close="closeModal" @submit="confirmCancel" />
 </template>

@@ -34,10 +34,23 @@ export const getUserShares = (userId, page = 0, size = 10) => {
 }
 
 // 환불(주문 취소)
+// 환불(주문 취소)
 export const refundFundingOrder = (fundingId, orderId, orderPrice) => {
+  // 모두 정수/숫자로 강제 변환
+  const params = {
+    fundingId: Number.parseInt(fundingId, 10),
+    orderId: Number.parseInt(orderId, 10),
+    orderPrice: Number(orderPrice), // 금액 소수 없음이면 parseInt로 바꿔도 됨
+  }
+
+  // 로깅(개발 중에만)
+  if (import.meta.env.DEV) {
+    console.log('[refundFundingOrder] params =', params)
+  }
+
   return api.post('/api/funding-order/refund', null, {
-    params: { fundingId, orderId, orderPrice },
-    withCredentials: true, // 쿠키 인증이면 유지
+    params,
+    withCredentials: true,
   })
 }
 
