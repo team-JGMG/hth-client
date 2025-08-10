@@ -83,7 +83,7 @@ const requestPay = async (amount) => {
 
   try {
     // 1) 서버에서 merchant_uid 발급 (DB: PENDING 저장)
-    const merchant_uid = await requestChargeMerchantUid(amount)
+    const merchant_uid = await requestChargeMerchantUid(Number(amount))
     if (!merchant_uid) {
       alert('결제 식별자(merchant_uid) 발급 실패')
       return
@@ -102,7 +102,7 @@ const requestPay = async (amount) => {
         pg: 'kakaopay.TC0ONETIME',
         pay_method: 'card',
         name: '반의 반 집 포인트 충전',
-        amount,
+        amount: Number(amount),
         merchant_uid, // 서버 발급값과 반드시 동일하게 전달
         buyer_email: authStore.userInfo?.email || 'guest@example.com',
         buyer_name: authStore.userInfo?.name || '비회원',
@@ -146,7 +146,7 @@ const handleRefund = async () => {
   if (!refundAmount.value || refundAmount.value <= 0) return alert('환급 금액을 입력해주세요.')
 
   try {
-    await requestPointRefund({ refundAmount: refundAmount.value })
+    await requestPointRefund({ amount: Number(refundAmount.value), userId: authStore.userId })
     alert('환급 신청이 완료되었습니다.')
     isRefundModalOpen.value = false
     refundAmount.value = 0
