@@ -28,3 +28,16 @@ Promise.all([
   app.use(router)
   app.mount('#app')
 })
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data?.type === 'FCM_MESSAGE') {
+      const { title, body } = event.data.payload || {}
+      // Pinia 토스트 사용
+      import('@/stores/toast').then(({ useToastStore }) => {
+        const toast = useToastStore()
+        toast.show({ title: title || '알림', body: body || '', timeout: 4000 })
+      })
+    }
+  })
+}
