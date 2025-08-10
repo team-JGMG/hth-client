@@ -77,7 +77,17 @@
         <BaseTypography weight="regular">방 수: {{ property.roomCount }}개</BaseTypography>
         <BaseTypography weight="regular">욕실 수: {{ property.bathroomCount }}개</BaseTypography>
         <BaseTypography weight="regular">해당 층 수: {{ property.floor }}층</BaseTypography>
-        <BaseTypography weight="regular">해시 태그: #역세권 #신축</BaseTypography>
+        <BaseTypography weight="regular" v-if="normalizedTags.length" class="flex flex-wrap gap-1">
+          해시 태그:
+          <span
+            v-for="(tag, i) in normalizedTags"
+            :key="tag + '-' + i"
+            class="bg-gray-100 px-1.5 py-1 rounded-full text-xs text-gray-600"
+            :title="tag"
+          >
+            #{{ tag }}
+          </span>
+        </BaseTypography>
         <BaseTypography weight="regular">세부 정보: {{ property.description }}</BaseTypography>
         <!-- <BaseTypography weight="regular">
         이미지:
@@ -140,7 +150,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { fetchPropertyDetail } from '@/api/admin'
 import { formatDate, formatDateTime, formatPriceInManwon, formatAreaToPyeong } from '@/utils/format'
@@ -166,6 +176,16 @@ function prevImage() {
 function nextImage() {
   currentImageIndex.value = (currentImageIndex.value + 1) % property.value.images.length
 }
+
+//해시태그
+const maxTagsToShow = 6
+const normalizedTags = computed(() => {
+  const raw = Array.isArray(property.value?.tags) ? property.value.tags : []
+  return raw
+    .map((t) => (typeof t === 'string' ? t.trim() : ''))
+    .filter((t) => t.length > 0)
+    .slice(0, maxTagsToShow)
+})
 
 function getDocumentName(type) {
   switch (type) {
