@@ -202,21 +202,44 @@
 
     <template #submitText> 닫기 </template>
   </CompletedModal>
+
+  <!-- 충전 모달 -->
+  <BaseModal
+    :isOpen="isChargeModalOpen"
+    @close="isChargeModalOpen = false"
+    @submit="() => requestPay(chargeAmount)"
+  >
+    <PointChargeModal v-model="chargeAmount" />
+    <template #submit><BaseTypography color="white"> 충전하기 </BaseTypography></template>
+  </BaseModal>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { mockItems } from '@/pages/funding/mockData'
+import { useAuthStore } from '@/stores/authStore'
+import { storeToRefs } from 'pinia'
+import {
+  requestChargeMerchantUid,
+  verifyPayment,
+  getPointBalance,
+} from '@/api/point'
+
 import DetailHeader from '@/layouts/DetailHeader.vue'
 import BaseModal from '@/components/common/Modal/BaseModal.vue'
 import CompletedModal from '@/components/common/Modal/CompletedModal.vue'
 import CompletedButton from '@/components/common/Button/CompletedButton.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import BaseButton from '@/components/common/Button/BaseButton.vue'
+import PointChargeModal from '@/components/main/PointSection/PointModal/PointChargeModal.vue'
+
 
 const showConfirmModal = ref(false)
 const showCompleteModal = ref(false)
+const isChargeModalOpen = ref(false)
+const chargeAmount = ref(0)
+
 const route = useRoute()
 const itemId = Number(route.params.id)
 const item = mockItems.find((f) => f.propertyId === itemId) || {
@@ -224,9 +247,12 @@ const item = mockItems.find((f) => f.propertyId === itemId) || {
   orderPricePerShare: 5000,
 }
 
+const authStore = useAuthStore()
+const { getIsLoggedIn, userPoints, userId } = storeToRefs(authStore)
+
+
 const quantity = ref('')
-const userPoints = 60000
-const userShares = 2
+const userShares = 2 // from mock
 
 const totalPrice = computed(() => Number(quantity.value || 0) * item.orderPricePerShare)
 
@@ -237,7 +263,7 @@ const handleReset = () => {
   quantity.value = '' // 또는 '0'
 }
 const handleCharge = () => {
-  console.log('충전하기 클릭됨')
+  isChargeModalOpen.value = true
 }
 const moneyIcon = new URL('@/assets/images/moneyIcon.png', import.meta.url).href
 
@@ -255,6 +281,76 @@ const goToMyPage = () => {
 }
 
 const isStepValid = computed(() => Number(quantity.value) > 0)
+
+const refreshPointBalance = async () => {
+  try {
+    const point = await getPointBalance(userId.value)
+    authStore.setUserPoint(point)
+  } catch (e) {
+    console.error('포인트 갱신 실패:', e)
+  }
+}
+
+const requestPay = async (amount) => {
+  if (!getIsLoggedIn.value) return alert('로그인이 필요합니다.')
+  if (!amount || amount <= 0) return alert('충전할 금액을 입력해주세요.')
+
+  try {
+    const merchant_uid = await requestChargeMerchantUid(Number(amount))
+    if (!merchant_uid) {
+      alert('결제 식별자(merchant_uid) 발급 실패')
+      return
+    }
+
+    const { IMP } = window
+    if (!IMP) return alert('PortOne 스크립트가 로드되지 않았습니다.')
+    if (!import.meta.env.VITE_PORTONE_IMP_KEY) {
+      return alert('포트원 키가 설정되지 않았습니다. VITE_PORTONE_IMP_KEY 확인')
+    }
+
+    IMP.init(import.meta.env.VITE_PORTONE_IMP_KEY)
+    IMP.request_pay(
+      {
+        pg: 'kakaopay.TC0ONETIME',
+        pay_method: 'card',
+        name: '반의 반 집 포인트 충전',
+        amount: Number(amount),
+        merchant_uid,
+        buyer_email: authStore.userInfo?.email || 'guest@example.com',
+        buyer_name: authStore.userInfo?.name || '비회원',
+        buyer_tel: '010-0000-0000',
+        buyer_addr: '서울특별시',
+        buyer_postcode: '00000',
+        m_redirect_url: `${window.location.origin}/payment-complete`,
+      },
+      async (rsp) => {
+        if (!rsp?.success) {
+          alert('❌ 결제 실패: ' + (rsp?.error_msg || '사용자 취소 또는 오류'))
+          return
+        }
+
+        try {
+          await verifyPayment({
+            impUid: rsp.imp_uid,
+            amount: rsp.paid_amount,
+            merchantUid: merchant_uid,
+          })
+
+          alert('포인트 충전이 완료되었습니다.')
+          isChargeModalOpen.value = false
+          chargeAmount.value = 0
+          await refreshPointBalance()
+        } catch (err) {
+          console.error(err)
+          alert('❌ 서버 검증 실패: ' + (err?.response?.data?.message || err?.message))
+        }
+      },
+    )
+  } catch (err) {
+    console.error(err)
+    alert('❌ 결제 요청 오류: ' + (err?.response?.data?.message || err?.message))
+  }
+}
 </script>
 <style scoped>
 /* Webkit 기반 브라우저용: 검은 화살표 크게 표시 */
