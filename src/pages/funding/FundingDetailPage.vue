@@ -41,7 +41,7 @@ const mapToViewModel = (d) => ({
   daysLeft: d.daysLeft,
   expectedDividendPerShare: d.expectedDividendPerShare,
   currentShareAmount: d.currentShareAmount,
-  tags: d.tags,
+  tags: d.tags ?? [],
 })
 
 const route = useRoute()

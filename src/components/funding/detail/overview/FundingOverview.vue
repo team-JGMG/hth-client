@@ -19,9 +19,9 @@
 
     <!-- 해시태그 -->
     <BaseTypography size="xs" color="gray-2" class="mt-2 flex flex-wrap gap-2">
-      <span class="bg-gray-100 px-2 py-1 rounded-full">#역세권</span>
-      <span class="bg-gray-100 px-2 py-1 rounded-full">#신축</span>
-      <span class="bg-gray-100 px-2 py-1 rounded-full">#고수익 기대</span>
+      <span v-for="tag in item.tags" :key="tag.id" class="bg-gray-100 px-2 py-1 rounded-full">
+        #{{ tag.name }}
+      </span>
     </BaseTypography>
 
     <!-- 총 투자 금액 -->
@@ -38,9 +38,9 @@
         <BaseTypography size="base" weight="bold" class="mb-2">펀딩 진행 현황</BaseTypography>
         <div class="mt-4 flex justify-between gap-1 mb-2">
           <BaseTypography size="sm" class="items-center mb-1"> 달성률</BaseTypography>
-          <BaseTypography color="blue" weight="bold" size="sm"
-            >{{ item.percent || 0 }}%</BaseTypography
-          >
+          <BaseTypography color="blue" weight="bold" size="sm">
+            {{ item.percent || 0 }}%
+          </BaseTypography>
         </div>
 
         <div class="h-3 bg-gray-200 rounded-full overflow-hidden mb-2">
