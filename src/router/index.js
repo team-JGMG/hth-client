@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+import FcmTestView from '@/pages/FcmTestView.vue'
 import NotFound from '@/pages/NotFound.vue'
 import accountRoutes from './modules/account'
 import adminRoutes from './modules/admin'
@@ -25,6 +26,7 @@ const router = createRouter({
       name: 'NotFound',
       component: NotFound,
     },
+    { path: '/fcm-test', name: 'fcm-test', component: FcmTestView },
   ],
 })
 
