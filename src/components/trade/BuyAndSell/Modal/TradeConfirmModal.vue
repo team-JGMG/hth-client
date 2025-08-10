@@ -1,9 +1,9 @@
 <script setup>
-import { createOrder } from '@/api/trade'
+import { createOrder } from '@/api/trade' // ✅ 통합 API만 사용
 import BaseModal from '@/components/common/Modal/BaseModal.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import { computed } from 'vue'
-// import { useUserStore } from '@/stores/user'
+// import { useAuthStore } from '@/stores/authStore'
 
 const props = defineProps({
   type: String, // 'buy' or 'sell'
@@ -13,21 +13,21 @@ const props = defineProps({
   fundingId: Number,
 })
 
-const total = computed(() => props.amount * props.quantity)
-// const userStore = useUserStore()
+const total = computed(() => (props.amount || 0) * (props.quantity || 0))
+// const userStore = useAuthStore()
 
-const emit = defineEmits(['close', 'completed'])
+const emit = defineEmits(['close', 'completed', 'trade-success']) // ✅ 누락된 이벤트 추가
 
 const handleConfirm = async () => {
   try {
-    const response = await createOrder({
-      // userId: userStore.userId,
+    const payload = {
       userId: 1,
       fundingId: props.fundingId,
       orderPricePerShare: props.amount,
       orderShareCount: props.quantity,
-      orderType: props.type.toUpperCase(),
-    })
+    }
+
+    const response = await createOrder(payload, props.type)
 
     console.log('✅ 주문 성공:', response.data)
 
@@ -35,7 +35,7 @@ const handleConfirm = async () => {
     emit('close')
     emit('trade-success')
   } catch (error) {
-    console.error('❌ 주문 실패:', error)
+    console.error('주문 실패:', error)
     alert(error?.response?.data?.message || '주문 중 오류가 발생했습니다.')
   }
 }

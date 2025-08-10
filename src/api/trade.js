@@ -2,14 +2,18 @@
 // src/api/trade.js
 import api from '@/libs/axios'
 
-// 주문 생성 API
-export const createOrder = (payload) => {
-  return api.post('/api/orders', payload)
-}
+// 주문 생성 API (BUY/SELL)
+export const createOrder = (payload, type) => {
+  const upperType = String(type).toUpperCase()
+  if (upperType !== 'BUY' && upperType !== 'SELL') {
+    throw new Error(`Invalid order type: ${type} (must be 'BUY' or 'SELL')`)
+  }
 
-//  @param {number} userId - 사용자 ID (path param)
-//  @param {('BUY'|'SELL')=} orderType - 선택: 주문 타입 필터
-//  @returns {Promise<Array>}
+  return api.post('/api/orders', {
+    ...payload,
+    orderType: upperType,
+  })
+}
 
 //거래 주문 내역 조회
 export const getOrderHistory = async (userId, orderType) => {
