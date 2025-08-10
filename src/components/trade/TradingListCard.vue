@@ -10,16 +10,33 @@
       class="w-full text-left"
     >
       <div class="flex justify-between items-center">
-        <div class="flex items-center justify-start">
+        <div class="flex items-center gap-3 flex-1 min-w-0">
           <img
             :src="item.image"
             :alt="item.title + ' 건물 이미지'"
-            class="w-14 h-auto mr-2 rounded-md"
+            class="w-14 h-14 object-cover rounded-md flex-shrink-0"
           />
-          <BaseTypography class="text-lg text-left leading-tight" weight="bold">
-            {{ item.title }}
-          </BaseTypography>
+
+          <div class="flex flex-col flex-1 min-w-0">
+            <BaseTypography class="text-lg leading-tight truncate" weight="bold">
+              {{ item.title }}
+            </BaseTypography>
+
+            <!-- 태그 -->
+            <div v-if="getTagsPreview(item.tags).length" class="mt-1 flex flex-wrap gap-1">
+              <span
+                v-for="(tag, i) in getTagsPreview(item.tags)"
+                :key="tag + '-' + i"
+                class="bg-gray-100 text-[8px] text-gray-600 px-2 py-0.5 rounded-full"
+                :title="tag"
+              >
+                #{{ tag }}
+              </span>
+            </div>
+          </div>
         </div>
+
+        <!-- RIGHT: 화살표 -->
         <div
           class="w-8 h-8 flex justify-end items-center text-black rounded-full transition-colors"
           aria-hidden="true"
@@ -81,6 +98,12 @@ const itemsWithImages = computed(() => {
     image: imageMap[`funding_${item.fundingId}`],
   }))
 })
+
+// 태그 추가
+function getTagsPreview(tags) {
+  const arr = Array.isArray(tags) ? tags : []
+  return arr.map((t) => (typeof t === 'string' ? t.trim() : '')).filter(Boolean)
+}
 
 const router = useRouter()
 const tradeOrderPage = (id) => {
