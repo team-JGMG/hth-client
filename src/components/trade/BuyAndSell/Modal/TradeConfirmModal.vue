@@ -3,7 +3,7 @@ import { createOrder } from '@/api/trade' // ✅ 통합 API만 사용
 import BaseModal from '@/components/common/Modal/BaseModal.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import { computed } from 'vue'
-// import { useAuthStore } from '@/stores/authStore'
+import { useAuthStore } from '@/stores/authStore'
 
 const props = defineProps({
   type: String, // 'buy' or 'sell'
@@ -14,14 +14,14 @@ const props = defineProps({
 })
 
 const total = computed(() => (props.amount || 0) * (props.quantity || 0))
-// const userStore = useAuthStore()
+const userStore = useAuthStore()
 
 const emit = defineEmits(['close', 'completed', 'trade-success']) // ✅ 누락된 이벤트 추가
 
 const handleConfirm = async () => {
   try {
     const payload = {
-      userId: 1,
+      userId: userStore.userId,
       fundingId: props.fundingId,
       orderPricePerShare: props.amount,
       orderShareCount: props.quantity,
