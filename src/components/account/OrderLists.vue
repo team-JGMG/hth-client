@@ -1,11 +1,11 @@
+<!-- TradeHistory.vue -->
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import CancelConfirmModal from './CancelConfirmModal.vue'
 import { formatDateTime } from '@/utils/format.js'
 import { getOrderHistory, cancelOrder } from '@/api/trade'
 
-// ===== 안전 유틸 =====
 function toIso(dateStr) {
   return typeof dateStr === 'string' ? dateStr.replace(' ', 'T') : dateStr
 }
@@ -28,21 +28,28 @@ function formatToHHMM(dateStr) {
   const [, timePart] = formatDateTime(toIso(dateStr)).split(' ')
   return timePart || ''
 }
-const prepareOrders = (orderArray) =>
-  orderArray.map((o) => ({
-    ...o,
-    _ui: { dragX: 0, touchStartX: 0 },
-  }))
+const prepareOrders = (arr) => arr.map((o) => ({ ...o, _ui: { dragX: 0, touchStartX: 0 } }))
 
 const FALLBACK_USER_ID = 4
 
 const orders = ref([])
-const isLoading = ref(false)
+const isFirstLoad = ref(true)
 const loadError = ref(null)
-const debugInfo = ref('')
 const isSubmitting = ref(false)
 
-// 서버 응답 -> UI 모델 매핑
+const PAGE_SIZE = 5
+const delay = (ms) => new Promise((r) => setTimeout(r, ms))
+const bottomRef = ref(null)
+let observer = null
+const isLoading = ref(false)
+
+const page = ref(0)
+const hasNext = ref(true)
+
+const bufferedMode = ref(false) // 서버가 배열만 줄 때 true
+const bufferAll = ref([]) // 전체 배열
+const bufferCursor = ref(0) // 다음 슬라이스 시작 인덱스
+
 function mapApiOrderToUi(o) {
   const pricePer = n(o?.orderPricePerShare)
   const shareCnt = n(o?.orderShareCount)
@@ -59,34 +66,115 @@ function mapApiOrderToUi(o) {
   }
 }
 
-function unwrapToArray(res) {
-  if (Array.isArray(res?.data)) return res.data
+function unwrapServerPaging(res) {
+  return Array.isArray(res?.data?.data?.content) ? res.data.data : null
+}
+function unwrapArray(res) {
   if (Array.isArray(res?.data?.data)) return res.data.data
-  return []
+  if (Array.isArray(res?.data)) return res.data
+  return null
 }
 
-async function loadOrders() {
+async function fetchOrdersPage() {
+  if (isLoading.value) return
+
+  // 클라 청크 모드면 다음 청크만 추가
+  if (bufferedMode.value) {
+    return appendNextChunk()
+  }
+
+  if (!hasNext.value) return
   isLoading.value = true
-  loadError.value = null
-  debugInfo.value = ''
   try {
-    const userId = FALLBACK_USER_ID
-    const res = await getOrderHistory(userId)
-    const list = unwrapToArray(res)
-    debugInfo.value = `status=${res?.data?.status || res?.status} | isArray=${Array.isArray(list)} | len=${list.length}`
-    const mapped = list.map(mapApiOrderToUi)
-    orders.value = prepareOrders(mapped)
+    const res = await getOrderHistory(FALLBACK_USER_ID, page.value, PAGE_SIZE)
+    await delay(2000)
+
+    const paged = unwrapServerPaging(res)
+    if (paged) {
+      // ✅ 서버 페이징
+      const mapped = paged.content.map(mapApiOrderToUi).filter((o) => {
+        const raw = o?._raw?.orderStatus ?? o?._raw?.status ?? ''
+        return !['CANCELLED', '취소', 'REFUNDED'].includes(String(raw).toUpperCase())
+      })
+      orders.value.push(...prepareOrders(mapped))
+
+      const nextFlag = !!paged.hasNext || paged.last === false
+      hasNext.value = nextFlag
+      if (nextFlag) page.value += 1
+    } else {
+      // ✅ 서버가 배열만 줌 → 클라 청크 모드 전환 + 첫 청크 직접 푸시(버그 fix)
+      const arr = unwrapArray(res) || []
+      bufferedMode.value = true
+      bufferAll.value = arr
+      bufferCursor.value = 0
+
+      // 첫 청크 직접 처리 (isLoading=true 상태여서 appendNextChunk()가 return 되던 문제 해결)
+      const firstSlice = bufferAll.value.slice(0, PAGE_SIZE)
+      bufferCursor.value = firstSlice.length
+
+      const firstMapped = firstSlice.map(mapApiOrderToUi).filter((o) => {
+        const raw = o?._raw?.orderStatus ?? o?._raw?.status ?? ''
+        return !['CANCELLED', '취소', 'REFUNDED'].includes(String(raw).toUpperCase())
+      })
+      orders.value.push(...prepareOrders(firstMapped))
+    }
   } catch (err) {
     console.error('❌ 거래 내역 불러오기 실패:', err)
     loadError.value = err
-    orders.value = []
-    debugInfo.value = `error=${err?.message || err}`
   } finally {
     isLoading.value = false
+    isFirstLoad.value = false
   }
 }
 
-onMounted(loadOrders)
+async function appendNextChunk() {
+  if (isLoading.value) return
+  const total = bufferAll.value.length
+  if (bufferCursor.value >= total) return
+
+  isLoading.value = true
+  try {
+    await delay(2000)
+    const slice = bufferAll.value.slice(bufferCursor.value, bufferCursor.value + PAGE_SIZE)
+    bufferCursor.value += slice.length
+
+    const mapped = slice.map(mapApiOrderToUi).filter((o) => {
+      const raw = o?._raw?.orderStatus ?? o?._raw?.status ?? ''
+      return !['CANCELLED', '취소', 'REFUNDED'].includes(String(raw).toUpperCase())
+    })
+    orders.value.push(...prepareOrders(mapped))
+  } catch (e) {
+    console.error('❌ 청크 추가 실패:', e)
+  } finally {
+    isLoading.value = false
+    isFirstLoad.value = false
+  }
+}
+
+function setupObserver() {
+  if (observer) observer.disconnect()
+  observer = new IntersectionObserver(
+    ([entry]) => {
+      if (!entry.isIntersecting || isLoading.value) return
+      if (bufferedMode.value) {
+        appendNextChunk()
+      } else if (hasNext.value) {
+        fetchOrdersPage()
+      }
+    },
+    { threshold: 1 },
+  )
+  if (bottomRef.value) observer.observe(bottomRef.value)
+}
+
+onMounted(async () => {
+  await fetchOrdersPage()
+  await nextTick()
+  setupObserver()
+})
+onBeforeUnmount(() => {
+  if (observer) observer.disconnect()
+})
 
 const sortedOrders = computed(() =>
   [...orders.value].sort((a, b) => parseDate(b.createdAt) - parseDate(a.createdAt)),
@@ -99,23 +187,13 @@ function openDeleteModal(order) {
   selectedOrder.value = order
   isModalOpen.value = true
 }
-
-// ✅ 성공 후 삭제로 변경
 async function confirmDelete() {
   if (!selectedOrder.value || isSubmitting.value) return
   const targetId = selectedOrder.value.id
-  if (!targetId) {
-    alert('주문 ID를 찾을 수 없습니다.')
-    return
-  }
-
+  if (!targetId) return alert('주문 ID를 찾을 수 없습니다.')
   isSubmitting.value = true
-  console.log('[confirmDelete] cancel targetId=', targetId)
-
   try {
-    const res = await cancelOrder(targetId)
-    console.log('[confirmDelete] cancel success:', res)
-    // 성공 시만 삭제
+    await cancelOrder(targetId)
     orders.value = orders.value.filter((o) => o.id !== targetId)
     isModalOpen.value = false
     selectedOrder.value = null
@@ -127,6 +205,7 @@ async function confirmDelete() {
   }
 }
 
+/* 터치 슬라이드 삭제 UI */
 function getYear(dateStr) {
   return parseDate(dateStr).getFullYear()
 }
@@ -162,12 +241,15 @@ function handleTouchEnd(order) {
 <template>
   <div class="py-3"></div>
   <div class="p-4 min-h-[600px] space-y-0">
-    <div v-if="isLoading" class="py-10 text-center text-gray-400">불러오는 중…</div>
-    <div v-else-if="loadError" class="py-10 text-center text-red-500">
+    <div v-if="loadError && isFirstLoad" class="py-10 text-center text-red-500">
       거래 내역을 불러오지 못했습니다.
     </div>
 
-    <template v-else-if="sortedOrders.length">
+    <div v-else-if="!sortedOrders.length && !isLoading" class="py-10 text-center text-gray-400">
+      주문 내역이 없습니다.
+    </div>
+
+    <template v-else>
       <template
         v-for="(order, index) in sortedOrders"
         :key="order.id ?? `${order.createdAt}-${order.itemName}-${index}`"
@@ -177,7 +259,6 @@ function handleTouchEnd(order) {
         </BaseTypography>
 
         <div class="relative rounded-md overflow-hidden">
-          <!-- 삭제 아이콘 -->
           <div
             class="absolute top-0 bottom-0 right-1 w-[60px] bg-[#FC2E6C] flex items-center justify-center z-0 rounded-md"
             @click="openDeleteModal(order)"
@@ -185,7 +266,6 @@ function handleTouchEnd(order) {
             <span class="material-symbols-outlined"> delete </span>
           </div>
 
-          <!-- 카드 본체 -->
           <div
             class="relative z-0 flex items-center gap-4 px-3 h-[72px]"
             :style="{
@@ -197,7 +277,6 @@ function handleTouchEnd(order) {
             @touchmove.passive="handleTouchMove($event, order)"
             @touchend="handleTouchEnd(order)"
           >
-            <!-- 날짜/시간 -->
             <div class="flex flex-col justify-center items-end min-w-[50px] h-full">
               <BaseTypography class="text-gray-500 text-xs text-right">
                 {{ formatToMMDD(order.createdAt) }}
@@ -207,7 +286,6 @@ function handleTouchEnd(order) {
               </BaseTypography>
             </div>
 
-            <!-- 제목/가격 -->
             <div class="flex-1 flex flex-col justify-center h-full overflow-hidden">
               <div class="h-[20px] overflow-hidden">
                 <BaseTypography class="!font-bold text-sm truncate whitespace-nowrap">
@@ -227,7 +305,6 @@ function handleTouchEnd(order) {
               </div>
             </div>
 
-            <!-- 주문량/미체결량 -->
             <div class="text-sm !font-black text-right min-w-[70px]">
               <BaseTypography class="text-xs text-gray-500">
                 주문량 {{ nfmt(order.shares) }}주
@@ -239,9 +316,19 @@ function handleTouchEnd(order) {
           </div>
         </div>
       </template>
-    </template>
 
-    <div v-else class="py-10 text-center text-gray-400">주문 내역이 없습니다.</div>
+      <!-- 📌 무한스크롤 트리거 -->
+      <div ref="bottomRef" class="h-2"></div>
+
+      <!-- ✅ 동일 로딩 아이콘 -->
+      <div v-if="isLoading" class="flex justify-center py-4">
+        <img
+          src="@/assets/images/character/loading.png"
+          alt="로딩 캐릭터"
+          class="w-12 h-12 animate-spin opacity-70"
+        />
+      </div>
+    </template>
   </div>
 
   <CancelConfirmModal
@@ -254,3 +341,9 @@ function handleTouchEnd(order) {
     :disabled="isSubmitting"
   />
 </template>
+
+<style scoped>
+.animate-spin {
+  animation: spin 0.4s linear infinite;
+}
+</style>

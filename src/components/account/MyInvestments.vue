@@ -297,7 +297,7 @@ onBeforeUnmount(() => {
             :disabled="isCancelLoading && selectedOrder?.orderId === item.orderId"
             @click="openCancelModal(item)"
             variant="danger"
-            class="text-xs text-white rounded-md px-3 py-2 hover:bg-[#e63232] transition-colors duration-150"
+            class="text-xs text-white rounded-md px-3 py-2 hover:bg-[#e63232] transition-colors duration-150 whitespace-nowrap"
           >
             <span class="text-xs font-medium">
               {{
@@ -307,12 +307,13 @@ onBeforeUnmount(() => {
               }}
             </span>
           </BaseButton>
+
           <BaseButton
             v-else-if="item.status === 'refunded'"
             disabled
-            class="text-xs bg-gray-300 text-white rounded-md px-3 py-2 cursor-not-allowed"
+            class="text-xs bg-gray-300 text-white rounded-md px-3 py-2 cursor-not-allowed whitespace-nowrap"
           >
-            <span class="text-xs font-medium">거래 만료</span>
+            <span class="text-xs font-medium">거래만료</span>
           </BaseButton>
         </div>
       </div>
