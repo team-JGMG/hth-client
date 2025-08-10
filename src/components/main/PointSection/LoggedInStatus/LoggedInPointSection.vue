@@ -1,5 +1,5 @@
 <template>
-  <div class="relative mb-4">
+  <div class="relative mb-0">
     <PointSummarySection
       :userName="authStore.userInfo?.name ?? '???'"
       :point="Number.isFinite(+authStore.userInfo?.point) ? +authStore.userInfo.point : null"
@@ -10,7 +10,7 @@
     </div>
 
     <PointActionButtons @charge="isChargeModalOpen = true" @refund="isRefundModalOpen = true" />
-    <PointManageCard />
+    <PointManageCard v-if="props.showManageCard" />
 
     <BaseModal
       :isOpen="isChargeModalOpen"
@@ -49,6 +49,10 @@ import PointRefundModal from '../PointModal/PointRefundModal.vue'
 import PointSummarySection from './PointSummarySection.vue'
 import PointActionButtons from './PointActionButtons.vue'
 import PointManageCard from './PointManageCard.vue'
+
+const props = defineProps({
+  showManageCard: { type: Boolean, default: true }, // ✅ 추가
+})
 
 const authStore = useAuthStore()
 const { getIsLoggedIn } = storeToRefs(authStore)

@@ -4,8 +4,8 @@
     <DetailHeader>마이 페이지</DetailHeader>
 
     <!-- 포인트 프로필 섹션을 헤더에 겹치도록 조정 -->
-    <div class="bg-black rounded-2xl p-4 text-white mt-4">
-      <LoggedInPointSection :showManagingButton="false">
+    <div class="bg-black rounded-2xl p-6 text-white mt-0">
+      <LoggedInPointSection :showManageCard="false">
         <button class="w-fit" @click="goToEditProfile" aria-label="정보 수정">
           <span class="material-symbols-outlined"> person_edit </span>
         </button>
@@ -36,7 +36,7 @@ import LoggedInPointSection from '@/components/main/PointSection/LoggedInStatus/
 import BlankLayout from '@/layouts/BlankLayout.vue'
 const userStore = useUserStore()
 onMounted(async () => {
-  if (userStore.getIsLoggedIn) {
+  if (userStore.getIsLoggedIn?.value) {
     await userStore.loadUserInfo()
   }
 })
