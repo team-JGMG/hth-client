@@ -73,8 +73,28 @@ export const getPropertyMapData = async (propertyId) => {
   return response.data
 }
 
-// 매물 ID 기반 좌표 조회
-export const getPropertyCoordinates = async (propertyId) => {
-  const response = await api.get(`/api/property/map/coordinate/${propertyId}`)
-  return response.data
+// 주소 기반 좌표 변환 (스웨거 우선: POST /api/property/map/coordinate, body = JSON 문자열)
+// 404면 서버 배포 상태가 달라진 것이니 GET ?address=... 으로 폴백
+export const getCoordinatesByAddress = async (address) => {
+  try {
+    const { data } = await api.post('/api/property/map/coordinate', JSON.stringify(address), {
+      headers: { 'Content-Type': 'application/json' },
+    })
+    return data // { latitude, longitude }
+  } catch (e) {
+    if (e?.response?.status === 404) {
+      const { data } = await api.get('/api/property/map/coordinate', { params: { address } })
+      return data
+    }
+    throw e
+  }
 }
+export const getPropertyDetail = async (propertyId) => {
+  const { data } = await api.get(`/api/property/${propertyId}`) // 실제 경로 다르면 수정
+  return data
+}
+
+// export const getPropertyCoordinates = async (propertyId) => {
+//   const response = await api.get(`/api/property/map/coordinate/${propertyId}`)
+//   return response.data // { latitude, longitude } 형태라고 가정
+// }

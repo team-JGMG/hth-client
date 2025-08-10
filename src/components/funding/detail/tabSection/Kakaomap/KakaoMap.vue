@@ -5,9 +5,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { getPropertyMapData } from '@/api/property'
-// import { getPropertyMapData, getPropertyCoordinates } from '@/api/property'
-
+import { getPropertyMapData, getCoordinatesByAddress, getPropertyDetail } from '@/api/property'
+function pickAddress(d) {
+  return (d && (d.roadAddress || d.address || d.jibunAddress || d.addr)) || null
+}
 const mapContainer = ref(null)
 const route = useRoute()
 
@@ -28,11 +29,22 @@ const loadMap = async () => {
   try {
     const propertyId = Number(route.params.id)
     console.log('요청할 propertyId:', propertyId)
-
+    let address = route.query?.address
+    if (!address) {
+      try {
+        const detail = await getPropertyDetail(propertyId)
+        address = pickAddress(detail?.data ?? detail)
+        console.log('[address from detail]', address)
+      } catch (e) {
+        console.warn('[getPropertyDetail 실패]', e?.response?.status, e?.message)
+      }
+    }
+    console.log('address:', address)
     // 중심 좌표 고정
-    const latitude = 37.57448614998234
-    const longitude = 126.96660956765075
-
+    // const latitude = 39.57448614998234
+    // const longitude = 126.96660956765075
+    let latitude
+    let longitude
     // 중심 좌표 조회
     // const { latitude, longitude } = await getPropertyCoordinates(propertyId)
     // if (!latitude || !longitude) {
@@ -42,7 +54,27 @@ const loadMap = async () => {
 
     // 주변 시세 조회
     const mapData = await getPropertyMapData(propertyId)
-
+    if (address) {
+      try {
+        const center = await getCoordinatesByAddress(address) // { latitude, longitude }
+        latitude = Number(center?.latitude)
+        longitude = Number(center?.longitude)
+        console.log('[center from address]', { latitude, longitude })
+      } catch (e) {
+        console.warn('[주소→좌표 실패]', e?.response?.status, e?.message)
+      }
+    }
+    // 폴백: mapData의 첫 좌표
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+      const first = Array.isArray(mapData) && mapData.length ? mapData[0] : null
+      if (!first) {
+        console.warn('지도 중심 좌표를 찾을 수 없습니다.')
+        return
+      }
+      latitude = Number(first.latitude)
+      longitude = Number(first.longitude)
+      console.log('[center from mapData[0]]', { latitude, longitude })
+    }
     await loadKakaoScript()
 
     const center = new window.kakao.maps.LatLng(latitude, longitude) // ✅ 고정 좌표 사용
