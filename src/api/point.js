@@ -44,18 +44,19 @@ export const requestPointRefund = async ({ amount, userId }) => {
   )
   return res.data.data
 }
-// ✅ 포인트 입출금 내역 조회 (페이징/정렬 지원)
+// 포인트 입출금 내역 조회 (테스트용 엔드포인트 사용)
 export const getPointTransactions = async ({
   page = 0,
   size = 100,
   sort = 'createdAt,DESC',
-  userId, // 선택: 지금은 4 전달, 나중엔 authStore.userId
+  userId, // 반드시 전달 (Swagger에 userId query 필요)
 } = {}) => {
   try {
     const params = { page, size, sort }
-    if (userId != null) params.userId = userId // 서버가 무시해도 문제 없음
+    if (userId != null) params.userId = userId
 
-    const res = await api.get('/api/point/transactions', { params })
+    // ⚠️ 여기 경로가 핵심
+    const res = await api.get('/api/point/transactions-test', { params })
     if (!Array.isArray(res?.data?.data)) {
       throw new Error(res?.data?.message || '포인트 내역 응답 형식 오류')
     }

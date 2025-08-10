@@ -1,4 +1,4 @@
-<!-- TradeHistory.vue -->
+<!-- OrderLists.vue -->
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
@@ -30,6 +30,7 @@ function formatToHHMM(dateStr) {
 }
 const prepareOrders = (arr) => arr.map((o) => ({ ...o, _ui: { dragX: 0, touchStartX: 0 } }))
 
+/* 🔧 테스트 유저: 데이터 있는 ID */
 const FALLBACK_USER_ID = 4
 
 const orders = ref([])
@@ -51,72 +52,148 @@ const bufferAll = ref([]) // 전체 배열
 const bufferCursor = ref(0) // 다음 슬라이스 시작 인덱스
 
 function mapApiOrderToUi(o) {
-  const pricePer = n(o?.orderPricePerShare)
-  const shareCnt = n(o?.orderShareCount)
+  const pricePer = n(o?.orderPricePerShare ?? o?.pricePerShare ?? o?.price_per_share)
+  const shareCnt = n(o?.orderShareCount ?? o?.shareCount ?? o?.shares)
+  const created =
+    o?.createdAt ??
+    o?.created_at ??
+    o?.createdDate ??
+    o?.orderDate ??
+    o?.timestamp ??
+    new Date().toISOString()
+
   return {
-    id: o?.orderId ?? o?.id,
-    itemName: o?.propertyTitle ?? '',
+    id: o?.orderId ?? o?.id ?? o?.historyId ?? o?.order_id ?? o?.history_id,
+    itemName: o?.propertyTitle ?? o?.title ?? o?.name ?? '',
     shares: shareCnt,
     totalPrice: pricePer * shareCnt,
     status:
-      o?.orderType === 'BUY' ? '매수' : o?.orderType === 'SELL' ? '매도' : (o?.orderType ?? ''),
-    createdAt: toIso(o?.createdAt),
-    pendingShares: n(o?.remainingShareCount, 0),
+      o?.orderType === 'BUY'
+        ? '매수'
+        : o?.orderType === 'SELL'
+          ? '매도'
+          : (o?.orderType ?? o?.type ?? ''),
+    createdAt: toIso(created),
+    pendingShares: n(o?.remainingShareCount ?? o?.pendingShares ?? 0),
     _raw: o,
   }
 }
 
-function unwrapServerPaging(res) {
-  return Array.isArray(res?.data?.data?.content) ? res.data.data : null
-}
-function unwrapArray(res) {
-  if (Array.isArray(res?.data?.data)) return res.data.data
-  if (Array.isArray(res?.data)) return res.data
+/* ---------- 언랩 ---------- */
+function findFirstArray(obj, depth = 0) {
+  if (!obj || typeof obj !== 'object' || depth > 3) return null
+  if (Array.isArray(obj)) return obj
+  for (const v of Object.values(obj)) {
+    if (Array.isArray(v)) return v
+  }
+  for (const v of Object.values(obj)) {
+    const found = findFirstArray(v, depth + 1)
+    if (found) return found
+  }
   return null
 }
+function unwrapServerPaging(res) {
+  const d1 = res?.data
+  const d2 = d1?.data ?? d1
+  if (Array.isArray(d2?.content)) return { content: d2.content, meta: d2, mode: 'content' }
+  if (Array.isArray(d2?.items)) return { content: d2.items, meta: d2, mode: 'items' }
+  return null
+}
+function unwrapArray(res) {
+  const d1 = res?.data
+  const arr = findFirstArray(d1)
+  return Array.isArray(arr) ? arr : null
+}
 
+// 🔎 취소 상태 판별 (영문/한글 모두)
+function isCancelledStatus(raw) {
+  const s = String(raw ?? '').trim()
+  if (!s) return false
+  const u = s.toUpperCase()
+  return u.includes('CANCEL') || u === 'CANCELED' || u === 'CANCELLED' || s === '취소'
+}
+
+// ✅ 취소 건 제외하고 매핑
+function mapAndFilter(list) {
+  return list
+    .map(mapApiOrderToUi)
+    .filter((o) => !isCancelledStatus(o?._raw?.orderStatus ?? o?._raw?.status ?? o?.status))
+}
+
+/** ---- 서버/배열 모두 "취소 제외 후 최소 PAGE_SIZE개" 채워 넣기 ---- **/
+/** ---- 서버/배열 모두 "취소 제외 후 최소 PAGE_SIZE개" 채워 넣기 ---- **/
 async function fetchOrdersPage() {
   if (isLoading.value) return
 
-  // 클라 청크 모드면 다음 청크만 추가
+  // 클라 청크 모드면 청크 쪽으로 위임
   if (bufferedMode.value) {
-    return appendNextChunk()
+    return appendNextChunk(PAGE_SIZE) // 항상 PAGE_SIZE만큼 채우도록 요청
   }
 
   if (!hasNext.value) return
   isLoading.value = true
   try {
-    const res = await getOrderHistory(FALLBACK_USER_ID, page.value, PAGE_SIZE)
-    await delay(2000)
+    let added = 0
+    let iter = 0
 
-    const paged = unwrapServerPaging(res)
-    if (paged) {
-      // ✅ 서버 페이징
-      const mapped = paged.content.map(mapApiOrderToUi).filter((o) => {
-        const raw = o?._raw?.orderStatus ?? o?._raw?.status ?? ''
-        return !['CANCELLED', '취소', 'REFUNDED'].includes(String(raw).toUpperCase())
-      })
-      orders.value.push(...prepareOrders(mapped))
+    while (added < PAGE_SIZE && hasNext.value && iter < 10) {
+      const res = await getOrderHistory(FALLBACK_USER_ID, page.value, PAGE_SIZE)
+      console.log('[orders fetch]', { page: page.value, raw: res?.data })
+      await delay(2000)
 
-      const nextFlag = !!paged.hasNext || paged.last === false
-      hasNext.value = nextFlag
-      if (nextFlag) page.value += 1
-    } else {
-      // ✅ 서버가 배열만 줌 → 클라 청크 모드 전환 + 첫 청크 직접 푸시(버그 fix)
-      const arr = unwrapArray(res) || []
-      bufferedMode.value = true
-      bufferAll.value = arr
-      bufferCursor.value = 0
+      const paged = unwrapServerPaging(res)
 
-      // 첫 청크 직접 처리 (isLoading=true 상태여서 appendNextChunk()가 return 되던 문제 해결)
-      const firstSlice = bufferAll.value.slice(0, PAGE_SIZE)
-      bufferCursor.value = firstSlice.length
+      if (paged) {
+        // ✅ 서버 페이징: 취소 제외 후 누적
+        const mapped = mapAndFilter(paged.content || [])
+        console.log('[orders page append]', {
+          page: page.value,
+          got: (paged.content || []).length,
+          mapped: mapped.length,
+          meta: {
+            hasNext: paged.meta?.hasNext,
+            last: paged.meta?.last,
+            totalPages: paged.meta?.totalPages,
+            number: paged.meta?.number,
+          },
+        })
+        orders.value.push(...prepareOrders(mapped))
+        added += mapped.length
 
-      const firstMapped = firstSlice.map(mapApiOrderToUi).filter((o) => {
-        const raw = o?._raw?.orderStatus ?? o?._raw?.status ?? ''
-        return !['CANCELLED', '취소', 'REFUNDED'].includes(String(raw).toUpperCase())
-      })
-      orders.value.push(...prepareOrders(firstMapped))
+        const nextFlag =
+          typeof paged.meta?.hasNext === 'boolean' ? paged.meta.hasNext : paged.meta?.last === false
+        hasNext.value = !!nextFlag
+        if (nextFlag) page.value += 1
+      } else {
+        // ✅ 배열 모드: 여기서 즉시( isLoading=true 여도 ) 5개가 모일 때까지 채워 넣기
+        const arr = unwrapArray(res) || []
+        console.log('[orders array mode]', { total: arr.length })
+
+        bufferedMode.value = true
+        bufferAll.value = arr
+        bufferCursor.value = 0
+
+        // 최초 호출이면 "항상 최소 5개"를 보장
+        const target = Math.max(PAGE_SIZE - added, PAGE_SIZE)
+        while (added < target && bufferCursor.value < bufferAll.value.length) {
+          const slice = bufferAll.value.slice(bufferCursor.value, bufferCursor.value + PAGE_SIZE)
+          bufferCursor.value += slice.length
+
+          const mapped = mapAndFilter(slice) // ⬅️ 취소 제외 여기서
+          console.log('[orders buffer immediate]', {
+            from: bufferCursor.value - slice.length,
+            size: slice.length,
+            mapped: mapped.length,
+          })
+          orders.value.push(...prepareOrders(mapped))
+          added += mapped.length
+        }
+
+        // 다음 호출(스크롤)부터는 appendNextChunk가 계속 채움
+        break
+      }
+
+      iter += 1
     }
   } catch (err) {
     console.error('❌ 거래 내역 불러오기 실패:', err)
@@ -127,22 +204,34 @@ async function fetchOrdersPage() {
   }
 }
 
-async function appendNextChunk() {
+/** ---- 버퍼(배열만 내려올 때)에서도 "취소 제외 후 최소 N개" 채우기 ---- **/
+async function appendNextChunk(minToFill = PAGE_SIZE) {
   if (isLoading.value) return
   const total = bufferAll.value.length
   if (bufferCursor.value >= total) return
 
   isLoading.value = true
   try {
-    await delay(2000)
-    const slice = bufferAll.value.slice(bufferCursor.value, bufferCursor.value + PAGE_SIZE)
-    bufferCursor.value += slice.length
+    let added = 0
+    let iter = 0
 
-    const mapped = slice.map(mapApiOrderToUi).filter((o) => {
-      const raw = o?._raw?.orderStatus ?? o?._raw?.status ?? ''
-      return !['CANCELLED', '취소', 'REFUNDED'].includes(String(raw).toUpperCase())
-    })
-    orders.value.push(...prepareOrders(mapped))
+    while (added < minToFill && bufferCursor.value < total && iter < 50) {
+      await delay(2000)
+      // 원본은 PAGE_SIZE 단위로 자르되, 필터링 후 부족하면 다음 슬라이스 계속 가져감
+      const slice = bufferAll.value.slice(bufferCursor.value, bufferCursor.value + PAGE_SIZE)
+      bufferCursor.value += slice.length
+
+      const mapped = mapAndFilter(slice) // ⬅️ 여기서 취소 제외
+      console.log('[orders buffer append]', {
+        from: bufferCursor.value - slice.length,
+        size: slice.length,
+        mapped: mapped.length,
+      })
+      orders.value.push(...prepareOrders(mapped))
+      added += mapped.length
+
+      iter += 1
+    }
   } catch (e) {
     console.error('❌ 청크 추가 실패:', e)
   } finally {
@@ -151,6 +240,7 @@ async function appendNextChunk() {
   }
 }
 
+/** ---- 트리거 완화 (sentinel이 조금만 보여도 로드) ---- **/
 function setupObserver() {
   if (observer) observer.disconnect()
   observer = new IntersectionObserver(
@@ -162,7 +252,10 @@ function setupObserver() {
         fetchOrdersPage()
       }
     },
-    { threshold: 1 },
+    {
+      threshold: 0,
+      rootMargin: '0px 0px 200px 0px',
+    },
   )
   if (bottomRef.value) observer.observe(bottomRef.value)
 }
