@@ -40,15 +40,20 @@
           weight="semibold"
           >{{ item.title }}</BaseTypography
         >
-        <BaseTypography class="truncate whitespace-nowrap overflow-hidden mt-0.5" size="[10px]">{{
-          item.address
-        }}</BaseTypography>
+        <BaseTypography class="truncate whitespace-nowrap overflow-hidden mt-0.5" size="[10px]">
+          {{ item.address }}
+        </BaseTypography>
 
-        <div class="flex flex-wrap gap-1 mt-1 mb-2">
-          <span class="bg-gray-100 text-[10px] text-gray-600 px-2 py-0.5 rounded-full"
-            >#수익형</span
+        <!-- 태그 부분 -->
+        <div v-if="normalizedTags.length" class="flex flex-wrap gap-0.5 mt-1 mb-2">
+          <span
+            v-for="(tag, i) in normalizedTags"
+            :key="tag + '-' + i"
+            class="bg-gray-100 text-[7px] text-gray-600 px-1 py-0.5 rounded-full"
+            :title="tag"
           >
-          <span class="bg-gray-100 text-[10px] text-gray-600 px-2 py-0.5 rounded-full">#투자</span>
+            #{{ tag }}
+          </span>
         </div>
 
         <div class="flex justify-between items-center mb-1">
@@ -85,6 +90,7 @@ import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import testImage from '@/assets/images/cardtestimage.png'
 import { formatAmount } from '@/utils/format.js'
 import { useRouter } from 'vue-router'
+import { computed } from 'vue'
 
 const props = defineProps({
   item: {
@@ -95,6 +101,16 @@ const props = defineProps({
     type: String,
     required: true,
   },
+})
+
+// 태그 추가
+const maxTagsToShow = 3
+const normalizedTags = computed(() => {
+  const raw = Array.isArray(props.item.tags) ? props.item.tags : []
+  return raw
+    .filter((t) => typeof t === 'string' && t.trim().length > 0)
+    .map((t) => t.trim())
+    .slice(0, maxTagsToShow)
 })
 
 const router = useRouter()
