@@ -1,6 +1,6 @@
 <!-- MyInvestments.vue -->
 <script setup>
-import { ref, onMounted, nextTick, onBeforeUnmount } from 'vue'
+import { ref, onMounted, nextTick, onBeforeUnmount, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { getUserFundingOrders, getUserShares, refundFundingOrder } from '@/api/funding'
 import { getAllocations, unwrapAllocations } from '@/api/allocation'
@@ -18,7 +18,7 @@ function goFundingDetail(fundingId) {
 }
 
 /** ---------------- 상태 ---------------- **/
-const userId = ref(3) // ✅ 테스트: 4번 유저
+const userId = ref(3) // 🔧 테스트: 보유 지분 응답이 있는 유저 ID로 고정
 const fundingItems = ref([]) // 펀딩중/환불된 주문
 const ownedItems = ref([]) // 보유 지분
 
@@ -34,7 +34,7 @@ const selectedBuildingName = ref('')
 const selectedDividends = ref([])
 
 /** ---------------- 유틸 ---------------- **/
-const PAGE_SIZE = 5
+const PAGE_SIZE = 4
 const delay = (ms) => new Promise((res) => setTimeout(res, ms))
 const toImg = (src) =>
   !src ? '/default-img.png' : /^https?:\/\//i.test(src) ? src : `https://half-to-half.site${src}`
@@ -169,9 +169,7 @@ async function fetchFundingPage() {
 function setupFundingObserver() {
   if (fundingObserver) fundingObserver.disconnect()
   fundingObserver = new IntersectionObserver(
-    ([entry]) => {
-      if (entry.isIntersecting) fetchFundingPage()
-    },
+    ([entry]) => entry.isIntersecting && fetchFundingPage(),
     { threshold: 1 },
   )
   if (fundingBottomRef.value) fundingObserver.observe(fundingBottomRef.value)
@@ -184,6 +182,13 @@ const sharesIsLoading = ref(false)
 const sharesBottomRef = ref(null)
 let sharesObserver = null
 
+// sentinel 재-옵저브 함수
+const ensureObserveShares = () => {
+  if (!sharesObserver || !sharesBottomRef.value) return
+  sharesObserver.unobserve(sharesBottomRef.value)
+  sharesObserver.observe(sharesBottomRef.value)
+}
+
 async function fetchSharesPage() {
   if (sharesIsLoading.value || !sharesHasNext.value) return
   sharesIsLoading.value = true
@@ -191,16 +196,49 @@ async function fetchSharesPage() {
     const res = await getUserShares(userId.value, sharesPage.value, PAGE_SIZE)
     await delay(2000)
 
-    // ✅ 배열/페이지네이션 응답 모두 대응
-    const root = res?.data
+    // { status: 'success', data: [...] } 형태 대응
+    const data = res?.data?.data ?? res?.data
+    console.log('[shares raw]', data)
+
     let content = []
-    if (Array.isArray(root?.data?.content)) {
-      content = root.data.content
-      sharesHasNext.value = !!root.data.hasNext || root.data.last === false
-    } else if (Array.isArray(root?.data)) {
-      content = root.data
-      sharesHasNext.value = false // 배열 응답이면 한 번에 끝
-    } else {
+
+    // 1) 페이징 객체(content) 형태
+    if (Array.isArray(data?.content)) {
+      content = data.content
+      const hasNextFromFlag =
+        typeof data.hasNext === 'boolean'
+          ? data.hasNext
+          : typeof data.last === 'boolean'
+            ? data.last === false
+            : typeof data.totalPages === 'number' && typeof data.number === 'number'
+              ? data.number + 1 < data.totalPages
+              : null
+
+      sharesHasNext.value =
+        hasNextFromFlag !== null ? hasNextFromFlag : content.length === PAGE_SIZE
+
+      if (sharesHasNext.value) sharesPage.value += 1
+    }
+    // 2) items 키
+    else if (Array.isArray(data?.items)) {
+      content = data.items
+      sharesHasNext.value =
+        typeof data.hasNext === 'boolean'
+          ? data.hasNext
+          : typeof data.totalPages === 'number' && typeof data.page === 'number'
+            ? data.page + 1 < data.totalPages
+            : content.length === PAGE_SIZE
+      if (sharesHasNext.value) sharesPage.value += 1
+    }
+    // 3) 배열 통째로 내려오는 형태 (지금 케이스)
+    else if (Array.isArray(data)) {
+      content = data
+      // ✅ 한 페이지 분량만큼 왔으면 다음 페이지 더 있음으로 간주
+      sharesHasNext.value = content.length === PAGE_SIZE
+      if (sharesHasNext.value) sharesPage.value += 1
+    }
+    // 4) 안전장치
+    else {
       content = []
       sharesHasNext.value = false
     }
@@ -214,26 +252,49 @@ async function fetchSharesPage() {
       img: toImg(item.thumbnailUrl ?? item.thumbnail?.photoUrl),
       status: '보유 중',
     }))
-    ownedItems.value.push(...mapped)
 
-    if (sharesHasNext.value) sharesPage.value += 1
+    ownedItems.value.push(...mapped)
+    console.log('[ownedItems length]', ownedItems.value.length)
+
+    // 새 DOM 반영 후 sentinel 다시 옵저브
+    await nextTick()
+    ensureObserveShares()
+
+    // 화면이 길어서 sentinel이 이미 보이는 경우 프리패치
+    if (!sharesIsLoading.value && sharesHasNext.value) {
+      const rect = sharesBottomRef.value?.getBoundingClientRect?.()
+      if (rect && rect.top < window.innerHeight) {
+        fetchSharesPage()
+      }
+    }
   } catch (e) {
     console.error('❌ 보유 지분 불러오기 실패:', e)
   } finally {
     sharesIsLoading.value = false
   }
 }
+
 function setupSharesObserver() {
   if (sharesObserver) sharesObserver.disconnect()
   sharesObserver = new IntersectionObserver(
     ([entry]) => {
       if (entry.isIntersecting) fetchSharesPage()
     },
-    { threshold: 1 },
+    {
+      threshold: 0,
+      rootMargin: '0px 0px 200px 0px',
+    },
   )
   if (sharesBottomRef.value) sharesObserver.observe(sharesBottomRef.value)
 }
 
+watch(
+  () => ownedItems.value.length,
+  async () => {
+    await nextTick()
+    ensureObserveShares()
+  },
+)
 /** ---------------- 초기 로딩 & 옵저버 연결 ---------------- **/
 onMounted(async () => {
   await Promise.all([fetchFundingPage(), fetchSharesPage()])
@@ -344,12 +405,12 @@ onBeforeUnmount(() => {
             <BaseTypography class="font-semibold text-sm !font-bold">{{
               item.name
             }}</BaseTypography>
-            <BaseTypography class="text-xs !text-gray-500 mt-1"
-              >보유 주 수량: {{ item.ownedAmount }}주</BaseTypography
-            >
-            <BaseTypography class="text-xs !text-gray-400 mt-0.5"
-              >평단가: {{ formatAmount(item.avgPrice) }}</BaseTypography
-            >
+            <BaseTypography class="text-xs !text-gray-500 mt-1">
+              보유 주 수량: {{ item.ownedAmount }}주
+            </BaseTypography>
+            <BaseTypography class="text-xs !text-gray-400 mt-0.5">
+              평단가: {{ formatAmount(item.avgPrice) }}
+            </BaseTypography>
           </div>
         </div>
 
@@ -359,9 +420,9 @@ onBeforeUnmount(() => {
             @click="openDividendModal(item)"
             class="text-xs px-0.5 mb-1 !py-0.5"
           >
-            <BaseTypography class="text-[10px] font-medium !text-white px-1"
-              >내 배당금</BaseTypography
-            >
+            <BaseTypography class="text-[10px] font-medium !text-white px-1">
+              내 배당금
+            </BaseTypography>
           </BaseButton>
 
           <BaseTypography class="text-xs text-gray-500 mb-0.5">현재 시세</BaseTypography>
