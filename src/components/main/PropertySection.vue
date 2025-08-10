@@ -68,7 +68,7 @@ const authStore = useAuthStore()
 
 const handleButtonClick = () => {
   if (authStore.getIsLoggedIn) {
-    router.push('/trade/list')
+    router.push('/property/register')
   } else {
     router.push('/auth/login')
   }

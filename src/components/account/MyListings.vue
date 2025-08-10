@@ -30,7 +30,7 @@
         <RouterLink
           v-for="item in listings[group.key]"
           :key="getItemId(item)"
-          class="block"
+          class="block py-1"
           :to="`/admin/property-review/${getItemId(item)}`"
         >
           <div

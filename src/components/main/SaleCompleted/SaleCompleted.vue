@@ -13,7 +13,7 @@
           <BaseTypography class="text-xs mr-1" weight="medium" color="gray-2">
             누적 수익률
           </BaseTypography>
-          <span class="material-symbols-outlined text-base mt-0.5">info</span>
+          <span class="material-symbols-outlined mt-0.5" style="font-size: 16px">info</span>
         </button>
 
         <SaleCompletedInfoAccodian :is-open="showInfoPopover" @close="showInfoPopover = false" />

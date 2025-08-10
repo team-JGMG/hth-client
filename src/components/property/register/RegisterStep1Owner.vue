@@ -102,6 +102,7 @@
           <span
             class="material-symbols-outlined text-xs cursor-pointer"
             @click="openModal('terms')"
+            style="font-size: 14px"
           >
             arrow_forward_ios
           </span>
@@ -119,6 +120,7 @@
           <span
             class="material-symbols-outlined text-xs cursor-pointer"
             @click="openModal('terms')"
+            style="font-size: 14px"
           >
             arrow_forward_ios
           </span>
