@@ -126,6 +126,7 @@
           <span
             class="material-symbols-outlined text-xs cursor-pointer"
             @click="openModal('terms')"
+            style="font-size: 14px"
           >
             arrow_forward_ios
           </span>
@@ -144,6 +145,7 @@
           <span
             class="material-symbols-outlined text-xs cursor-pointer"
             @click="openModal('privacy')"
+            style="font-size: 14px"
           >
             arrow_forward_ios
           </span>
@@ -189,9 +191,9 @@
             }}
           </h3>
         </div>
-        <p class="text-sm text-gray-700 whitespace-pre-wrap">
+        <BaseTypography size="sm" color="gray-1" class="whitespace-pre-wrap">
           {{ modalText[activeModal] }}
-        </p>
+        </BaseTypography>
 
         <div class="py-3"></div>
       </template>
