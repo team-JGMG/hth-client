@@ -32,8 +32,16 @@ export const getPointBalance = async (userId) => {
 }
 
 // 포인트 환급 요청
-export const requestPointRefund = async (refundData) => {
-  const res = await api.post('/api/point/refund-test', refundData)
+export const requestPointRefund = async ({ amount, userId }) => {
+  const res = await api.post(
+    '/api/point/refund-test',
+    { amount: Number(amount) },
+    {
+      params: { userId },
+      withCredentials: true,
+      headers: { 'Content-Type': 'application/json' },
+    },
+  )
   return res.data.data
 }
 // ✅ 포인트 입출금 내역 조회 (페이징/정렬 지원)
