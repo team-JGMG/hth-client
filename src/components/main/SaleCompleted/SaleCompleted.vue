@@ -24,19 +24,27 @@
         class="flex gap-4 overflow-x-auto no-scrollbar px-2"
       >
         <!-- 최대 5개까지 카드 표시 -->
-        <SoldPropertyCard
+        <div
           v-for="property in propertyStore.soldProperties.slice(0, 5)"
           :key="property.id"
-          :property="property"
-        />
+          class="min-w-[160px] flex-shrink-0 cursor-pointer"
+          role="button"
+          tabindex="0"
+          @click="goToDetail(property.id)"
+          @keydown.enter.space="goToDetail(property.id)"
+        >
+          <SoldPropertyCard :property="property" />
+        </div>
 
         <!-- 더보기 카드 -->
-        <div
-          class="min-w-[160px] h-[160px] flex-shrink-0 rounded-xl bg-gray-100 hover:bg-gray-200 transition cursor-pointer flex items-center justify-center text-sm font-medium text-gray-600"
+        <BaseTypography
+          color="gray-1"
+          size="sm"
+          class="min-w-[160px] h-[160px] flex-shrink-0 rounded-xl bg-gray-100 hover:bg-gray-200 transition cursor-pointer flex items-center justify-center"
           @click="goToSaleCompletedPage"
         >
           더보기
-        </div>
+        </BaseTypography>
       </div>
 
       <div v-else class="text-gray-500 text-center py-4">매각 완료된 매물이 없습니다.</div>
@@ -62,7 +70,9 @@ const infoButtonRef = ref(null)
 const toggleInfoPopover = () => {
   showInfoPopover.value = !showInfoPopover.value
 }
-
+const goToDetail = (id) => {
+  router.push({ name: 'funding-detail', params: { id } })
+}
 const handleClickOutside = (event) => {
   if (
     showInfoPopover.value &&
