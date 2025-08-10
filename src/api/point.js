@@ -6,14 +6,19 @@ import api from '@/libs/axios'
 // merchant_uid 발급
 export const requestChargeMerchantUid = async (amount) => {
   const res = await api.post('/api/point/charge', null, {
-    params: { amount },
+    params: { amount: Number(amount) },
+    withCredentials: true,
   })
   return res.data.data
 }
 
 // 결제 검증
-export const verifyPayment = async ({ impUid, amount }) => {
-  const res = await api.post('/api/point/verify', { impUid, amount })
+export const verifyPayment = async ({ impUid, amount, merchantUid }) => {
+  const res = await api.post(
+    '/api/point/verify',
+    { impUid, amount, merchantUid },
+    { withCredentials: true },
+  )
   return res.data
 }
 
@@ -28,7 +33,7 @@ export const getPointBalance = async (userId) => {
 
 // 포인트 환급 요청
 export const requestPointRefund = async (refundData) => {
-  const res = await api.post('/api/point/refund', refundData)
+  const res = await api.post('/api/point/refund-test', refundData)
   return res.data.data
 }
 // ✅ 포인트 입출금 내역 조회 (페이징/정렬 지원)
