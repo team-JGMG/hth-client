@@ -1,6 +1,5 @@
 import { getMessaging, getToken, isSupported, onMessage } from 'firebase/messaging'
 
-import { createNotification } from '@/api/notification'
 import { defineStore } from 'pinia'
 import { initializeApp } from 'firebase/app'
 import { useNotificationStore } from '@/stores/notification'
@@ -62,7 +61,26 @@ export const useFcmStore = defineStore('fcm', {
 
         // 2) 서버 저장 + 동기화
         try {
-          await createNotification({ title, body, createdAt })
+          nStore.refreshSoon()
+        } catch (e) {
+          console.warn('[FCM] 서버 저장 실패:', e)
+        }
+      })
+
+      // ✅ 백그라운드 수신(페이지 열려있을 때): 토스트 + 목록 추가 + 서버 저장
+      navigator.serviceWorker.addEventListener('message', async (event) => {
+        if (event.data?.type !== 'FCM_MESSAGE') return
+
+        const toast = useToastStore()
+        const nStore = useNotificationStore()
+        const { title, body, createdAt } = event.data.payload
+
+        // 1) 즉시 UI 반영
+        nStore.add({ title, body, createdAt })
+        toast.show({ title, body, timeout: 4000 })
+
+        // 2) 서버 저장 + 동기화
+        try {
           nStore.refreshSoon()
         } catch (e) {
           console.warn('[FCM] 서버 저장 실패:', e)

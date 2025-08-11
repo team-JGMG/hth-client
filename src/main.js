@@ -26,6 +26,14 @@ Promise.all([
   app.use(VCalendar, {})
   app.use(pinia)
   app.use(router)
+
+  // ✅ 여기서 FCM 초기화 + 토큰 콘솔 출력
+  import('@/stores/fcm').then(async ({ useFcmStore }) => {
+    const fcmStore = useFcmStore()
+    await fcmStore.init()
+    console.log('✅ Device Token:', fcmStore.token)
+  })
+
   app.mount('#app')
 })
 
@@ -42,12 +50,10 @@ if ('serviceWorker' in navigator) {
 
       // 목록 + 서버 저장
       Promise.all([import('@/stores/notification'), import('@/api/notification')]).then(
-        ([{ useNotificationStore }, { createNotification }]) => {
+        ([{ useNotificationStore }]) => {
           const nStore = useNotificationStore()
           nStore.add({ title, body, createdAt })
-          createNotification({ title, body, createdAt })
-            .then(() => nStore.refreshSoon())
-            .catch((e) => console.warn('[SW→page] 서버 저장 실패:', e))
+          nStore.refreshSoon()
         },
       )
     }
