@@ -29,7 +29,7 @@ const handleLogout = async () => {
     authStore.logout()
 
     // ✅ 로그인 페이지로 이동
-    toast.show('로그인 후 이용 가능합니다.')
+    toast.show('로그아웃 되었습니다.')
     router.push('/auth/login')
   } catch (error) {
     console.error('로그아웃 실패:', error)

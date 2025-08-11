@@ -1,3 +1,17 @@
+<template>
+  <DetailLayout>
+    <DetailHeader>알림</DetailHeader>
+
+    <NotificationControls />
+
+    <NotificationLoading v-if="nStore.loading" />
+    <NotificationError v-else-if="nStore.error" :error="nStore.error" />
+    <template v-else>
+      <NotificationList v-if="nStore.items.length" :grouped="grouped" />
+      <NotificationEmpty v-else />
+    </template>
+  </DetailLayout>
+</template>
 <script setup>
 import { computed, onMounted } from 'vue'
 import DetailLayout from '@/layouts/DetailLayout.vue'
@@ -30,18 +44,3 @@ const grouped = computed(() =>
     }, {}),
 )
 </script>
-
-<template>
-  <DetailLayout>
-    <DetailHeader>알림</DetailHeader>
-
-    <NotificationControls />
-
-    <NotificationLoading v-if="nStore.loading" />
-    <NotificationError v-else-if="nStore.error" :error="nStore.error" />
-    <template v-else>
-      <NotificationList v-if="nStore.items.length" :grouped="grouped" />
-      <NotificationEmpty v-else />
-    </template>
-  </DetailLayout>
-</template>
