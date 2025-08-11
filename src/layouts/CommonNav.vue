@@ -69,10 +69,12 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import { useToastStore } from '@/stores/toast'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const toast = useToastStore()
 
 const activeItem = ref('home')
 
@@ -95,6 +97,7 @@ const handleMyPageClick = () => {
   if (authStore.getIsLoggedIn) {
     router.push('/account/my-page')
   } else {
+    toast.show('로그인 후 이용 가능합니다.')
     router.push('/auth/login')
   }
 }

@@ -75,13 +75,24 @@ export const getFundingById = async (id) => {
 
 // 거래 체결 내역
 export const getFundingTradeHistory = async (fundingId) => {
+  // 어제 날짜
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+  const endDate = yesterday.toISOString().split('T')[0] // YYYY-MM-DD
+
+  // 1년 전 날짜
+  const lastYear = new Date(yesterday)
+  lastYear.setFullYear(lastYear.getFullYear() - 1)
+  const startDate = lastYear.toISOString().split('T')[0]
+
   const res = await api.get(`/api/fundings/${fundingId}/trades`, {
     params: {
-      startDate: '2025-06-01',
-      endDate: '2025-06-20',
+      startDate, // endDate 기준 1년 전
+      endDate, // 어제
       limit: 100,
       offset: 0,
     },
   })
+
   return res.data.data?.history || []
 }

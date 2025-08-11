@@ -41,11 +41,16 @@ const props = defineProps({
 
 const option = ref({})
 
+const formatDate = (dateStr) => {
+  // 년도 포함해서 표시 (예: "2024-01-15" -> "2024-01-15")
+  return dateStr
+}
+
 const fetchChartData = async () => {
   try {
     const history = await getFundingTradeHistory(props.fundingId)
 
-    const times = history.map((d) => d.date)
+    const times = history.map((d) => formatDate(d.date))
     const prices = history.map((d) => d.closingPrice)
     const volumes = history.map((d) => d.volume)
     const changeRates = history.map((d) => d.priceChangeRate)
@@ -65,7 +70,7 @@ const fetchChartData = async () => {
         {
           left: 50,
           right: 40,
-          bottom: 10, // ← 아래 여백 증가 (최저 레이블 보호)
+          bottom: 10,
           height: '15%',
         },
       ],
@@ -101,7 +106,7 @@ const fetchChartData = async () => {
           return `
             <div style="font-weight:bold">${params[0].axisValue}</div>
             <div style="color:${color}">${p.toLocaleString()}원 (${sign}${r}%)</div>
-            <div>거래량 ${v}</div>
+            <div>거래량 ${v.toLocaleString()}</div>
           `
         },
       },
@@ -134,6 +139,7 @@ const fetchChartData = async () => {
         {
           type: 'value',
           gridIndex: 1,
+          min: 0, // ← 바 차트 최솟값 설정
           axisLine: { show: false },
           axisTick: { show: false },
           splitLine: { show: false },
@@ -144,7 +150,6 @@ const fetchChartData = async () => {
         {
           type: 'line',
           data: prices,
-          // smooth:true,
           smooth: false,
           showSymbol: true,
           symbolSize: 0,
@@ -153,19 +158,6 @@ const fetchChartData = async () => {
             color: '#0057FF',
             width: 2,
           },
-          // areaStyle: {
-          //   color: {
-          //     type: 'linear',
-          //     x: 0,
-          //     y: 0,
-          //     x2: 0,
-          //     y2: 1,
-          //     colorStops: [
-          //       { offset: 0, color: 'rgba(0, 87, 255, 0.25)' },
-          //       { offset: 1, color: 'rgba(0, 87, 255, 0)' },
-          //     ],
-          //   },
-          // },
           markPoint: {
             symbol: 'circle',
             symbolSize: 6,
