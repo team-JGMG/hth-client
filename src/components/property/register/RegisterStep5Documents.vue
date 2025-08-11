@@ -92,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
@@ -108,13 +108,13 @@ const router = useRouter()
 
 //문서 첨부 항목 정의
 const documentFields = [
-  { label: '등기권리증' },
-  { label: '매도용 인감증명서' },
-  { label: '위임장' },
-  { label: '주민등록등본' },
-  { label: '신분증 사본' },
-  { label: '표준부동산매매계약서' },
-  { label: '임대차계약서' },
+  { label: '등기권리증', value: 'OWNERSHIP_CERTIFICATE' },
+  { label: '매도용 인감증명서', value: 'SEAL_CERTIFICATE' },
+  { label: '위임장', value: 'POWER_OF_ATTORNEY' },
+  { label: '주민등록등본', value: 'RESIDENT_REGISTRATION' },
+  { label: '신분증 사본', value: 'ID_COPY' },
+  { label: '표준부동산매매계약서', value: 'STANDARD_CONTRACT' },
+  { label: '임대차계약서', value: 'LEASE_CONTRACT' },
 ]
 
 //각 첨부된 파일 저장
@@ -145,7 +145,7 @@ const handleSubmit = () => {
 const handleFinalSubmit = async () => {
   try {
     store.documentFiles = documents.value.map((doc) => doc)
-    store.documentTypes = documentFields.map((field) => field.label)
+    store.documentTypes = documentFields.map((field) => field.value)
 
     const requestBody = {
       userId: parseInt(store.ownerInfo.userId),
@@ -163,7 +163,15 @@ const handleFinalSubmit = async () => {
       totalFloorAreaBuilding: parseFloat(store.propertyBuilding.buildingTotalArea),
       basementFloors: parseInt(store.propertyBuilding.floorUnder),
       groundFloors: parseInt(store.propertyBuilding.floorAbove),
-      approvalDate: store.propertyBuilding.builtDate,
+      approvalDate: store.propertyBuilding.builtDate
+        ? (() => {
+            const d = new Date(store.propertyBuilding.builtDate)
+            const year = d.getFullYear()
+            const month = String(d.getMonth() + 1).padStart(2, '0')
+            const day = String(d.getDate()).padStart(2, '0')
+            return `${year}-${month}-${day}`
+          })()
+        : null,
       officialLandPrice: parseFloat(store.propertyBuilding.officialPrice),
       unitPricePerPyeong: parseFloat(store.propertyBuilding.marketPrice),
 
@@ -172,7 +180,7 @@ const handleFinalSubmit = async () => {
       bathroomCount: parseInt(store.propertyDetail.bathroomCount),
       floor: parseInt(store.propertyDetail.floor),
       description: store.propertyDetail.memo,
-      rentalIncome: 0,
+      hashTagIds: store.propertyDetail.options,
     }
 
     await registerPropertyWithFormData({
@@ -195,4 +203,8 @@ const goToMyPage = () => {
   router.push('/account/my-page/listings')
   showCompleteModal.value = false
 }
+
+onMounted(() => {
+  window.scrollTo(0, 0)
+})
 </script>

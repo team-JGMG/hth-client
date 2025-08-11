@@ -271,7 +271,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { format } from 'date-fns'
 import { usePropertyRegisterStore } from '@/stores/propertyRegister'
 import InputField from '@/components/auth/InputField.vue'
@@ -347,6 +347,10 @@ const handleNext = () => {
     store.goToNextStep()
   }
 }
+
+onMounted(() => {
+  window.scrollTo(0, 0)
+})
 </script>
 
 <style>

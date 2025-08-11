@@ -102,12 +102,13 @@
           :key="tag"
           @click="toggleTag(tag)"
           :disabled="
-            store.propertyDetail.options.length >= 3 && !store.propertyDetail.options.includes(tag)
+            store.propertyDetail.options.length >= 3 &&
+            !store.propertyDetail.options.includes(hashtagOptions.indexOf(tag) + 1)
           "
           :class="[
             // 선택된 상태면 활성화
             'px-3 py-1 rounded-full text-sm border',
-            store.propertyDetail.options.includes(tag)
+            store.propertyDetail.options.includes(hashtagOptions.indexOf(tag) + 1)
               ? 'bg-black text-white border-black'
               : 'bg-white text-gray-500 border-gray-300 disabled:opacity-40 ',
           ]"
@@ -141,7 +142,7 @@
     <div class="mb-12 relative">
       <label class="text-base font-medium block mb-2">매물 사진 첨부</label>
 
-      <input type="file" class="hidden" id="fileInput" @change="handleFile" />
+      <input type="file" class="hidden" id="fileInput" multiple @change="handleFiles" />
 
       <label
         for="fileInput"
@@ -150,7 +151,7 @@
       >
         <!-- 파일명 또는 기본 텍스트 -->
         <span class="truncate">
-          {{ store.documents[0]?.name || '파일 선택' }}
+          {{ store.documents.length > 0 ? `${store.documents.length}개 파일 선택됨` : '파일 선택' }}
         </span>
 
         <!-- 클립 아이콘 -->
@@ -184,7 +185,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { usePropertyRegisterStore } from '@/stores/propertyRegister'
 import InputField from '@/components/auth/InputField.vue'
 import InputSelect from '@/components/common/Select/InputSelect.vue'
@@ -204,25 +205,26 @@ const touched = ref({
 
 const propertyTypes = ['아파트']
 const hashtagOptions = [
-  '#신축',
-  '#냠향',
-  '#편세권',
-  '#역세권',
-  '#학세권',
-  '#숲세권',
-  '#대형 마트',
-  '#개발 지역',
-  '#한강뷰',
-  '#투자가치',
+  '#교통호재',
+  '#상권친화형',
+  '#핫플레이스',
+  '#하이테크',
+  '#규제해제',
+  '#산업허브',
+  '#신축매물',
+  '#공원인접',
+  '#문화역사권',
+  '#투자수익형',
 ]
 
 const toggleTag = (tag) => {
+  const id = hashtagOptions.indexOf(tag) + 1
   const options = store.propertyDetail.options
-  const idx = options.indexOf(tag)
+  const idx = options.indexOf(id)
 
   if (idx === -1) {
     if (options.length < 3) {
-      options.push(tag)
+      options.push(id)
     }
   } else {
     options.splice(idx, 1)
@@ -231,9 +233,12 @@ const toggleTag = (tag) => {
   touched.value.options = true
 }
 
-const handleFile = (e) => {
-  const file = e.target.files[0]
-  if (file) store.documents[0] = file
+const handleFiles = (e) => {
+  const files = e.target.files
+  if (files.length > 0) {
+    // 배열로 변환해서 store.documents에 할당
+    store.documents = Array.from(files)
+  }
 }
 
 const isNumber = (value) => /^[0-9]+$/.test(value)
@@ -265,4 +270,8 @@ const handleNext = () => {
     store.goToNextStep()
   }
 }
+
+onMounted(() => {
+  window.scrollTo(0, 0)
+})
 </script>
