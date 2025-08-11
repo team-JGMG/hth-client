@@ -15,36 +15,37 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging()
 
-messaging.onBackgroundMessage(async (payload) => {
-  const title = payload?.data?.title || payload?.notification?.title || '알림'
-  const body = payload?.data?.body || payload?.notification?.body || ''
-  const createdAt = payload?.data?.createdAt || new Date().toISOString()
+messaging.onBackgroundMessage((payload) => {
+  const title = payload?.notification?.title || payload?.data?.title || '알림'
 
-  const clientList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
-  const visibleClient = clientList.find((c) => c.visibilityState === 'visible')
+  const body = payload?.notification?.body || payload?.data?.body || ''
 
-  if (visibleClient) {
-    // 페이지가 보이는 중이면 페이지로 전달 → 페이지가 토스트+목록/서버 저장 처리
-    visibleClient.postMessage({ type: 'FCM_MESSAGE', payload: { title, body, createdAt } })
-    return
-  }
+  const icon =
+    payload?.notification?.icon ||
+    'https://firebase.google.com/images/brand-guidelines/logo-logomark.png'
 
-  // 보이지 않으면 OS 알림
+  const url = payload?.data?.url || '/'
+
   self.registration.showNotification(title, {
     body,
-    icon: '/favicon.ico',
-    data: { url: payload?.data?.url || '/', createdAt },
+    icon,
+    data: { url },
   })
 })
 
 self.addEventListener('notificationclick', (event) => {
-  const url = event.notification?.data?.url || '/'
   event.notification.close()
+  const url = event.notification?.data?.url || '/'
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
-      const page = list.find((c) => c.url.includes(self.location.origin))
-      if (page) return page.focus().then(() => page.navigate(url))
-      return clients.openWindow(url)
-    }),
+    (async () => {
+      const allClients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+      const client = allClients.find((c) => c.url.includes(self.location.origin))
+      if (client) {
+        client.focus()
+        client.postMessage({ type: 'FCM_MESSAGE_CLICKED', url })
+      } else {
+        await self.clients.openWindow(url)
+      }
+    })(),
   )
 })

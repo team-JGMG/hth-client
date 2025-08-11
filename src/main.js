@@ -16,7 +16,7 @@ Promise.all([
   document.fonts.load('24px "Material Symbols Outlined"'),
   document.fonts.load('24px "Material Symbols Rounded"'),
   document.fonts.load('24px "Material Symbols Sharp"'),
-]).then(() => {
+]).then(async () => {
   document.documentElement.classList.add('icons-loaded')
 
   const app = createApp(App)
@@ -27,35 +27,63 @@ Promise.all([
   app.use(pinia)
   app.use(router)
 
-  // ✅ 여기서 FCM 초기화 + 토큰 콘솔 출력
-  import('@/stores/fcm').then(async ({ useFcmStore }) => {
+  // ✅ FCM 초기화 (권한/토큰/업서트)
+  try {
+    const { useFcmStore } = await import('@/stores/fcm')
     const fcmStore = useFcmStore()
     await fcmStore.init()
     console.log('✅ Device Token:', fcmStore.token)
-  })
+  } catch (e) {
+    console.warn('[FCM] init 실패:', e)
+  }
 
   app.mount('#app')
 })
 
-// SW → 페이지 메시지: 토스트 + 목록 추가 + 서버 저장
+// ✅ SW → 페이지 메시지 통합 처리 (포그라운드/백그라운드 공통)
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.addEventListener('message', (event) => {
-    if (event.data?.type === 'FCM_MESSAGE') {
-      const { title, body, createdAt } = event.data.payload || {}
+  navigator.serviceWorker.addEventListener('message', async (event) => {
+    const type = event?.data?.type
+    const payload = event?.data?.payload || {}
+    const title = payload?.title || '알림'
+    const body = payload?.body || ''
+    const url = payload?.url || event?.data?.url || '/'
 
-      // 토스트
-      import('@/stores/toast').then(({ useToastStore }) => {
-        useToastStore().show({ title: title || '알림', body: body || '', timeout: 4000 })
-      })
+    try {
+      const [{ useNotificationStore }, { useToastStore }] = await Promise.all([
+        import('@/stores/notification'),
+        import('@/stores/toast'),
+      ])
+      const nStore = useNotificationStore()
+      const toast = useToastStore()
 
-      // 목록 + 서버 저장
-      Promise.all([import('@/stores/notification'), import('@/api/notification')]).then(
-        ([{ useNotificationStore }]) => {
-          const nStore = useNotificationStore()
-          nStore.add({ title, body, createdAt })
+      switch (type) {
+        // SW에서 브로드캐스트한 일반 수신
+        case 'FCM_MESSAGE': {
+          // 토스트만 띄우고 서버 목록은 디바운스 fetch
+          toast.show({ title, body, timeout: 4000 })
           nStore.refreshSoon()
-        },
-      )
+          break
+        }
+        // 사용자가 시스템 알림을 클릭했을 때
+        case 'FCM_MESSAGE_CLICKED': {
+          // 라우터 이동(없으면 location.href)
+          try {
+            // 전역 router 인스턴스 사용
+            await router.push(url)
+          } catch {
+            window.location.href = url
+          }
+          // 이동 후 목록 동기화
+          nStore.refreshSoon()
+          break
+        }
+        default:
+          // 기타 메시지는 무시
+          break
+      }
+    } catch (e) {
+      console.warn('[SW message handler] 처리 실패:', e)
     }
   })
 }

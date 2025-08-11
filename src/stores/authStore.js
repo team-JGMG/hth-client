@@ -3,6 +3,8 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { fetchUserInfo } from '@/api/auth'
 
+const LAST_REG_KEY = 'fcm:lastReg' // { uid, token } 저장
+
 export const useAuthStore = defineStore(
   'auth',
   () => {
@@ -15,6 +17,34 @@ export const useAuthStore = defineStore(
 
     // ✅ 로그인 여부 (userInfo 값 존재 여부로 판단)
     const getIsLoggedIn = computed(() => !!userInfo.value)
+
+    // ✅ 로그인 상태에서만 FCM 토큰 등록/갱신
+    async function registerFcmTokenIfLoggedIn() {
+      try {
+        const uid = userInfo.value?.userId
+        if (!uid) return
+
+        const [{ useFcmStore }, { registerDeviceToken }] = await Promise.all([
+          import('@/stores/fcm'),
+          import('@/api/auth'),
+        ])
+
+        const fcm = useFcmStore()
+        await fcm.init() // 권한/서비스워커/토큰 확보
+        if (!fcm.token) return
+
+        // 마지막 등록 정보 확인
+        const last = JSON.parse(localStorage.getItem(LAST_REG_KEY) || 'null')
+
+        // uid 또는 token이 달라지면 서버에 업서트
+        if (!last || last.uid !== uid || last.token !== fcm.token) {
+          await registerDeviceToken(uid, fcm.token) // POST /api/users/{userId}/device-token
+          localStorage.setItem(LAST_REG_KEY, JSON.stringify({ uid, token: fcm.token }))
+        }
+      } catch (e) {
+        console.warn('[FCM] 토큰 등록 실패:', e)
+      }
+    }
 
     // ✅ 유저 정보 불러오기 (API 요청)
     async function loadUserInfo() {
@@ -31,6 +61,7 @@ export const useAuthStore = defineStore(
     // ✅ 유저 정보 수동 설정
     function setUserInfo(user) {
       userInfo.value = user
+      registerFcmTokenIfLoggedIn()
     }
 
     // ✅ 포인트 정보만 업데이트
@@ -61,6 +92,7 @@ export const useAuthStore = defineStore(
       setUserInfo,
       setUserPoint,
       logout,
+      registerFcmTokenIfLoggedIn,
     }
   },
   {
