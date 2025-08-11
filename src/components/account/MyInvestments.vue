@@ -12,23 +12,24 @@ import DividendModal from './DividendModal.vue'
 import NoInvestmentItems from './NoInvestmentItems.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
+
 const router = useRouter()
 function goFundingDetail(fundingId) {
-  if (!fundingId) return
-  router.push({ name: 'funding-detail', params: { id: fundingId } })
+  if (fundingId) router.push({ name: 'funding-detail', params: { id: fundingId } })
 }
 
-/** ---------------- 상태 ---------------- **/
+/** ---------- 상태 ---------- **/
 const auth = useAuthStore()
 const { userId: storeUserId } = storeToRefs(auth)
-// 스토어 userId가 있으면 사용, 없으면 개발용 3으로 폴백
 const userId = computed(() => storeUserId.value ?? 3)
-// 배포시에는 ?? 3 삭제
+
+const initialLoading = ref(true) // ✅ 초기 스피너 전용
 const fundingItems = ref([]) // 펀딩중/환불된 주문
 const ownedItems = ref([]) // 보유 지분
-watch(userId, (id, prev) => {
+
+watch(userId, async (id, prev) => {
   if (id && id !== prev) {
-    // 목록/페이징 초기화
+    // 초기화
     fundingItems.value = []
     ownedItems.value = []
     fundingCursor.value = 0
@@ -36,10 +37,16 @@ watch(userId, (id, prev) => {
     fundingHasNext.value = true
     sharesPage.value = 0
     sharesHasNext.value = true
-    // 다시 로딩
-    Promise.all([fetchFundingPage(), fetchSharesPage()])
+
+    initialLoading.value = true
+    await Promise.all([fetchFundingPage(), fetchSharesPage()])
+    initialLoading.value = false
+    await nextTick()
+    setupFundingObserver()
+    setupSharesObserver()
   }
 })
+
 // 환불 모달
 const isModalOpen = ref(false)
 const isCancelLoading = ref(false)
@@ -51,13 +58,13 @@ const isDividendLoading = ref(false)
 const selectedBuildingName = ref('')
 const selectedDividends = ref([])
 
-/** ---------------- 유틸 ---------------- **/
+/** ---------- 유틸 ---------- **/
 const PAGE_SIZE = 4
 const delay = (ms) => new Promise((res) => setTimeout(res, ms))
 const toImg = (src) =>
   !src ? '/default-img.png' : /^https?:\/\//i.test(src) ? src : `https://half-to-half.site${src}`
 
-/** ---------------- 배당 모달 ---------------- **/
+/** ---------- 배당 모달 ---------- **/
 const openDividendModal = async (item) => {
   try {
     isDividendLoading.value = true
@@ -66,14 +73,12 @@ const openDividendModal = async (item) => {
 
     const res = await getAllocations(item.fundingId)
     const list = unwrapAllocations(res)
-
     selectedDividends.value = list.map((a) => ({
       date: a.paymentDate,
       perShare: a.dividendPerShare,
       total: a.totalDividendAmount,
       status: a.paymentStatusKorean || a.paymentStatus,
     }))
-
     isDividendModalOpen.value = true
   } catch (e) {
     console.error('배당금 조회 실패', e)
@@ -83,7 +88,7 @@ const openDividendModal = async (item) => {
   }
 }
 
-/** ---------------- 환불(취소) ---------------- **/
+/** ---------- 환불(취소) ---------- **/
 const openCancelModal = (item) => {
   const payload = {
     fundingId: item.fundingId,
@@ -105,7 +110,6 @@ const confirmCancel = async () => {
   try {
     if (!selectedOrder.value) return
     isCancelLoading.value = true
-
     const { fundingId, orderId, orderPrice } = selectedOrder.value
     const res = await refundFundingOrder(fundingId, orderId, orderPrice)
 
@@ -125,7 +129,7 @@ const confirmCancel = async () => {
   }
 }
 
-/** ---------------- 무한스크롤: 펀딩(주문) ---------------- **/
+/** ---------- 무한스크롤: 펀딩(주문) ---------- **/
 const fundingStatusOrder = ['pending', 'refunded']
 const fundingCursor = ref(0)
 const fundingPage = ref(0)
@@ -170,6 +174,7 @@ async function fetchFundingPage() {
     fundingHasNext.value = hasNext
 
     if (!hasNext) {
+      // 다음 상태로 넘어가기
       if (fundingCursor.value + 1 < fundingStatusOrder.length) {
         fundingCursor.value += 1
         fundingPage.value = 0
@@ -188,19 +193,18 @@ function setupFundingObserver() {
   if (fundingObserver) fundingObserver.disconnect()
   fundingObserver = new IntersectionObserver(
     ([entry]) => entry.isIntersecting && fetchFundingPage(),
-    { threshold: 1 },
+    { threshold: 0, rootMargin: '0px 0px 200px 0px' },
   )
   if (fundingBottomRef.value) fundingObserver.observe(fundingBottomRef.value)
 }
 
-/** ---------------- 무한스크롤: 보유 지분 ---------------- **/
+/** ---------- 무한스크롤: 보유 지분 ---------- **/
 const sharesPage = ref(0)
 const sharesHasNext = ref(true)
 const sharesIsLoading = ref(false)
 const sharesBottomRef = ref(null)
 let sharesObserver = null
 
-// sentinel 재-옵저브 함수
 const ensureObserveShares = () => {
   if (!sharesObserver || !sharesBottomRef.value) return
   sharesObserver.unobserve(sharesBottomRef.value)
@@ -212,15 +216,11 @@ async function fetchSharesPage() {
   sharesIsLoading.value = true
   try {
     const res = await getUserShares(userId.value, sharesPage.value, PAGE_SIZE)
-    await delay(2000)
+    await delay(600)
 
-    // { status: 'success', data: [...] } 형태 대응
     const data = res?.data?.data ?? res?.data
-    console.log('[shares raw]', data)
-
     let content = []
 
-    // 1) 페이징 객체(content) 형태
     if (Array.isArray(data?.content)) {
       content = data.content
       const hasNextFromFlag =
@@ -231,14 +231,10 @@ async function fetchSharesPage() {
             : typeof data.totalPages === 'number' && typeof data.number === 'number'
               ? data.number + 1 < data.totalPages
               : null
-
       sharesHasNext.value =
         hasNextFromFlag !== null ? hasNextFromFlag : content.length === PAGE_SIZE
-
       if (sharesHasNext.value) sharesPage.value += 1
-    }
-    // 2) items 키
-    else if (Array.isArray(data?.items)) {
+    } else if (Array.isArray(data?.items)) {
       content = data.items
       sharesHasNext.value =
         typeof data.hasNext === 'boolean'
@@ -247,16 +243,11 @@ async function fetchSharesPage() {
             ? data.page + 1 < data.totalPages
             : content.length === PAGE_SIZE
       if (sharesHasNext.value) sharesPage.value += 1
-    }
-    // 3) 배열 통째로 내려오는 형태 (지금 케이스)
-    else if (Array.isArray(data)) {
+    } else if (Array.isArray(data)) {
       content = data
-      // ✅ 한 페이지 분량만큼 왔으면 다음 페이지 더 있음으로 간주
       sharesHasNext.value = content.length === PAGE_SIZE
       if (sharesHasNext.value) sharesPage.value += 1
-    }
-    // 4) 안전장치
-    else {
+    } else {
       content = []
       sharesHasNext.value = false
     }
@@ -272,18 +263,14 @@ async function fetchSharesPage() {
     }))
 
     ownedItems.value.push(...mapped)
-    console.log('[ownedItems length]', ownedItems.value.length)
 
-    // 새 DOM 반영 후 sentinel 다시 옵저브
     await nextTick()
     ensureObserveShares()
 
-    // 화면이 길어서 sentinel이 이미 보이는 경우 프리패치
-    if (!sharesIsLoading.value && sharesHasNext.value) {
-      const rect = sharesBottomRef.value?.getBoundingClientRect?.()
-      if (rect && rect.top < window.innerHeight) {
-        fetchSharesPage()
-      }
+    // 화면이 길어서 센티넬이 이미 보이면 프리패치
+    const rect = sharesBottomRef.value?.getBoundingClientRect?.()
+    if (!sharesIsLoading.value && sharesHasNext.value && rect && rect.top < window.innerHeight) {
+      fetchSharesPage()
     }
   } catch (e) {
     console.error('❌ 보유 지분 불러오기 실패:', e)
@@ -295,13 +282,8 @@ async function fetchSharesPage() {
 function setupSharesObserver() {
   if (sharesObserver) sharesObserver.disconnect()
   sharesObserver = new IntersectionObserver(
-    ([entry]) => {
-      if (entry.isIntersecting) fetchSharesPage()
-    },
-    {
-      threshold: 0,
-      rootMargin: '0px 0px 200px 0px',
-    },
+    ([entry]) => entry.isIntersecting && fetchSharesPage(),
+    { threshold: 0, rootMargin: '0px 0px 200px 0px' },
   )
   if (sharesBottomRef.value) sharesObserver.observe(sharesBottomRef.value)
 }
@@ -313,9 +295,13 @@ watch(
     ensureObserveShares()
   },
 )
-/** ---------------- 초기 로딩 & 옵저버 연결 ---------------- **/
+
+/** ---------- 초기 로딩 & 옵저버 ---------- **/
 onMounted(async () => {
+  initialLoading.value = true
   await Promise.all([fetchFundingPage(), fetchSharesPage()])
+  initialLoading.value = false
+
   await nextTick()
   setupFundingObserver()
   setupSharesObserver()
@@ -328,10 +314,19 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="p-4 min-h-[600px]">
-    <NoInvestmentItems v-if="!fundingItems.length && !ownedItems.length" />
+    <!-- 초기 스피너 -->
+    <div v-if="initialLoading" class="flex justify-center items-center py-16">
+      <img
+        src="@/assets/images/character/loading.png"
+        alt="로딩"
+        class="w-12 h-12 animate-spin opacity-70"
+      />
+    </div>
 
-    <!-- 🏗 펀딩 중인 매물 -->
-    <div v-if="fundingItems.length" class="space-y-4 mb-6">
+    <NoInvestmentItems v-else-if="!fundingItems.length && !ownedItems.length" />
+
+    <!-- 펀딩 중인 매물 -->
+    <div v-else-if="fundingItems.length" class="space-y-4 mb-6">
       <BaseTypography class="text-lg !font-bold mb-2">펀딩 중인 매물</BaseTypography>
 
       <div
@@ -407,7 +402,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
-    <!-- 📦 보유중인 매물 -->
+    <!-- 보유중인 매물 -->
     <div v-if="ownedItems.length" class="space-y-4 mb-6">
       <BaseTypography class="text-lg !font-bold mb-2">보유중인 매물</BaseTypography>
 
@@ -423,12 +418,12 @@ onBeforeUnmount(() => {
             <BaseTypography class="font-semibold text-sm !font-bold">{{
               item.name
             }}</BaseTypography>
-            <BaseTypography class="text-xs !text-gray-500 mt-1">
-              보유 주 수량: {{ item.ownedAmount }}주
-            </BaseTypography>
-            <BaseTypography class="text-xs !text-gray-400 mt-0.5">
-              평단가: {{ formatAmount(item.avgPrice) }}
-            </BaseTypography>
+            <BaseTypography class="text-xs !text-gray-500 mt-1"
+              >보유 주 수량: {{ item.ownedAmount }}주</BaseTypography
+            >
+            <BaseTypography class="text-xs !text-gray-400 mt-0.5"
+              >평단가: {{ formatAmount(item.avgPrice) }}</BaseTypography
+            >
           </div>
         </div>
 
@@ -438,11 +433,10 @@ onBeforeUnmount(() => {
             @click="openDividendModal(item)"
             class="text-xs px-0.5 mb-1 !py-0.5"
           >
-            <BaseTypography class="text-[10px] font-medium !text-white px-1">
-              내 배당금
-            </BaseTypography>
+            <BaseTypography class="text-[10px] font-medium !text-white px-1"
+              >내 배당금</BaseTypography
+            >
           </BaseButton>
-
           <BaseTypography class="text-xs text-gray-500 mb-0.5">현재 시세</BaseTypography>
           <BaseTypography class="text-base font-semibold" style="color: #ff3b3b">
             {{ formatAmount(item.price) }}
