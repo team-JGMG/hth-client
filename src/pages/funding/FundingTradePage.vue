@@ -220,11 +220,7 @@ import { useRoute } from 'vue-router'
 import { mockItems } from '@/pages/funding/mockData'
 import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
-import {
-  requestChargeMerchantUid,
-  verifyPayment,
-  getPointBalance,
-} from '@/api/point'
+import { requestChargeMerchantUid, verifyPayment, getPointBalance } from '@/api/point'
 
 import DetailHeader from '@/layouts/DetailHeader.vue'
 import BaseModal from '@/components/common/Modal/BaseModal.vue'
@@ -233,12 +229,13 @@ import CompletedButton from '@/components/common/Button/CompletedButton.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import BaseButton from '@/components/common/Button/BaseButton.vue'
 import PointChargeModal from '@/components/main/PointSection/PointModal/PointChargeModal.vue'
-
+import { useToastStore } from '@/stores/toast'
 
 const showConfirmModal = ref(false)
 const showCompleteModal = ref(false)
 const isChargeModalOpen = ref(false)
 const chargeAmount = ref(0)
+const toast = useToastStore()
 
 const route = useRoute()
 const itemId = Number(route.params.id)
@@ -249,7 +246,6 @@ const item = mockItems.find((f) => f.propertyId === itemId) || {
 
 const authStore = useAuthStore()
 const { getIsLoggedIn, userPoints, userId } = storeToRefs(authStore)
-
 
 const quantity = ref('')
 const userShares = 2 // from mock
@@ -292,8 +288,10 @@ const refreshPointBalance = async () => {
 }
 
 const requestPay = async (amount) => {
-  if (!getIsLoggedIn.value) return alert('로그인이 필요합니다.')
-  if (!amount || amount <= 0) return alert('충전할 금액을 입력해주세요.')
+  if (!getIsLoggedIn.value)
+    return toast.warn({ title: '로그인이 필요합니다', body: '로그인 후 이용해주세요.' }) // ✅
+
+  if (!amount || amount <= 0) return toast.warn({ title: '', body: '충전할 금액을 입력해주세요.' }) // ✅
 
   try {
     const merchant_uid = await requestChargeMerchantUid(Number(amount))
