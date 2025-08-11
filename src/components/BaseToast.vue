@@ -58,13 +58,13 @@ const toast = useToastStore()
 
 /* 타입별 색감 라이트닝(원하면 조정) */
 .toast.success {
-  background: rgba(182, 255, 182, 0.92);
+  background: rgba(215, 255, 215, 0.92);
 }
 .toast.error {
-  background: rgba(255, 172, 172, 0.92);
+  background: rgba(250, 209, 209, 0.92);
 }
 .toast.warn {
-  background: rgba(252, 255, 189, 0.92);
+  background: rgba(249, 251, 216, 0.92);
 }
 .toast.info {
   background: rgba(255, 255, 255, 0.92);
