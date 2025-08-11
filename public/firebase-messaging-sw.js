@@ -18,26 +18,25 @@ const messaging = firebase.messaging()
 messaging.onBackgroundMessage(async (payload) => {
   const title = payload?.data?.title || payload?.notification?.title || '알림'
   const body = payload?.data?.body || payload?.notification?.body || ''
+  const createdAt = payload?.data?.createdAt || new Date().toISOString()
 
-  // 🔸 열려 있는 윈도우(탭) 목록
   const clientList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
   const visibleClient = clientList.find((c) => c.visibilityState === 'visible')
 
   if (visibleClient) {
-    // 🔸 앱이 보이는 중이면 페이지로 전달 → 페이지가 토스트로 표시
-    visibleClient.postMessage({ type: 'FCM_MESSAGE', payload: { title, body } })
+    // 페이지가 보이는 중이면 페이지로 전달 → 페이지가 토스트+목록/서버 저장 처리
+    visibleClient.postMessage({ type: 'FCM_MESSAGE', payload: { title, body, createdAt } })
     return
   }
 
-  // 🔸 앱이 백그라운드/닫힘이면 OS 알림
+  // 보이지 않으면 OS 알림
   self.registration.showNotification(title, {
     body,
     icon: '/favicon.ico',
-    data: { url: payload?.data?.url || '/' },
+    data: { url: payload?.data?.url || '/', createdAt },
   })
 })
 
-// 알림 클릭 → 앱으로 이동
 self.addEventListener('notificationclick', (event) => {
   const url = event.notification?.data?.url || '/'
   event.notification.close()

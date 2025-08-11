@@ -29,15 +29,27 @@ Promise.all([
   app.mount('#app')
 })
 
+// SW → 페이지 메시지: 토스트 + 목록 추가 + 서버 저장
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('message', (event) => {
     if (event.data?.type === 'FCM_MESSAGE') {
-      const { title, body } = event.data.payload || {}
-      // Pinia 토스트 사용
+      const { title, body, createdAt } = event.data.payload || {}
+
+      // 토스트
       import('@/stores/toast').then(({ useToastStore }) => {
-        const toast = useToastStore()
-        toast.show({ title: title || '알림', body: body || '', timeout: 4000 })
+        useToastStore().show({ title: title || '알림', body: body || '', timeout: 4000 })
       })
+
+      // 목록 + 서버 저장
+      Promise.all([import('@/stores/notification'), import('@/api/notification')]).then(
+        ([{ useNotificationStore }, { createNotification }]) => {
+          const nStore = useNotificationStore()
+          nStore.add({ title, body, createdAt })
+          createNotification({ title, body, createdAt })
+            .then(() => nStore.refreshSoon())
+            .catch((e) => console.warn('[SW→page] 서버 저장 실패:', e))
+        },
+      )
     }
   })
 }

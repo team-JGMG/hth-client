@@ -1,7 +1,9 @@
 import { getMessaging, getToken, isSupported, onMessage } from 'firebase/messaging'
 
+import { createNotification } from '@/api/notification'
 import { defineStore } from 'pinia'
 import { initializeApp } from 'firebase/app'
+import { useNotificationStore } from '@/stores/notification'
 import { useToastStore } from '@/stores/toast'
 
 const firebaseConfig = {
@@ -28,10 +30,12 @@ export const useFcmStore = defineStore('fcm', {
   actions: {
     async init() {
       if (typeof window === 'undefined') return
+
       this.supported = await isSupported().catch(() => false)
       if (!this.supported) return
 
       const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
+
       this.permission = await Notification.requestPermission()
       if (this.permission !== 'granted') return
 
@@ -41,19 +45,28 @@ export const useFcmStore = defineStore('fcm', {
         serviceWorkerRegistration: reg,
       })
 
-      // ✅ 포그라운드 수신 → 토스트로 표시 + 알림 목록 갱신
-      onMessage(messaging, (payload) => {
+      // ✅ 포그라운드 수신: 토스트 + 목록 추가 + 서버 저장
+      onMessage(messaging, async (payload) => {
         const toast = useToastStore()
+        const nStore = useNotificationStore()
+
         const title = payload?.data?.title || payload?.notification?.title || '알림'
         const body = payload?.data?.body || payload?.notification?.body || ''
+        const createdAt = payload?.data?.createdAt || new Date().toISOString()
+
         this.lastMessage = payload
+
+        // 1) 즉시 UI 반영
+        nStore.add({ title, body, createdAt })
         toast.show({ title, body, timeout: 4000 })
 
-        // 🔁 알림 목록 새로고침 (디바운스 적용)
-        import('@/stores/notification').then(({ useNotificationStore }) => {
-          const n = useNotificationStore()
-          n.refreshSoon()
-        })
+        // 2) 서버 저장 + 동기화
+        try {
+          await createNotification({ title, body, createdAt })
+          nStore.refreshSoon()
+        } catch (e) {
+          console.warn('[FCM] 서버 저장 실패:', e)
+        }
       })
     },
   },
