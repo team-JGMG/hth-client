@@ -1,3 +1,4 @@
+<!-- MyListings.vue -->
 <template>
   <div class="py-2"></div>
   <div class="py-3 min-h-[600px] flex flex-col items-center">
@@ -81,14 +82,15 @@
 </template>
 
 <script setup>
-import { reactive, onMounted, nextTick, computed, ref } from 'vue'
+import { reactive, onMounted, nextTick, computed } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import BaseButton from '../common/Button/BaseButton.vue'
 import NoTradeItems from './NoTradeItems.vue'
 import { format, formatAmount } from '@/utils/format'
 import api from '@/libs/axios'
-
+import { useAuthStore } from '@/stores/authStore'
+import { storeToRefs } from 'pinia'
 // ✅ 그룹 설정
 const groupConfig = [
   { key: 'APPROVED_ACTIVE', title: '거래 진행중인 매물', status: 'approved' },
@@ -125,9 +127,11 @@ const PAGE_SIZE = 5
 // ✅ 딜레이(요청 후 2초)
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-// ✅ 테스트용 userId
-const userId = ref(1)
-
+// ✅ 스토어 userId | 없으면 3
+const auth = useAuthStore()
+const { userId } = storeToRefs(auth)
+const effectiveUserId = computed(() => userId.value ?? 3)
+// ✅ 스토어 userId | 없으면 3
 // ✅ 라우터
 const router = useRouter()
 
@@ -147,11 +151,11 @@ const isEmpty = computed(() => {
 // ✅ API 호출
 const fetchProperties = async (groupKey, statusParam) => {
   const info = pageInfo[groupKey]
-  if (info.isLoading || !info.hasNextPage || !userId.value) return
+  if (info.isLoading || !info.hasNextPage || !effectiveUserId.value) return
 
   info.isLoading = true
   try {
-    const res = await api.get(`/api/property/user/${userId.value}`, {
+    const res = await api.get(`/api/property/user/${effectiveUserId.value}`, {
       params: { page: info.page, size: PAGE_SIZE, status: statusParam },
     })
 
@@ -200,7 +204,7 @@ const setupObserverForGroup = (groupKey, statusParam) => {
 
 // ✅ onMounted에서 초기 로딩 + 옵저버 등록
 onMounted(async () => {
-  if (!userId.value) return
+  if (!effectiveUserId.value) return
   for (const group of groupConfig) {
     await fetchProperties(group.key, group.status)
     nextTick(() => setupObserverForGroup(group.key, group.status))

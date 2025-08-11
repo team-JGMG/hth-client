@@ -1,6 +1,6 @@
 <!-- MyInvestments.vue -->
 <script setup>
-import { ref, onMounted, nextTick, onBeforeUnmount, watch } from 'vue'
+import { ref, onMounted, nextTick, onBeforeUnmount, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { getUserFundingOrders, getUserShares, refundFundingOrder } from '@/api/funding'
 import { getAllocations, unwrapAllocations } from '@/api/allocation'
@@ -10,7 +10,8 @@ import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import CancelConfirmModal from '@/components/account/CancelConfirmModal.vue'
 import DividendModal from './DividendModal.vue'
 import NoInvestmentItems from './NoInvestmentItems.vue'
-
+import { useAuthStore } from '@/stores/authStore'
+import { storeToRefs } from 'pinia'
 const router = useRouter()
 function goFundingDetail(fundingId) {
   if (!fundingId) return
@@ -18,10 +19,27 @@ function goFundingDetail(fundingId) {
 }
 
 /** ---------------- 상태 ---------------- **/
-const userId = ref(3) // 🔧 테스트: 보유 지분 응답이 있는 유저 ID로 고정
+const auth = useAuthStore()
+const { userId: storeUserId } = storeToRefs(auth)
+// 스토어 userId가 있으면 사용, 없으면 개발용 3으로 폴백
+const userId = computed(() => storeUserId.value ?? 3)
+// 배포시에는 ?? 3 삭제
 const fundingItems = ref([]) // 펀딩중/환불된 주문
 const ownedItems = ref([]) // 보유 지분
-
+watch(userId, (id, prev) => {
+  if (id && id !== prev) {
+    // 목록/페이징 초기화
+    fundingItems.value = []
+    ownedItems.value = []
+    fundingCursor.value = 0
+    fundingPage.value = 0
+    fundingHasNext.value = true
+    sharesPage.value = 0
+    sharesHasNext.value = true
+    // 다시 로딩
+    Promise.all([fetchFundingPage(), fetchSharesPage()])
+  }
+})
 // 환불 모달
 const isModalOpen = ref(false)
 const isCancelLoading = ref(false)

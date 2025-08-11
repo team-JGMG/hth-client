@@ -39,7 +39,6 @@ export const useAuthStore = defineStore(
         userInfo.value.point = point
       }
     }
-    
 
     // 🔒 로그아웃 처리
     function logout() {
@@ -75,3 +74,4 @@ export const useAuthStore = defineStore(
 
 // ✨ 기존 useUserStore 사용 코드 호환용 별칭
 export const useUserStore = useAuthStore
+export * from './authStore'

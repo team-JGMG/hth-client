@@ -5,7 +5,8 @@ import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import CancelConfirmModal from './CancelConfirmModal.vue'
 import { formatDateTime } from '@/utils/format.js'
 import { getOrderHistory, cancelOrder } from '@/api/trade'
-
+import { useAuthStore } from '@/stores/authStore'
+import { storeToRefs } from 'pinia'
 function toIso(dateStr) {
   return typeof dateStr === 'string' ? dateStr.replace(' ', 'T') : dateStr
 }
@@ -31,8 +32,11 @@ function formatToHHMM(dateStr) {
 const prepareOrders = (arr) => arr.map((o) => ({ ...o, _ui: { dragX: 0, touchStartX: 0 } }))
 
 /* 🔧 테스트 유저: 데이터 있는 ID */
-const FALLBACK_USER_ID = 4
-
+// -------------------------------------------
+const auth = useAuthStore()
+const { userId: storeUserId } = storeToRefs(auth)
+const userId = computed(() => storeUserId.value ?? 3) // 스토어 없으면 3로 폴백
+// -------------------------------------------
 const orders = ref([])
 const isFirstLoad = ref(true)
 const loadError = ref(null)
@@ -137,7 +141,7 @@ async function fetchOrdersPage() {
     let iter = 0
 
     while (added < PAGE_SIZE && hasNext.value && iter < 10) {
-      const res = await getOrderHistory(FALLBACK_USER_ID, page.value, PAGE_SIZE)
+      const res = await getOrderHistory(userId.value, page.value, PAGE_SIZE)
       console.log('[orders fetch]', { page: page.value, raw: res?.data })
       await delay(2000)
 
