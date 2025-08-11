@@ -110,7 +110,7 @@ export const getCoordinatesByAddress = async (address) => {
   }
 }
 export const getPropertyDetail = async (propertyId) => {
-  const { data } = await api.get(`/api/property/${propertyId}`) // 실제 경로 다르면 수정
+  const { data } = await api.get(`/api/funding/${propertyId}`) // 실제 경로 다르면 수정
   return data
 }
 
