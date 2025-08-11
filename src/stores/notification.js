@@ -3,20 +3,15 @@ import { getNotifications, markAllRead, markNotificationRead } from '@/api/notif
 
 import { defineStore } from 'pinia'
 
-const normalizeList = (res) => res?.data?.data ?? []
-
-// notificationId 기준으로 병합(서버 데이터 우선)
-const mergeById = (current, incoming) => {
-  const map = new Map(current.map((n) => [n.notificationId, n]))
-  for (const n of incoming) {
-    map.set(n.notificationId, { ...(map.get(n.notificationId) || {}), ...n, optimistic: false })
-  }
-  return Array.from(map.values())
+// 어떤 형태든 배열만 안전하게 추출
+const normalizeList = (res) => {
+  const candidate = res?.data?.data ?? res?.data ?? res ?? []
+  return Array.isArray(candidate) ? candidate : []
 }
 
 export const useNotificationStore = defineStore('notification', {
   state: () => ({
-    /** @type {Array<{notificationId:number,title:string,body:string,createdAt:string,read:boolean,optimistic?:boolean}>} */
+    /** @type {Array<{notificationId:number,title:string,body:string,createdAt:string,read:boolean}>} */
     items: [],
     loading: false,
     error: null,
@@ -31,20 +26,9 @@ export const useNotificationStore = defineStore('notification', {
       this.error = null
       try {
         const res = await getNotifications()
-        const serverList = normalizeList(res)
-
-        // 서버가 아직 비어있으면 기존(낙관적) 리스트 유지
-        if (serverList.length === 0) {
-          this.items = this.items
-            .slice()
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-          return
-        }
-
-        // 서버 응답과 병합(서버 우선), 정렬
-        this.items = mergeById(this.items, serverList).sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-        )
+        const list = normalizeList(res)
+        // 서버 응답으로 덮어쓰기 + 정렬
+        this.items = list.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       } catch (e) {
         this.error = e?.message || '알림을 불러오지 못했습니다.'
       } finally {
@@ -71,21 +55,7 @@ export const useNotificationStore = defineStore('notification', {
       }
     },
 
-    // 낙관적 데이터 유지
-    add({ title, body, createdAt, id, read = false }) {
-      const notificationId = id ?? Date.now()
-      if (this.items.some((n) => n.notificationId === notificationId)) return
-      this.items.unshift({
-        notificationId,
-        title: title ?? '알림',
-        body: body ?? '',
-        createdAt: createdAt ?? new Date().toISOString(),
-        read,
-        optimistic: true, // 서버 미반영 상태 표시
-      })
-    },
-
-    // 서버와 동기화(디바운스)
+    // 서버 동기화(디바운스)
     refreshSoon: (() => {
       let timer = null
       return function () {

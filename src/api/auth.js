@@ -32,3 +32,16 @@ export const logout = async () => {
 export const fetchUserInfo = async () => {
   return api.get('/api/users/me', { withCredentials: true })
 }
+
+/**
+ * 디바이스 토큰 등록/갱신
+ * @param {number|string} userId
+ * @param {string} deviceToken
+ * @returns {Promise<{code:string, data:any, message:string, status:string}>}
+ */
+export const registerDeviceToken = async (userId, deviceToken) => {
+  const res = await api.post(`/api/users/${encodeURIComponent(userId)}/device-token`, {
+    deviceToken,
+  })
+  return res.data
+}

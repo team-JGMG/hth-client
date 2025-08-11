@@ -18,6 +18,7 @@ const VAPID_PUBLIC_KEY =
   'BDQGH97rGd2TYNHX40Cw392hDAkQO139lLlEjMHQP9T55Cq3Vifi4BGgddISfPQEa9NxRFlTYV20ssiJHOGewkU'
 
 const app = initializeApp(firebaseConfig)
+const LAST_REG_KEY = 'fcm:lastReg' // { uid, token }
 
 export const useFcmStore = defineStore('fcm', {
   state: () => ({
@@ -30,61 +31,70 @@ export const useFcmStore = defineStore('fcm', {
     async init() {
       if (typeof window === 'undefined') return
 
+      // 지원 여부
       this.supported = await isSupported().catch(() => false)
       if (!this.supported) return
 
+      // SW 등록
       const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
 
-      this.permission = await Notification.requestPermission()
+      // 권한
+      this.permission =
+        Notification.permission === 'default'
+          ? await Notification.requestPermission()
+          : Notification.permission
       if (this.permission !== 'granted') return
 
+      // 토큰 발급
       const messaging = getMessaging(app)
-      this.token = await getToken(messaging, {
-        vapidKey: VAPID_PUBLIC_KEY,
-        serviceWorkerRegistration: reg,
-      })
+      try {
+        this.token = await getToken(messaging, {
+          vapidKey: VAPID_PUBLIC_KEY,
+          serviceWorkerRegistration: reg,
+        })
+      } catch (e) {
+        console.warn('[FCM] getToken 실패:', e)
+        return
+      }
 
-      // ✅ 포그라운드 수신: 토스트 + 목록 추가 + 서버 저장
-      onMessage(messaging, async (payload) => {
+      // 로그인된 경우에만 토큰 등록/업서트
+      try {
+        const [{ useAuthStore }, { registerDeviceToken }] = await Promise.all([
+          import('@/stores/authStore'),
+          import('@/api/auth'),
+        ])
+        const auth = useAuthStore()
+        const uid = auth.userInfo?.userId
+        if (uid && this.token) {
+          const last = JSON.parse(localStorage.getItem(LAST_REG_KEY) || 'null')
+          if (!last || last.uid !== uid || last.token !== this.token) {
+            await registerDeviceToken(uid, this.token) // POST /api/users/{uid}/device-token
+            localStorage.setItem(LAST_REG_KEY, JSON.stringify({ uid, token: this.token }))
+          }
+        }
+      } catch (e) {
+        console.warn('[FCM] 토큰 등록 실패:', e)
+      }
+
+      // 포그라운드 수신: 토스트 + 서버 동기화(fetch만)
+      onMessage(messaging, (payload) => {
         const toast = useToastStore()
         const nStore = useNotificationStore()
-
         const title = payload?.data?.title || payload?.notification?.title || '알림'
         const body = payload?.data?.body || payload?.notification?.body || ''
-        const createdAt = payload?.data?.createdAt || new Date().toISOString()
-
         this.lastMessage = payload
-
-        // 1) 즉시 UI 반영
-        nStore.add({ title, body, createdAt })
         toast.show({ title, body, timeout: 4000 })
-
-        // 2) 서버 저장 + 동기화
-        try {
-          nStore.refreshSoon()
-        } catch (e) {
-          console.warn('[FCM] 서버 저장 실패:', e)
-        }
+        nStore.refreshSoon() // 600~1000ms 후 GET /api/notifications
       })
 
-      // ✅ 백그라운드 수신(페이지 열려있을 때): 토스트 + 목록 추가 + 서버 저장
-      navigator.serviceWorker.addEventListener('message', async (event) => {
+      // SW → 페이지: 토스트 + 서버 동기화(fetch만)
+      navigator.serviceWorker.addEventListener('message', (event) => {
         if (event.data?.type !== 'FCM_MESSAGE') return
-
         const toast = useToastStore()
         const nStore = useNotificationStore()
-        const { title, body, createdAt } = event.data.payload
-
-        // 1) 즉시 UI 반영
-        nStore.add({ title, body, createdAt })
-        toast.show({ title, body, timeout: 4000 })
-
-        // 2) 서버 저장 + 동기화
-        try {
-          nStore.refreshSoon()
-        } catch (e) {
-          console.warn('[FCM] 서버 저장 실패:', e)
-        }
+        const { title, body } = event.data.payload || {}
+        toast.show({ title: title || '알림', body: body || '', timeout: 4000 })
+        nStore.refreshSoon()
       })
     },
   },
