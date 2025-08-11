@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import FcmTestView from '@/pages/FcmTestView.vue'
 import NotFound from '@/pages/NotFound.vue'
+import NotificationPage from '@/pages/notification/NotificationPage.vue'
 import accountRoutes from './modules/account'
 import adminRoutes from './modules/admin'
 import authRoutes from './modules/auth'
@@ -26,7 +26,7 @@ const router = createRouter({
       name: 'NotFound',
       component: NotFound,
     },
-    { path: '/fcm-test', name: 'fcm-test', component: FcmTestView },
+    { path: '/fcm-test', name: 'fcm-test', component: NotificationPage },
   ],
 })
 
