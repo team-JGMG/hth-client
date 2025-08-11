@@ -323,7 +323,7 @@ const requestPay = async (amount) => {
       },
       async (rsp) => {
         if (!rsp?.success) {
-          alert('❌ 결제 실패: ' + (rsp?.error_msg || '사용자 취소 또는 오류'))
+          toast.error({ title: '결제 실패: ', body: rsp?.error_msg || '사용자 취소 또는 오류' })
           return
         }
 
@@ -334,19 +334,22 @@ const requestPay = async (amount) => {
             merchantUid: merchant_uid,
           })
 
-          alert('포인트 충전이 완료되었습니다.')
+          toast.success({ title: '충전 완료', body: '포인트 충전이 완료되었습니다.' })
           isChargeModalOpen.value = false
           chargeAmount.value = 0
           await refreshPointBalance()
         } catch (err) {
           console.error(err)
-          alert('❌ 서버 검증 실패: ' + (err?.response?.data?.message || err?.message))
+          toast.error({
+            title: '서버 검증 실패: ',
+            body: err?.response?.data?.message || err?.message,
+          })
         }
       },
     )
   } catch (err) {
     console.error(err)
-    alert('❌ 결제 요청 오류: ' + (err?.response?.data?.message || err?.message))
+    toast.error({ title: '결제 요청 오류: ', body: err?.response?.data?.message || err?.message })
   }
 }
 </script>
