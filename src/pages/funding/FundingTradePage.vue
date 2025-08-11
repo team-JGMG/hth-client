@@ -1,8 +1,6 @@
 <template>
-  <div class="min-h-screen flex flex-col bg-white">
-    <!-- 상단 콘텐츠 영역 (스크롤) -->
-    <div class="flex-1 p-4 pb-32 overflow-y-auto">
-      <!-- 헤더 -->
+  <BlankLayout>
+    <div class="flex-1 overflow-y-auto pb-36">
       <DetailHeader>
         <BaseTypography tag="h2" size="2xl" weight="semibold" class="text-2xl">
           {{ item.title || '매물 제목 없음' }}
@@ -11,8 +9,8 @@
 
       <!-- 주당 가격 -->
       <div class="flex justify-between items-center text-sm text-black font-medium mb-4">
-        <BaseTypography size="sm" weight="medium">주당 가격</BaseTypography>
-        <BaseTypography weight="bold">
+        <BaseTypography size="sm" weight="medium" class="px-2">주당 가격</BaseTypography>
+        <BaseTypography weight="bold" class="px-2">
           {{ item.orderPricePerShare?.toLocaleString() || 5000 }}원/주
         </BaseTypography>
       </div>
@@ -20,28 +18,31 @@
       <div class="flex justify-between gap-2 mb-4">
         <BaseButton
           variant="outline"
-          class="flex-1 h-10 !border-gray-200 !text-black !bg-white font-semibold rounded-[10px] hover:!bg-gray-100 transition"
+          class="flex-1 !px-2 !py-2 text-sm md:text-sm leading-none border-2 !border-gray-200 !text-black !bg-white font-semibold rounded-[10px] hover:!bg-gray-100 transition inline-flex items-center justify-center whitespace-nowrap break-keep"
           @click="addShares(1)"
         >
           +1주
         </BaseButton>
+
         <BaseButton
           variant="outline"
-          class="flex-1 h-10 !border-gray-200 !text-black !bg-white font-semibold rounded-[10px] hover:!bg-gray-100 transition"
+          class="flex-1 !px-2 !py-1 text-sm md:text-sm leading-none border-2 !border-gray-200 !text-black !bg-white font-semibold rounded-[10px] hover:!bg-gray-100 transition inline-flex items-center justify-center whitespace-nowrap break-keep"
           @click="addShares(10)"
         >
           +10주
         </BaseButton>
+
         <BaseButton
           variant="outline"
-          class="flex-1 h-10 !border-gray-200 !text-black !bg-white font-semibold rounded-[10px] hover:!bg-gray-100 transition"
+          class="flex-1 !px-2 !py-1 text-sm md:text-sm leading-none border-2 !border-gray-200 !text-black !bg-white font-semibold rounded-[10px] hover:!bg-gray-100 transition inline-flex items-center justify-center whitespace-nowrap break-keep"
           @click="addShares(50)"
         >
           +50주
         </BaseButton>
+
         <BaseButton
           variant="outline"
-          class="flex-1 h-10 !border-gray-200 !text-black !bg-white font-semibold rounded-[10px] hover:!bg-gray-100 transition"
+          class="flex-1 !px-2 !py-1 text-sm md:text-sm leading-none border-2 !border-gray-200 !text-black !bg-white font-semibold rounded-[10px] hover:!bg-gray-100 transition inline-flex items-center justify-center whitespace-nowrap break-keep"
           @click="addShares(100)"
         >
           +100주
@@ -55,7 +56,7 @@
           v-model="quantity"
           min="0"
           placeholder="구매할 수량(주)을 입력해주세요."
-          class="w-full h-10 border-2 border-gray-200 rounded-[10px] px-4 pr-8 text-sm text-black placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-700"
+          class="w-full h-10 border-2 border-gray-200 rounded-[10px] px-8 text-sm text-black placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-700"
         />
         <span class="absolute right-4 top-2.5 text-gray-600 text-xs pointer-events-none"></span>
       </div>
@@ -69,10 +70,9 @@
 
       <!-- 투자 가능 현황 카드 -->
       <div class="bg-gray-50 rounded-xl border border-gray-300 p-4">
-        <BaseTypography size="sm" class="mb-3 !font-semibold text-xl"
-          >투자 가능 현황</BaseTypography
-        >
-        <div class="py-3"></div>
+        <BaseTypography size="sm" class="mb-3 !font-semibold text-xl">
+          투자 가능 현황
+        </BaseTypography>
         <!-- 현재 보유 주 -->
         <div class="flex justify-between text-sm mb-2">
           <BaseTypography size="sm" class="font-semibold">현재 보유 주</BaseTypography>
@@ -137,12 +137,12 @@
     </div>
 
     <!-- ✅ 하단 고정 버튼 바 -->
-    <div class="fixed bottom-0 left-0 w-full border-gray-200">
-      <div class="max-w-md mx-auto px-4 pt-3 pb-6">
-        <div class="flex flex-col w-full gap-2">
+    <div class="fixed inset-x-0 bottom-[72px] z-40 border-t border-gray-200 bg-white">
+      <div class="max-w-md mx-auto px-6">
+        <div class="flex flex-col w-full">
           <!-- 초기화 버튼 -->
           <BaseButton
-            class="w-full py-3 bg-white border-gray-300 text-gray-800 text-sm font-medium rounded-[10px] flex items-center justify-center gap-1 hover:bg-white"
+            class="w-full bg-white border-gray-300 text-gray-800 text-sm font-medium rounded-[10px] flex items-center justify-center gap-1 hover:bg-white"
             @click="handleReset"
           >
             <img src="@/assets/images/refresh.png" alt="초기화" class="w-4 h-4 cursor-pointer" />
@@ -158,7 +158,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </BlankLayout>
   <!-- 확인 모달 -->
   <BaseModal :isOpen="showConfirmModal" @close="showConfirmModal = false">
     <template #default>
@@ -222,14 +222,14 @@ import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
 import { requestChargeMerchantUid, verifyPayment, getPointBalance } from '@/api/point'
 
-import DetailHeader from '@/layouts/DetailHeader.vue'
 import BaseModal from '@/components/common/Modal/BaseModal.vue'
 import CompletedModal from '@/components/common/Modal/CompletedModal.vue'
 import CompletedButton from '@/components/common/Button/CompletedButton.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import BaseButton from '@/components/common/Button/BaseButton.vue'
 import PointChargeModal from '@/components/main/PointSection/PointModal/PointChargeModal.vue'
-import { useToastStore } from '@/stores/toast'
+import BlankLayout from '@/layouts/BlankLayout.vue'
+import DetailHeader from '@/layouts/DetailHeader.vue'
 
 const showConfirmModal = ref(false)
 const showCompleteModal = ref(false)
