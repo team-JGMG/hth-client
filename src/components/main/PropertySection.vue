@@ -63,13 +63,17 @@ import BaseCard from '@/components/common/Card/BaseCard.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import { useToastStore } from '@/stores/toast'
+
 const router = useRouter()
 const authStore = useAuthStore()
+const toast = useToastStore()
 
 const handleButtonClick = () => {
   if (authStore.getIsLoggedIn) {
     router.push('/property/register')
   } else {
+    toast.show('로그인 후 이용 가능합니다.')
     router.push('/auth/login')
   }
 }

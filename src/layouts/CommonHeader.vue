@@ -20,11 +20,20 @@
 import BaseLogo from '@/components/common/Logo/BaseLogo.vue'
 import { useRouter } from 'vue-router'
 import { useNotificationStore } from '@/stores/notification'
+import { useAuthStore } from '@/stores/authStore'
+import { useToastStore } from '@/stores/toast'
 
 const router = useRouter()
 const nStore = useNotificationStore()
+const authStore = useAuthStore()
+const toast = useToastStore()
 
 const goFcmTest = () => {
-  router.push('/fcm-test') // 또는 '/notifications'
+  if (!authStore.getIsLoggedIn) {
+    toast.show('로그인 후 이용 가능합니다.')
+    router.push('/auth/login')
+    return
+  }
+  router.push('/fcm-test')
 }
 </script>
