@@ -151,7 +151,9 @@
       >
         <!-- 파일명 또는 기본 텍스트 -->
         <span class="truncate">
-          {{ store.documents.length > 0 ? `${store.documents.length}개 파일 선택됨` : '파일 선택' }}
+          {{
+            store.photoFiles.length > 0 ? `${store.photoFiles.length}개 파일 선택됨` : '파일 선택'
+          }}
         </span>
 
         <!-- 클립 아이콘 -->
@@ -159,7 +161,7 @@
       </label>
 
       <BaseTypography
-        v-if="touched.image && !store.documents[0]"
+        v-if="touched.image && !store.photoFiles[0]"
         color="red-1"
         size="xs"
         class="absolute mt-1 left-0 top-full"
@@ -236,8 +238,7 @@ const toggleTag = (tag) => {
 const handleFiles = (e) => {
   const files = e.target.files
   if (files.length > 0) {
-    // 배열로 변환해서 store.documents에 할당
-    store.documents = Array.from(files)
+    store.photoFiles = Array.from(files)
   }
 }
 
@@ -260,7 +261,7 @@ const isStepValid = computed(() => {
     d.bathroomCount !== '' &&
     isNumber(d.bathroomCount) &&
     d.options.length >= 3 &&
-    !!store.documents[0]
+    !!store.photoFiles[0]
   )
 })
 
