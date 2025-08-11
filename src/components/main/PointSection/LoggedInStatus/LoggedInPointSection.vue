@@ -36,6 +36,7 @@
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/authStore'
+import { useToastStore } from '@/stores/toast'
 import {
   requestChargeMerchantUid,
   verifyPayment,
@@ -55,6 +56,7 @@ const props = defineProps({
 })
 
 const authStore = useAuthStore()
+const toast = useToastStore()
 const { getIsLoggedIn } = storeToRefs(authStore)
 
 const isChargeModalOpen = ref(false)
@@ -82,9 +84,14 @@ const refreshPointBalance = async () => {
 }
 
 const requestPay = async (amount) => {
-  if (!getIsLoggedIn.value) return alert('로그인이 필요합니다.')
-  if (!amount || amount <= 0) return alert('충전할 금액을 입력해주세요.')
-
+  if (!getIsLoggedIn.value) {
+    toast.warn({ title: '로그인이 필요합니다', body: '로그인 후 이용해주세요.' }) // ✅
+    return
+  }
+  if (!amount || amount <= 0) {
+    toast.warn({ title: '금액 확인', body: '충전할 금액을 입력해주세요.' }) // ✅
+    return
+  }
   try {
     // 1) 서버에서 merchant_uid 발급 (DB: PENDING 저장)
     const merchant_uid = await requestChargeMerchantUid(Number(amount))
@@ -129,35 +136,49 @@ const requestPay = async (amount) => {
             merchantUid: merchant_uid, // ✅ PENDING 매칭 필수
           })
 
-          alert('포인트 충전이 완료되었습니다.')
+          toast.success({ title: '충전 완료', body: '포인트 충전이 완료되었습니다.' })
           isChargeModalOpen.value = false
           chargeAmount.value = 0
           await refreshPointBalance()
         } catch (err) {
           console.error(err)
-          alert('❌ 서버 검증 실패: ' + (err?.response?.data?.message || err?.message))
+          toast.error({
+            title: '검증 실패',
+            body: err?.response?.data?.message || err?.message || '서버 검증 실패',
+          })
         }
       },
     )
   } catch (err) {
     console.error(err)
-    alert('❌ 결제 요청 오류: ' + (err?.response?.data?.message || err?.message))
+    toast.error({
+      title: '요청 오류',
+      body: err?.response?.data?.message || err?.message || '결제 요청 오류',
+    })
   }
 }
 
 const handleRefund = async () => {
-  if (!getIsLoggedIn.value) return alert('로그인이 필요합니다.')
-  if (!refundAmount.value || refundAmount.value <= 0) return alert('환급 금액을 입력해주세요.')
-
+  if (!getIsLoggedIn.value) {
+    toast.warn({ title: '로그인이 필요합니다', body: '로그인 후 이용해주세요.' }) // ✅
+    return
+  }
+  if (!refundAmount.value || refundAmount.value <= 0) {
+    toast.warn({ title: '금액 확인', body: '환급 금액을 입력해주세요.' }) // ✅
+    return
+  }
   try {
     await requestPointRefund({ amount: Number(refundAmount.value), userId: authStore.userId })
-    alert('환급 신청이 완료되었습니다.')
+    toast.success({ title: '신청 완료', body: '환급 신청이 완료되었습니다.' })
     isRefundModalOpen.value = false
     refundAmount.value = 0
     await refreshPointBalance()
   } catch (err) {
     console.error(err)
-    alert('❌ 환급 실패: ' + (err?.response?.data?.message || err?.message))
+    toast.error({
+      title: '환급 실패',
+      body: err?.response?.data?.message || err?.message || '환급 처리 중 오류',
+    })
   }
 }
 </script>

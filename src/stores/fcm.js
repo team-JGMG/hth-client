@@ -41,13 +41,19 @@ export const useFcmStore = defineStore('fcm', {
         serviceWorkerRegistration: reg,
       })
 
-      // ✅ 포그라운드 수신 → 토스트로 표시
+      // ✅ 포그라운드 수신 → 토스트로 표시 + 알림 목록 갱신
       onMessage(messaging, (payload) => {
         const toast = useToastStore()
         const title = payload?.data?.title || payload?.notification?.title || '알림'
         const body = payload?.data?.body || payload?.notification?.body || ''
         this.lastMessage = payload
         toast.show({ title, body, timeout: 4000 })
+
+        // 🔁 알림 목록 새로고침 (디바운스 적용)
+        import('@/stores/notification').then(({ useNotificationStore }) => {
+          const n = useNotificationStore()
+          n.refreshSoon()
+        })
       })
     },
   },
