@@ -2,20 +2,37 @@
 
 import api from '@/libs/axios'
 
-// 매물 등록 (multipart/form-data 방식)
 export const registerPropertyWithFormData = async ({
   requestData,
   photoFiles,
   documentFiles,
   documentTypes,
 }) => {
+  // 1. 날짜 변환 (LocalDate 호환)
+  const formatDate = (value) => {
+    if (!value) return null
+    const d = new Date(value)
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
+  const finalData = {
+    ...requestData,
+    approvalDate: formatDate(requestData.approvalDate),
+  }
+
+  // 2. FormData 생성
   const formData = new FormData()
 
-  const requestBlob = new Blob([JSON.stringify(requestData)], {
+  // JSON -> Blob(application/json) 변환
+  const requestBlob = new Blob([JSON.stringify(finalData)], {
     type: 'application/json',
   })
   formData.append('request', requestBlob)
 
+  // 3. 파일 첨부
   photoFiles.forEach((file) => {
     formData.append('photoFiles', file)
   })
@@ -24,10 +41,13 @@ export const registerPropertyWithFormData = async ({
     formData.append('documentFiles', file)
   })
 
-  documentTypes.forEach((type) => {
-    formData.append('documentTypes', type)
+  // 4. documentTypes JSON Blob으로 담기
+  const documentTypesBlob = new Blob([JSON.stringify(documentTypes)], {
+    type: 'application/json',
   })
+  formData.append('documentTypes', documentTypesBlob)
 
+  // 5. 요청 전송
   return api.post('/api/property', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
