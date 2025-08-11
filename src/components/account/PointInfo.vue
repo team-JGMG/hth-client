@@ -3,8 +3,11 @@
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import { getPointTransactions } from '@/api/point' // 경로 확인
-
-const FALLBACK_USER_ID = 3
+import { useAuthStore } from '@/stores/authStore'
+import { storeToRefs } from 'pinia'
+const auth = useAuthStore()
+const { userId: storeUserId } = storeToRefs(auth)
+const userId = computed(() => storeUserId.value ?? 3)
 
 /* ========= 날짜 유틸 ========= */
 function toDateFlexible(dt) {
@@ -118,7 +121,7 @@ async function fetchLogsPage() {
       page: page.value,
       size: PAGE_SIZE,
       sort: 'createdAt,DESC',
-      userId: FALLBACK_USER_ID,
+      userId: userId.value,
     })
     console.log('[PointInfo] raw response:', res) // 🔍 디버깅
     await delay(2000)
