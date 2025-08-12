@@ -56,7 +56,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useUserStore } from '@/stores/user'
+import { useAuthStore as useUserStore } from '@/stores/user'
 import PointChargeModal from '@/components/account/PointChargeModal.vue'
 import PointChangeModal from '@/components/account/PointChangeModal.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'

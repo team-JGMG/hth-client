@@ -26,7 +26,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/authStore'
+import { useAuthStore as useUserStore } from '@/stores/authStore'
 import { onMounted } from 'vue'
 import DetailHeader from '@/layouts/DetailHeader.vue'
 import BaseTab from '@/components/common/Tab/BaseTab.vue'
