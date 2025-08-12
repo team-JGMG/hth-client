@@ -1,10 +1,11 @@
 <script setup>
-import { createOrder } from '@/api/trade' // ✅ 통합 API만 사용
+import { createOrder } from '@/api/trade'
 import BaseModal from '@/components/common/Modal/BaseModal.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import { computed } from 'vue'
+import { computed, watch, ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useToastStore } from '@/stores/toast'
+import { getPointBalance } from '@/api/point'
 
 const props = defineProps({
   type: String, // 'buy' or 'sell'
@@ -18,7 +19,24 @@ const total = computed(() => (props.amount || 0) * (props.quantity || 0))
 const userStore = useAuthStore()
 const toast = useToastStore()
 
-const emit = defineEmits(['close', 'completed', 'trade-success']) // ✅ 누락된 이벤트 추가
+const currentPoint = ref(0)
+const expectedBalance = computed(() => currentPoint.value - total.value)
+
+const emit = defineEmits(['close', 'completed', 'trade-success'])
+
+watch(
+  () => props.isOpen,
+  async (open) => {
+    if (open && userStore.userId) {
+      try {
+        const point = await getPointBalance(userStore.userId)
+        currentPoint.value = point || 0
+      } catch (e) {
+        console.error('포인트 조회 실패:', e)
+      }
+    }
+  },
+)
 
 const handleConfirm = async () => {
   try {
@@ -60,7 +78,11 @@ const handleConfirm = async () => {
         주당 가격: {{ amount.toLocaleString() }}원 <br />
         수량: {{ quantity }}주 <br />
         총 금액: {{ total.toLocaleString() }}원 <br />
-        예상 잔여 포인트: 50,000원
+        예상 잔여 포인트:
+        <span :class="expectedBalance < 0 ? 'text-red-500' : ''">
+          {{ expectedBalance.toLocaleString() }}원
+          <span v-if="expectedBalance < 0"> (잔액 부족)</span>
+        </span>
       </BaseTypography>
     </div>
 
