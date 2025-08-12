@@ -1,4 +1,3 @@
-// src/stores/authStore.js
 import { computed, ref } from 'vue'
 
 import { defineStore } from 'pinia'
@@ -11,7 +10,7 @@ export const useAuthStore = defineStore(
     const userInfo = ref(null)
 
     const userName = computed(() => userInfo.value?.name || '')
-    const userPoints = computed(() => userInfo.value?.point ?? 0)
+    const userPoints = computed(() => userInfo.value?.point ?? null)
     const userId = computed(() => userInfo.value?.userId ?? null)
 
     // ✅ 로그인 여부 (userInfo 값 존재 여부로 판단)
@@ -32,6 +31,7 @@ export const useAuthStore = defineStore(
     // ✅ 유저 정보 불러오기 (API 요청)
     async function loadUserInfo() {
       try {
+        console.log('🌐 fetchUserInfo API 호출')
         const res = await fetchUserInfo()
         // 필요 시 res.data.data로 변경
         userInfo.value = res.data
@@ -44,6 +44,8 @@ export const useAuthStore = defineStore(
 
     // ✅ 유저 정보 수동 설정 (로그인 콜백 등)
     async function setUserInfo(user) {
+      console.log('📝 setUserInfo 호출:', user)
+
       userInfo.value = user
       await initFcmIfLoggedIn()
     }
@@ -55,11 +57,16 @@ export const useAuthStore = defineStore(
 
     // 🔒 로그아웃
     async function logout() {
+      console.log('🚪 로그아웃 처리')
       userInfo.value = null
       localStorage.removeItem('refreshToken')
 
-      const { useFcmStore } = await import('@/stores/fcm')
-      useFcmStore().reset()
+      try {
+        const { useFcmStore } = await import('@/stores/fcm')
+        useFcmStore().reset()
+      } catch (e) {
+        console.warn('[FCM] 리셋 실패:', e)
+      }
     }
 
     return {
@@ -78,8 +85,10 @@ export const useAuthStore = defineStore(
     }
   },
   {
-    // 새로고침 유지
-    persist: { storage: localStorage },
+    persist: {
+      storage: localStorage,
+      paths: ['userInfo.userId', 'userInfo.name'],
+    },
   },
 )
 
