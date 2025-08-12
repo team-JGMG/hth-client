@@ -1,5 +1,5 @@
 <template>
-  <main class="py-6 px-6 w-full bg-white text-black relative">
+  <main class="py-6 px-6 w-full bg-white text-black relative pb-24">
     <DetailHeader />
     <slot></slot>
     <CommonNav />
