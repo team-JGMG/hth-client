@@ -8,37 +8,32 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
-import { useFcmStore } from '@/stores/fcm'
 import { useNotificationStore } from '@/stores/notification'
 import BaseToast from './components/BaseToast.vue'
 
 const authStore = useAuthStore()
-const fcmStore = useFcmStore()
 const notificationStore = useNotificationStore()
-const fcmInitializing = ref(false)
 
 onMounted(async () => {
-  const refreshToken = localStorage.getItem('refreshToken')
-  if (refreshToken) {
-    await authStore.loadUserInfo()
-    if (authStore.getIsLoggedIn) {
-      notificationStore.fetch()
+  console.log('[APP] bootstrap')
+  // ✅ 토큰 여부와 무관하게 유저정보를 항상 요청
+  await authStore.loadUserInfo()
+
+  if (authStore.getIsLoggedIn) {
+    // FCM 초기화는 authStore.loadUserInfo() 내부에서 이미 호출됨 (afterLogin)
+    notificationStore.fetch()
+    try {
+      const { getPointBalance } = await import('@/api/auth')
       const point = await getPointBalance(authStore.userId)
       authStore.setUserPoint(point)
+    } catch (e) {
+      console.warn('[Point] 포인트 조회 실패:', e)
     }
   } else {
-    authStore.logout()
-  }
-
-  try {
-    fcmInitializing.value = true
-    await fcmStore.init()
-  } catch (err) {
-    console.error('❌ FCM 초기화 실패:', err)
-  } finally {
-    fcmInitializing.value = false
+    // 세션 없음
+    console.log('[APP] not logged in')
   }
 })
 </script>
