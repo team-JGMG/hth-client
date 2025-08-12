@@ -1,6 +1,5 @@
 import './assets/main.css'
 import 'v-calendar/style.css'
-import './firebase'
 
 import App from './App.vue'
 import VCalendar from 'v-calendar'
