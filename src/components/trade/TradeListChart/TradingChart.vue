@@ -1,13 +1,9 @@
 <template>
-  <div class="overflow-hidden">
-    <div class="w-[calc(90%+80px)] ml-[-20px] h-[400px]">
-      <VChart :option="option" autoresize class="mb-20 mt-10" />
-    </div>
-  </div>
+  <VChart :option="option" autoresize class="mb-20 mt-10" />
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 import * as echarts from 'echarts/core'
 import VChart from 'vue-echarts'
 import { LineChart, BarChart } from 'echarts/charts'
@@ -19,7 +15,9 @@ import {
   AxisPointerComponent,
 } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
-import { getFundingTradeHistory } from '@/api/funding' // ✅ API 호출
+import { getFundingTradeHistory } from '@/api/funding'
+// ✅ subYears 함수를 추가로 임포트합니다.
+import { subMonths, subYears, isAfter, parseISO } from 'date-fns'
 
 echarts.use([
   LineChart,
@@ -37,42 +35,50 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  timeRange: {
+    type: String,
+    required: true,
+  },
 })
 
 const option = ref({})
 
 const formatDate = (dateStr) => {
-  // 년도 포함해서 표시 (예: "2024-01-15" -> "2024-01-15")
   return dateStr
 }
 
 const fetchChartData = async () => {
   try {
-    const history = await getFundingTradeHistory(props.fundingId)
+    const allHistory = await getFundingTradeHistory(props.fundingId)
 
-    const times = history.map((d) => formatDate(d.date))
-    const prices = history.map((d) => d.closingPrice)
-    const volumes = history.map((d) => d.volume)
-    const changeRates = history.map((d) => d.priceChangeRate)
+    let filteredHistory = allHistory
+    const now = new Date()
 
-    const max = Math.max(...prices)
-    const min = Math.min(...prices)
+    // ✅ timeRange에 '1y' 필터링 로직을 추가합니다.
+    if (props.timeRange === '1y') {
+      const oneYearAgo = subYears(now, 1)
+      filteredHistory = allHistory.filter((d) => isAfter(parseISO(d.date), oneYearAgo))
+    } else if (props.timeRange === '3m') {
+      const threeMonthsAgo = subMonths(now, 3)
+      filteredHistory = allHistory.filter((d) => isAfter(parseISO(d.date), threeMonthsAgo))
+    } else if (props.timeRange === '1m') {
+      const oneMonthAgo = subMonths(now, 1)
+      filteredHistory = allHistory.filter((d) => isAfter(parseISO(d.date), oneMonthAgo))
+    }
+
+    const times = filteredHistory.map((d) => formatDate(d.date))
+    const prices = filteredHistory.map((d) => d.closingPrice)
+    const volumes = filteredHistory.map((d) => d.volume)
+    const changeRates = filteredHistory.map((d) => d.priceChangeRate)
+
+    const max = prices.length > 0 ? Math.max(...prices) : 0
+    const min = prices.length > 0 ? Math.min(...prices) : 0
 
     option.value = {
       backgroundColor: 'transparent',
       grid: [
-        {
-          left: 40,
-          right: 40,
-          top: 40,
-          height: '65%',
-        },
-        {
-          left: 50,
-          right: 40,
-          bottom: 10,
-          height: '15%',
-        },
+        { left: 40, right: 40, top: 40, height: '65%' },
+        { left: 50, right: 40, bottom: 10, height: '15%' },
       ],
       tooltip: {
         trigger: 'axis',
@@ -98,13 +104,13 @@ const fetchChartData = async () => {
           },
         },
         formatter(params) {
-          const p = params[0].data
+          const p = prices[params[0].dataIndex]
           const v = volumes[params[0].dataIndex]
           const r = changeRates[params[0].dataIndex]
           const sign = r > 0 ? '+' : ''
           const color = r > 0 ? '#d60000' : '#0057FF'
           return `
-            <div style="font-weight:bold">${params[0].axisValue}</div>
+            <div style="font-weight:bold">${times[params[0].dataIndex]}</div>
             <div style="color:${color}">${p.toLocaleString()}원 (${sign}${r}%)</div>
             <div>거래량 ${v.toLocaleString()}</div>
           `
@@ -139,7 +145,7 @@ const fetchChartData = async () => {
         {
           type: 'value',
           gridIndex: 1,
-          min: 0, // ← 바 차트 최솟값 설정
+          min: 0,
           axisLine: { show: false },
           axisTick: { show: false },
           splitLine: { show: false },
@@ -218,11 +224,17 @@ const fetchChartData = async () => {
   }
 }
 
-onMounted(() => {
-  fetchChartData()
-})
-
+// 부모 컴포넌트에서 호출할 수 있도록 메서드를 노출합니다.
 defineExpose({
   fetchChartData,
 })
+
+// watch를 사용하여 timeRange prop이 변경될 때마다 차트를 다시 그립니다.
+watch(
+  () => props.timeRange,
+  () => {
+    fetchChartData()
+  },
+  { immediate: true },
+)
 </script>
