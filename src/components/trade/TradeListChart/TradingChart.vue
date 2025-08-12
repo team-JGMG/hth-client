@@ -16,7 +16,6 @@ import {
 } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
 import { getFundingTradeHistory } from '@/api/funding'
-// ✅ subYears 함수를 추가로 임포트합니다.
 import { subMonths, subYears, isAfter, parseISO } from 'date-fns'
 
 echarts.use([
@@ -54,7 +53,6 @@ const fetchChartData = async () => {
     let filteredHistory = allHistory
     const now = new Date()
 
-    // ✅ timeRange에 '1y' 필터링 로직을 추가합니다.
     if (props.timeRange === '1y') {
       const oneYearAgo = subYears(now, 1)
       filteredHistory = allHistory.filter((d) => isAfter(parseISO(d.date), oneYearAgo))
@@ -77,8 +75,8 @@ const fetchChartData = async () => {
     option.value = {
       backgroundColor: 'transparent',
       grid: [
-        { left: 40, right: 40, top: 40, height: '65%' },
-        { left: 50, right: 40, bottom: 10, height: '15%' },
+        { left: 40, right: 40, top: 40, height: '70%' }, // 가격 차트 높이 조금 키움
+        { left: 50, right: 40, top: '78%', height: '15%' }, // 거래량 차트 바로 아래 배치
       ],
       tooltip: {
         trigger: 'axis',
@@ -123,7 +121,7 @@ const fetchChartData = async () => {
           boundaryGap: false,
           axisLine: { show: false },
           axisTick: { show: false },
-          axisLabel: { fontSize: 12 },
+          axisLabel: { show: false },
         },
         {
           type: 'category',
@@ -195,17 +193,6 @@ const fetchChartData = async () => {
               },
             ],
           },
-          markLine: {
-            symbol: 'none',
-            lineStyle: {
-              color: '#e0e0e0',
-              width: 1,
-              type: 'solid',
-            },
-            data: times.map((_, i) => ({
-              xAxis: i,
-            })),
-          },
         },
         {
           type: 'bar',
@@ -224,12 +211,10 @@ const fetchChartData = async () => {
   }
 }
 
-// 부모 컴포넌트에서 호출할 수 있도록 메서드를 노출합니다.
 defineExpose({
   fetchChartData,
 })
 
-// watch를 사용하여 timeRange prop이 변경될 때마다 차트를 다시 그립니다.
 watch(
   () => props.timeRange,
   () => {

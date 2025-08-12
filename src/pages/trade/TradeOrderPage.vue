@@ -5,8 +5,31 @@
         <DetailHeader>{{ tradeItem.title }}</DetailHeader>
         <div class="bg-white pt-0">
           <CurrentPrice :fundingId="tradeId" />
-          <div class="filter-tabs-container mb-2">
-            <BaseTab :tabs="fundingStatusTabs" v-model="currentFundingStatus" />
+          <div class="flex justify-center px-4 mb-4">
+            <div class="flex bg-transparent">
+              <button
+                @click="currentFundingStatus = 'askingPrice'"
+                :class="[
+                  'px-16 break-keep py-3 text-base font-medium transition-all duration-200',
+                  currentFundingStatus === 'askingPrice'
+                    ? 'text-gray-900 border-b-2 border-gray-900'
+                    : 'text-gray-400 border-b-2 border-transparent hover:text-gray-600',
+                ]"
+              >
+                호가
+              </button>
+              <button
+                @click="currentFundingStatus = 'stockChart'"
+                :class="[
+                  'px-16 py-3 break-keep text-base font-medium transition-all duration-200',
+                  currentFundingStatus === 'stockChart'
+                    ? 'text-gray-900 border-b-2 border-gray-900'
+                    : 'text-gray-400 border-b-2 border-transparent hover:text-gray-600',
+                ]"
+              >
+                시세
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -36,7 +59,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import BaseTab from '@/components/common/Tab/BaseTab.vue'
 import BlankLayout from '@/layouts/BlankLayout.vue'
 import DetailHeader from '@/layouts/DetailHeader.vue'
 import BuyAndSellAccodian from '@/components/trade/BuyAndSell/BuyAndSellAccodian.vue'
@@ -46,7 +68,7 @@ import { getFundingById } from '@/api/funding'
 import TradingChartContainer from '@/components/trade/TradeListChart/TradingChartContainer.vue'
 
 const route = useRoute()
-const tradeId = ref(Number(route.params.id)) // 반응형으로 처리
+const tradeId = ref(Number(route.params.id))
 const tradeItem = ref({})
 const tradeHistoryChart = ref(null)
 const chartRefreshTrigger = ref(0)
@@ -80,10 +102,6 @@ const handleTradeCompleted = () => {
   console.log('TradeOrderPage - chartRefreshTrigger incremented to:', chartRefreshTrigger.value)
 }
 
-const fundingStatusTabs = [
-  { label: '호가', value: 'askingPrice' },
-  { label: '시세', value: 'stockChart' },
-]
 const currentFundingStatus = ref('askingPrice')
 </script>
 
