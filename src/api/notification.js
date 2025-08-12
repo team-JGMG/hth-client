@@ -1,4 +1,3 @@
-// src/api/notifications.js
 import api from '@/libs/axios'
 
 // 알림 목록 조회
