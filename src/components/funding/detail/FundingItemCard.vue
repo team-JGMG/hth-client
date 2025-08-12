@@ -45,7 +45,7 @@ item.images =
     : [{ photoUrl: '/src/assets/images/cardtestimage.png' }]
 
 function goToTradePage() {
-  const id = item.propertyId
+  const id = item.fundingId
   // 일단 펀딩 거래 페이지로 이동하는 기본 라우팅만:
   router.push(`/funding/trade/${id}`)
 }

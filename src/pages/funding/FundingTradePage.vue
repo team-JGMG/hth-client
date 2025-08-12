@@ -206,7 +206,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { ref, computed, nextTick, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
@@ -224,22 +224,22 @@ import BlankLayout from '@/layouts/BlankLayout.vue'
 import DetailHeader from '@/layouts/DetailHeader.vue'
 
 // 응답 로깅 헬퍼
-function logLimit(tag, limit) {
-  // 혹시 문자열 숫자로 올 수도 있으니 Number(...)로 정규화
-  const row = {
-    fundingId,
-    userId: Number(userId.value),
-    remainingAmount: Number(limit?.remainingAmount),
-    remainingShares: Number(limit?.remainingShares),
-    shareAmount: Number(limit?.shareAmount),
-    userPoints: Number(limit?.userPoints),
-    userShareCount: Number(limit?.userShareCount),
-  }
-  console.group(`[LIMIT][${tag}]`)
-  console.log('raw:', limit)
-  console.table([row])
-  console.groupEnd()
-}
+// function logLimit(tag, limit) {
+//   // 혹시 문자열 숫자로 올 수도 있으니 Number(...)로 정규화
+//   const row = {
+//     fundingId,
+//     userId: Number(userId.value),
+//     remainingAmount: Number(limit?.remainingAmount),
+//     remainingShares: Number(limit?.remainingShares),
+//     shareAmount: Number(limit?.shareAmount),
+//     userPoints: Number(limit?.userPoints),
+//     userShareCount: Number(limit?.userShareCount),
+//   }
+//   console.group(`[LIMIT][${tag}]`)
+//   console.log('raw:', limit)
+//   console.table([row])
+//   console.groupEnd()
+// }
 
 const showConfirmModal = ref(false)
 const showCompleteModal = ref(false)
@@ -315,7 +315,9 @@ const handleFinalSubmit = async () => {
   }
 }
 
-const goToMyPage = () => router.push('/account/my-page')
+const goToMyPage = () =>
+  +router.push({ path: '/account/my-page/investments', query: { r: Date.now().toString() } })
+
 const isStepValid = computed(() => Number(quantity.value) > 0)
 
 const refreshPointBalance = async () => {
@@ -412,38 +414,38 @@ const requestPay = async (amount) => {
   }
 }
 
-onMounted(async () => {
-  if (!getIsLoggedIn.value) {
-    alert('로그인이 필요합니다.')
-    router.push('/auth/login')
-    return
-  }
-  try {
-    const [limit, detailRes] = await Promise.all([
-      getFundingOrderLimit(fundingId, userId.value),
-      getFundingById(fundingId),
-    ])
-    logLimit('MOUNT', limit)
-    const detail = detailRes?.data?.data ?? {}
+// onMounted(async () => {
+//   if (!getIsLoggedIn.value) {
+//     alert('로그인이 필요합니다.')
+//     router.push('/auth/login')
+//     return
+//   }
+//   try {
+//     const [limit, detailRes] = await Promise.all([
+//       getFundingOrderLimit(fundingId, userId.value),
+//       getFundingById(fundingId),
+//     ])
+//     logLimit('MOUNT', limit)
+//     const detail = detailRes?.data?.data ?? {}
 
-    // 주당가 안전 세팅 (currentShareAmount > shareAmount > limit.shareAmount > 5000)
-    const share =
-      Number(detail.currentShareAmount) ||
-      Number(detail.shareAmount) ||
-      Number(limit?.shareAmount) ||
-      5000
+//     // 주당가 안전 세팅 (currentShareAmount > shareAmount > limit.shareAmount > 5000)
+//     const share =
+//       Number(detail.currentShareAmount) ||
+//       Number(detail.shareAmount) ||
+//       Number(limit?.shareAmount) ||
+//       5000
 
-    item.value = {
-      ...item.value,
-      ...limit,
-      title: detail.title || `펀딩 매물 #${fundingId}`,
-      shareAmount: share,
-    }
-  } catch (error) {
-    console.error('펀딩 정보를 가져오는 데 실패했습니다:', error)
-    alert('펀딩 정보를 가져오는 데 실패했습니다.')
-  }
-})
+//     item.value = {
+//       ...item.value,
+//       ...limit,
+//       title: detail.title || `펀딩 매물 #${fundingId}`,
+//       shareAmount: share,
+//     }
+//   } catch (error) {
+//     console.error('펀딩 정보를 가져오는 데 실패했습니다:', error)
+//     alert('펀딩 정보를 가져오는 데 실패했습니다.')
+//   }
+// })
 
 const loaded = ref(false) // 로딩 여부 표시(선택)
 
