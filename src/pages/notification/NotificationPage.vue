@@ -1,7 +1,7 @@
 <template>
   <DetailLayout>
     <DetailHeader>알림</DetailHeader>
-    <NotificationControls />
+    <NotificationControls class="-mt-20" />
     <NotificationLoading v-if="nStore.loading" />
     <NotificationError v-else-if="nStore.error" :error="nStore.error" />
     <template v-else>

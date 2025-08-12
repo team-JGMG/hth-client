@@ -22,11 +22,9 @@ const handleClick = async () => {
 
 <template>
   <article
-    class="rounded-2xl px-4 py-3 shadow-sm border relative transition-colors"
+    class="rounded-xl px-4 py-3 relative transition-colors"
     :class="
-      isUnread
-        ? 'bg-blue-50 border-blue-100 hover:bg-blue-100 cursor-pointer'
-        : 'bg-gray-50 border-gray-100 cursor-default'
+      isUnread ? 'bg-blue-50 hover:bg-blue-100 cursor-pointer' : 'bg-white border cursor-default'
     "
     @click="handleClick"
     @keydown.enter.space.prevent="handleClick"
