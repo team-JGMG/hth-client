@@ -8,7 +8,7 @@ import { formatAmount } from '@/utils/format'
 import BaseButton from '@/components/common/Button/BaseButton.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import CancelConfirmModal from '@/components/account/CancelConfirmModal.vue'
-import DividendModal from './DividendModal.vue'
+import BaseModal from '@/components/common/Modal/BaseModal.vue'
 import NoInvestmentItems from './NoInvestmentItems.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
@@ -23,7 +23,7 @@ const auth = useAuthStore()
 const { userId: storeUserId } = storeToRefs(auth)
 const userId = computed(() => storeUserId.value ?? 3)
 
-const initialLoading = ref(true) // ✅ 초기 스피너 전용
+const initialLoading = ref(true)
 const fundingItems = ref([]) // 펀딩중/환불된 주문
 const ownedItems = ref([]) // 보유 지분
 
@@ -52,7 +52,7 @@ const isModalOpen = ref(false)
 const isCancelLoading = ref(false)
 const selectedOrder = ref(null)
 
-// 배당 모달
+// 배당 모달 (BaseModal 직접 사용)
 const isDividendModalOpen = ref(false)
 const isDividendLoading = ref(false)
 const selectedBuildingName = ref('')
@@ -73,12 +73,15 @@ const openDividendModal = async (item) => {
 
     const res = await getAllocations(item.fundingId)
     const list = unwrapAllocations(res)
+
+    // 원본 → 화면용으로 최소 정규화 (키 혼용 대비)
     selectedDividends.value = list.map((a) => ({
-      date: a.paymentDate,
-      perShare: a.dividendPerShare,
-      total: a.totalDividendAmount,
-      status: a.paymentStatusKorean || a.paymentStatus,
+      date: a.paymentDate ?? a.payment_date,
+      perShare: a.dividendPerShare ?? a.dividend_per_share,
+      total: a.totalDividendAmount ?? a.total_dividend_amount,
+      status: a.paymentStatusKorean ?? a.paymentStatus ?? a.payment_status,
     }))
+
     isDividendModalOpen.value = true
   } catch (e) {
     console.error('배당금 조회 실패', e)
@@ -174,7 +177,6 @@ async function fetchFundingPage() {
     fundingHasNext.value = hasNext
 
     if (!hasNext) {
-      // 다음 상태로 넘어가기
       if (fundingCursor.value + 1 < fundingStatusOrder.length) {
         fundingCursor.value += 1
         fundingPage.value = 0
@@ -267,7 +269,6 @@ async function fetchSharesPage() {
     await nextTick()
     ensureObserveShares()
 
-    // 화면이 길어서 센티넬이 이미 보이면 프리패치
     const rect = sharesBottomRef.value?.getBoundingClientRect?.()
     if (!sharesIsLoading.value && sharesHasNext.value && rect && rect.top < window.innerHeight) {
       fetchSharesPage()
@@ -306,9 +307,45 @@ onMounted(async () => {
   setupFundingObserver()
   setupSharesObserver()
 })
+
 onBeforeUnmount(() => {
   if (fundingObserver) fundingObserver.disconnect()
   if (sharesObserver) sharesObserver.disconnect()
+})
+
+const formatPlusAmount = (n) => `+ ${Number(n ?? 0).toLocaleString('ko-KR')}`
+
+// "MM.DD" 포맷
+const formatDateMd = (d) => {
+  if (!d) return ''
+  const date = new Date(d)
+  const mm = String(date.getMonth() + 1).padStart(2, '0')
+  const dd = String(date.getDate()).padStart(2, '0')
+  return `${mm}.${dd}`
+}
+
+// ✅ 연도별 그룹화 (지급예정/완료 라벨 제거, 금액은 "+ 1,234,567")
+const groupedDividends = computed(() => {
+  const list = (selectedDividends.value || [])
+    .map((a) => ({
+      year: new Date(a.date).getFullYear(),
+      date: a.date,
+      dateMd: formatDateMd(a.date),
+      amount: formatPlusAmount(a.total ?? a.totalDividendAmount),
+    }))
+    // 최신 날짜가 위로 오도록 정렬
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+
+  const map = new Map()
+  for (const it of list) {
+    if (!map.has(it.year)) map.set(it.year, [])
+    map.get(it.year).push({ dateMd: it.dateMd, amount: it.amount })
+  }
+
+  // [{ year: 2025, items: [...] }, { year: 2024, items: [...] }, ...]
+  return Array.from(map.entries())
+    .sort((a, b) => b[0] - a[0])
+    .map(([year, items]) => ({ year, items }))
 })
 </script>
 
@@ -433,8 +470,8 @@ onBeforeUnmount(() => {
             @click="openDividendModal(item)"
             class="text-xs px-0.5 mb-1 !py-0.5"
           >
-            <BaseTypography class="text-[10px] font-medium !text-white px-1"
-              >내 배당금</BaseTypography
+            <BaseTypography class="text-[10px] font-medium !text-white">
+              배당금 내역</BaseTypography
             >
           </BaseButton>
           <BaseTypography class="text-xs text-gray-500 mb-0.5">현재 시세</BaseTypography>
@@ -455,13 +492,53 @@ onBeforeUnmount(() => {
     </div>
   </div>
 
-  <!-- 모달 -->
-  <DividendModal
+  <!-- ✅ BaseModal 직접 사용: 배당 모달 -->
+  <BaseModal
     :isOpen="isDividendModalOpen"
-    :buildingName="selectedBuildingName"
-    :dividends="selectedDividends"
     @close="isDividendModalOpen = false"
-  />
+    @submit="isDividendModalOpen = false"
+  >
+    <div>
+      <!-- 제목 -->
+      <BaseTypography size="xl" weight="bold" class="mb-6">
+        {{ selectedBuildingName }}
+      </BaseTypography>
+
+      <!-- 내용 -->
+      <div v-if="isDividendLoading" class="py-12 text-center">
+        <BaseTypography class="text-sm !text-gray-500">불러오는 중...</BaseTypography>
+      </div>
+
+      <div v-else-if="groupedDividends.length" class="space-y-6 max-h-[400px] overflow-y-auto pr-1">
+        <div v-for="(group, gIdx) in groupedDividends" :key="gIdx">
+          <BaseTypography size="sm" class="mb-2">{{ group.year }}년</BaseTypography>
+
+          <div
+            v-for="(row, idx) in group.items"
+            :key="idx"
+            class="flex items-center justify-between p-4 rounded-md"
+            :class="idx % 2 === 0 ? 'bg-gray-100' : 'bg-white'"
+          >
+            <BaseTypography size="sm">{{ row.dateMd }}</BaseTypography>
+            <BaseTypography size="sm" weight="bold" class="!text-blue-600">
+              {{ row.amount }}
+            </BaseTypography>
+          </div>
+        </div>
+      </div>
+
+      <div v-else class="py-12 text-center">
+        <BaseTypography class="text-sm !text-gray-500">배당받은 내역이 없습니다.</BaseTypography>
+      </div>
+    </div>
+
+    <!-- 제출 버튼 슬롯 -->
+    <template #submit>
+      <BaseTypography class="!text-white font-medium text-base">확인</BaseTypography>
+    </template>
+  </BaseModal>
+
+  <!-- 환불 확인 모달 -->
   <CancelConfirmModal :isOpen="isModalOpen" @close="closeModal" @submit="confirmCancel" />
 </template>
 
