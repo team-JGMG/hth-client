@@ -48,7 +48,7 @@ export const registerPropertyWithFormData = async ({
   formData.append('documentTypes', documentTypesBlob)
 
   // 5. 요청 전송
-  return api.post('/api/property', formData, {
+  return api.post('/api/auth/property', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -56,12 +56,12 @@ export const registerPropertyWithFormData = async ({
 }
 
 // 매물 목록 조회
-export const fetchUserProperties = async (userId) => {
+export const fetchUserProperties = async () => {
   try {
     const statuses = ['pending', 'approved', 'rejected', 'sold']
     const allResults = await Promise.all(
       statuses.map((status) =>
-        api.get(`/api/property/user/${userId}`, {
+        api.get(`/api/auth/property/user`, {
           params: {
             page: 0,
             size: 10,
@@ -109,8 +109,8 @@ export const getCoordinatesByAddress = async (address) => {
     throw e
   }
 }
-export const getPropertyDetail = async (propertyId) => {
-  const { data } = await api.get(`/api/funding/${propertyId}`) // 실제 경로 다르면 수정
+export const getPropertyDetail = async (fundingId) => {
+  const { data } = await api.get(`/api/funding/${fundingId}`) // 실제 경로 다르면 수정
   return data
 }
 

@@ -41,10 +41,10 @@ watch(
 const handleConfirm = async () => {
   try {
     const payload = {
-      userId: userStore.userId,
       fundingId: props.fundingId,
       orderPricePerShare: props.amount,
       orderShareCount: props.quantity,
+      orderType: String(props.type).toUpperCase(),
     }
 
     const response = await createOrder(payload, props.type)

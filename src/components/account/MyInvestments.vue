@@ -182,7 +182,7 @@ async function fetchFundingPage() {
 
   fundingIsLoading.value = true
   try {
-    const res = await getUserFundingOrders(userId.value, status, fundingPage.value, PAGE_SIZE)
+    const res = await getUserFundingOrders(status, fundingPage.value, PAGE_SIZE)
     await delay(2000)
 
     const content = res?.data?.data?.content ?? []
@@ -259,7 +259,7 @@ async function fetchSharesPage() {
   if (sharesIsLoading.value || !sharesHasNext.value) return
   sharesIsLoading.value = true
   try {
-    const res = await getUserShares(userId.value, sharesPage.value, PAGE_SIZE)
+    const res = await getUserShares(sharesPage.value, PAGE_SIZE)
     await delay(600)
 
     const data = res?.data?.data ?? res?.data

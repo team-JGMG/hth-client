@@ -27,12 +27,12 @@ const loadKakaoScript = () => {
 
 const loadMap = async () => {
   try {
-    const propertyId = Number(route.params.id)
-    console.log('요청할 propertyId:', propertyId)
+    const fundingId = Number(route.params.id)
+    console.log('요청할 propertyId:', fundingId)
     let address = route.query?.address
     if (!address) {
       try {
-        const detail = await getPropertyDetail(propertyId)
+        const detail = await getPropertyDetail(fundingId)
         address = pickAddress(detail?.data ?? detail)
         console.log('[address from detail]', address)
       } catch (e) {
@@ -53,7 +53,7 @@ const loadMap = async () => {
     // }
 
     // 주변 시세 조회
-    const mapData = await getPropertyMapData(propertyId)
+    const mapData = await getPropertyMapData(fundingId)
     if (address) {
       try {
         const center = await getCoordinatesByAddress(address) // { latitude, longitude }

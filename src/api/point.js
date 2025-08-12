@@ -5,7 +5,7 @@ import api from '@/libs/axios'
 
 // merchant_uid 발급
 export const requestChargeMerchantUid = async (amount) => {
-  const res = await api.post('/api/point/charge', null, {
+  const res = await api.post('/api/auth/point/charge', null, {
     params: { amount: Number(amount) },
     withCredentials: true,
   })
@@ -15,7 +15,7 @@ export const requestChargeMerchantUid = async (amount) => {
 // 결제 검증
 export const verifyPayment = async ({ impUid, amount, merchantUid }) => {
   const res = await api.post(
-    '/api/point/verify',
+    '/api/auth/point/verify',
     { impUid, amount, merchantUid },
     { withCredentials: true },
   )
@@ -23,21 +23,19 @@ export const verifyPayment = async ({ impUid, amount, merchantUid }) => {
 }
 
 // 현재 포인트 보유량 조회
-export const getPointBalance = async (userId) => {
-  const res = await api.get('/api/point/balance-test', {
-    params: { userId },
+export const getPointBalance = async () => {
+  const res = await api.get('/api/auth/point/balance', {
     withCredentials: true,
   })
   return res.data.data
 }
 
 // 포인트 환급 요청
-export const requestPointRefund = async ({ amount, userId }) => {
+export const requestPointRefund = async ({ amount }) => {
   const res = await api.post(
-    '/api/point/refund-test',
+    '/api/auth/point/refund',
     { amount: Number(amount) },
     {
-      params: { userId },
       withCredentials: true,
       headers: { 'Content-Type': 'application/json' },
     },
@@ -49,14 +47,12 @@ export const getPointTransactions = async ({
   page = 0,
   size = 100,
   sort = 'createdAt,DESC',
-  userId, // 반드시 전달 (Swagger에 userId query 필요)
 } = {}) => {
   try {
     const params = { page, size, sort }
-    if (userId != null) params.userId = userId
 
     // ⚠️ 여기 경로가 핵심
-    const res = await api.get('/api/point/transactions-test', { params })
+    const res = await api.get('/api/auth/point/transactions', { params })
     if (!Array.isArray(res?.data?.data)) {
       throw new Error(res?.data?.message || '포인트 내역 응답 형식 오류')
     }

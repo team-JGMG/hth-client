@@ -290,7 +290,6 @@ const handleFinalSubmit = async () => {
   try {
     const payload = {
       fundingId,
-      userId: userId.value,
       shareCount: Number(quantity.value),
     }
     console.log('[REQ] funding-order', payload)
@@ -459,7 +458,7 @@ watch(
       loaded.value = false
 
       const [limit, detailRes] = await Promise.all([
-        getFundingOrderLimit(fundingId, uid), // ← 언래핑된 객체가 들어옴
+        getFundingOrderLimit(fundingId), // ← 언래핑된 객체가 들어옴
         getFundingById(fundingId),
       ])
       const detail = detailRes?.data?.data ?? {}

@@ -76,8 +76,8 @@ const refreshPointBalance = async () => {
 
   isLoading.value = true
   try {
-    console.log('🌐 getPointBalance API 호출, userId:', authStore.userId)
-    const point = await getPointBalance(authStore.userId)
+    console.log('🌐 getPointBalance API 호출')
+    const point = await getPointBalance()
     console.log('📨 포인트 API 응답:', { point, type: typeof point })
 
     authStore.setUserPoint(point)
@@ -199,7 +199,7 @@ const handleRefund = async () => {
     return
   }
   try {
-    await requestPointRefund({ amount: Number(refundAmount.value), userId: authStore.userId })
+    await requestPointRefund({ amount: Number(refundAmount.value) })
     toast.success({ title: '신청 완료', body: '환급 신청이 완료되었습니다.' })
     isRefundModalOpen.value = false
     refundAmount.value = 0

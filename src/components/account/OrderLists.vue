@@ -141,7 +141,7 @@ async function fetchOrdersPage() {
     let iter = 0
 
     while (added < PAGE_SIZE && hasNext.value && iter < 10) {
-      const res = await getOrderHistory(userId.value, page.value, PAGE_SIZE)
+      const res = await getOrderHistory(page.value, PAGE_SIZE)
       console.log('[orders fetch]', { page: page.value, raw: res?.data })
       await delay(2000)
 

@@ -2,19 +2,19 @@ import api from '@/libs/axios'
 
 // 알림 목록 조회
 export const getNotifications = async () => {
-  const res = await api.get('/api/notifications')
+  const res = await api.get('/api/auth/notifications')
   return res.data
 }
 
 // 특정 알림 읽음 처리
 export const markNotificationRead = async (notificationId) => {
-  const res = await api.put(`/api/notifications/${notificationId}/read`)
+  const res = await api.put(`/api/auth/notifications/${notificationId}/read`)
   return res.data
 }
 
 // 모든 알림 읽음 처리
 export const markAllRead = async () => {
-  const res = await api.put('/api/notifications/read-all')
+  const res = await api.put('/api/auth/notifications/read-all')
   return res.data
 }
 

@@ -15,15 +15,20 @@ import { logout as logoutAPI } from '@/api/auth'
 import { useAuthStore } from '@/stores/authStore'
 import BaseTypography from '../common/Typography/BaseTypography.vue'
 import { useToastStore } from '@/stores/toast'
+import { useFcmStore } from '@/stores/fcm'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const toast = useToastStore()
+const fcmStore = useFcmStore()
 
 const handleLogout = async () => {
   try {
+    await fcmStore.init()
+    const deviceToken = fcmStore.token || null
+
     // ✅ 백엔드에 로그아웃 요청
-    await logoutAPI()
+    await logoutAPI(deviceToken)
 
     // ✅ Pinia 스토어 초기화
     authStore.logout()

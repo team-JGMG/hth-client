@@ -2,11 +2,10 @@
 // src/api/fundingtrade.js
 import api from '@/libs/axios'
 
-export async function getFundingOrderLimit(fundingId, userId) {
+export async function getFundingOrderLimit(fundingId) {
   const f = Number(fundingId)
-  const u = Number(userId)
-  const { data } = await api.get('/api/funding-order/limit', {
-    params: { fundingId: f, userId: u },
+  const { data } = await api.get('/api/auth/funding-order/limit', {
+    params: { fundingId: f },
   })
   const body = data?.data ?? data ?? {}
   // 숫자 정규화(선택)
@@ -20,12 +19,11 @@ export async function getFundingOrderLimit(fundingId, userId) {
   }
 }
 
-export async function createFundingOrder({ fundingId, userId, shareCount }) {
+export async function createFundingOrder({ fundingId, shareCount }) {
   const f = Number(fundingId)
-  const u = Number(userId)
   const s = Number(shareCount)
 
-  const url = `/api/funding-order?fundingId=${f}&userId=${u}&shareCount=${s}`
+  const url = `/api/auth/funding-order?fundingId=${f}&shareCount=${s}`
   try {
     const { data } = await api.post(url)
     // ✅ 성공 판정 통일

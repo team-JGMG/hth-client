@@ -175,20 +175,6 @@ import { formatPhoneNumber } from '@/utils/format'
 const authStore = useAuthStore()
 const store = usePropertyRegisterStore()
 
-//목데이터
-authStore.userInfo = {
-  userId: 1,
-  name: '홍길동',
-  phone: '01012345678',
-  email: 'hong@test.com',
-  isAdmin: false,
-}
-//목데이터 자동 바인딩
-store.ownerInfo.name = authStore.userInfo.name
-store.ownerInfo.phone = authStore.userInfo.phone
-store.ownerInfo.email = authStore.userInfo.email
-store.ownerInfo.userId = authStore.userInfo.userId
-
 onMounted(async () => {
   try {
     if (!authStore.userInfo) {
