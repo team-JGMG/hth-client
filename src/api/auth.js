@@ -40,7 +40,7 @@ export const fetchUserInfo = async () => {
  * @returns {Promise<{code:string, data:any, message:string, status:string}>}
  */
 export const registerDeviceToken = async (userId, deviceToken) => {
-  const res = await api.post(`/api/auth/device-token`, {
+  const res = await api.post(`/api/auth/device-tokens`, {
     deviceToken,
   })
   return res.data
