@@ -1,9 +1,7 @@
 <template>
   <DetailLayout>
     <DetailHeader>알림</DetailHeader>
-
     <NotificationControls />
-
     <NotificationLoading v-if="nStore.loading" />
     <NotificationError v-else-if="nStore.error" :error="nStore.error" />
     <template v-else>
@@ -13,7 +11,7 @@
   </DetailLayout>
 </template>
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import DetailLayout from '@/layouts/DetailLayout.vue'
 import DetailHeader from '@/layouts/DetailHeader.vue'
 import { useNotificationStore } from '@/stores/notification'
@@ -24,8 +22,6 @@ import NotificationLoading from '@/components/notification/NotificationLoading.v
 import NotificationError from '@/components/notification/NotificationError.vue'
 
 const nStore = useNotificationStore()
-
-onMounted(() => nStore.fetch())
 
 const yyyymmddDot = (iso) => {
   const d = new Date(iso)
