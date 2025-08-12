@@ -25,6 +25,8 @@ onMounted(async () => {
     await authStore.loadUserInfo()
     if (authStore.getIsLoggedIn) {
       notificationStore.fetch()
+      const point = await getPointBalance(authStore.userId)
+      authStore.setUserPoint(point)
     }
   } else {
     authStore.logout()
