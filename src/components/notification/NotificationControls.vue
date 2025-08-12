@@ -7,16 +7,23 @@ const nStore = useNotificationStore()
 
 <template>
   <div class="flex items-center justify-between px-2 mb-2">
-    <BaseTypography size="sm" color="gray-1"
-      >안 읽은 알림 {{ nStore.unreadCount }}개</BaseTypography
-    >
+    <BaseTypography size="sm" color="gray-1">
+      안 읽은 알림 {{ nStore.unreadCount }}개
+    </BaseTypography>
     <div class="flex gap-2">
       <button
-        class="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-sm"
+        class="group relative px-4 py-1.5 rounded-full text-sm font-medium"
+        :class="[
+          nStore.hasUnread
+            ? 'bg-blue-500 from-blue-500 text-white '
+            : 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50',
+        ]"
         @click="nStore.readAll"
         :disabled="!nStore.hasUnread"
       >
-        전체 읽음
+        <span class="relative z-10 flex items-center gap-1.5"
+          ><span class="material-symbols-outlined" style="font-size: 14px"> check </span>
+        </span>
       </button>
     </div>
   </div>
