@@ -21,6 +21,10 @@ onMounted(async () => {
   const refreshToken = localStorage.getItem('refreshToken')
   if (refreshToken) {
     await authStore.loadUserInfo()
+    if (authStore.getIsLoggedIn) {
+      const point = await getPointBalance(authStore.userId)
+      authStore.setUserPoint(point)
+    }
   } else {
     authStore.logout()
   }
