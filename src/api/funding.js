@@ -16,8 +16,8 @@ export const getFundingList = async (category, sort = 'date', page = 0, size = 2
 }
 
 // 특정유저 펀딩 주문 목록 조회
-export const getUserFundingOrders = (userId, status = 'pending', page = 0, size = 10) => {
-  return api.get(`/api/funding-order/${userId}`, {
+export const getUserFundingOrders = (status = 'pending', page = 0, size = 10) => {
+  return api.get(`/api/auth/funding-order`, {
     params: {
       status,
       page,
@@ -27,8 +27,8 @@ export const getUserFundingOrders = (userId, status = 'pending', page = 0, size 
 }
 
 //  특정유저 보유 지분 목록 조회
-export const getUserShares = (userId, page = 0, size = 10) => {
-  return api.get(`/api/shares/users/${userId}`, {
+export const getUserShares = (page = 0, size = 10) => {
+  return api.get(`/api/auth/shares`, {
     params: { page, size },
   })
 }
@@ -48,7 +48,7 @@ export const refundFundingOrder = (fundingId, orderId, orderPrice) => {
     console.log('[refundFundingOrder] params =', params)
   }
 
-  return api.post('/api/funding-order/refund', null, {
+  return api.post('/api/auth/funding-order/refund', null, {
     params,
     withCredentials: true,
   })

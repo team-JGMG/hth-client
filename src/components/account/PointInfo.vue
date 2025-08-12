@@ -121,7 +121,6 @@ async function fetchLogsPage() {
       page: page.value,
       size: PAGE_SIZE,
       sort: 'createdAt,DESC',
-      userId: userId.value,
     })
     console.log('[PointInfo] raw response:', res) // 🔍 디버깅
     await delay(2000)

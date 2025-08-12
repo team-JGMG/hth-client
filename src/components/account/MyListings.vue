@@ -209,7 +209,7 @@ const fetchProperties = async (groupKey, statusParam) => {
 
   info.isLoading = true
   try {
-    const res = await api.get(`/api/property/user/${effectiveUserId.value}`, {
+    const res = await api.get(`/api/auth/property/user`, {
       params: { page: info.page, size: PAGE_SIZE, status: statusParam },
     })
 

@@ -22,7 +22,17 @@ export const useAuthStore = defineStore(
       try {
         const { useFcmStore } = await import('@/stores/fcm')
         const fcm = useFcmStore()
-        await fcm.init() // 토큰 발급/서버등록/리스너 바인딩
+        await fcm.init() // 권한/서비스워커/토큰 확보
+        if (!fcm.token) return
+
+        // 마지막 등록 정보 확인
+        const last = JSON.parse(localStorage.getItem(LAST_REG_KEY) || 'null')
+
+        // uid 또는 token이 달라지면 서버에 업서트
+        if (!last || last.uid !== uid || last.token !== fcm.token) {
+          await registerDeviceToken(fcm.token) // POST /api/auth/device-tokens
+          localStorage.setItem(LAST_REG_KEY, JSON.stringify({ uid, token: fcm.token }))
+        }
       } catch (e) {
         console.warn('[FCM] 초기화 실패:', e)
       }

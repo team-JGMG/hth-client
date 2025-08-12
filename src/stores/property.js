@@ -8,9 +8,9 @@ export const usePropertyStore = defineStore('property', () => {
   function setSoldProperties(properties) {
     soldProperties.value = properties
   }
-  const loadUserProperties = async (userId) => {
+  const loadUserProperties = async () => {
     try {
-      const propertyList = await fetchUserProperties(userId) // ✅ 배열로 바로 받기
+      const propertyList = await fetchUserProperties() // ✅ 배열로 바로 받기
       console.log('✅ API 응답:', propertyList)
       userProperties.value = propertyList
       soldProperties.value = propertyList.filter((item) => item.status === 'COMPLETED')

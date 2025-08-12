@@ -111,7 +111,9 @@ export const useFcmStore = defineStore('fcm', {
             token: this.token,
           })
 
-          const res = await registerDeviceToken(userId, this.token)
+          const res = await registerDeviceToken(this.token) // POST /api/auth/device-tokens
+
+          // ✅ 콘솔 추가 - 요청 후
           console.log('[FCM] registerDeviceToken 응답', res)
 
           localStorage.setItem(

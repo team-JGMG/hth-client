@@ -148,7 +148,6 @@ const handleFinalSubmit = async () => {
     store.documentTypes = documentFields.map((field) => field.value)
 
     const requestBody = {
-      userId: parseInt(store.ownerInfo.userId),
       title: store.propertyBasic.title,
       rawdCd: store.propertyBasic.rawdCd,
       address: `${store.propertyBasic.address} ${store.propertyBasic.detailAddress}`,

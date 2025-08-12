@@ -13,24 +13,24 @@ export const getKakaoLoginUrl = async () => {
 
 // 회원가입 요청 (preauthToken 쿠키 사용)
 export const signUpWithPreAuth = async (userInfo) => {
-  return api.post('/api/auth/signup', userInfo, {
+  return api.post('/api/signup', userInfo, {
     withCredentials: true,
   })
 }
 
 // 토큰 갱신
 export const refreshAccessToken = async () => {
-  return api.post('/api/auth/oauth/token-refresh')
+  return api.post('/api/auth/token-refresh')
 }
 
 // 로그아웃 요청
-export const logout = async () => {
-  return api.post('/api/auth/oauth/logout')
+export const logout = async (deviceToken) => {
+  return api.post('/api/auth/logout', { deviceToken })
 }
 
 // 유저 정보 요청
 export const fetchUserInfo = async () => {
-  return api.get('/api/users/me', { withCredentials: true })
+  return api.get('/api/auth/users/me', { withCredentials: true })
 }
 
 /**
@@ -39,8 +39,8 @@ export const fetchUserInfo = async () => {
  * @param {string} deviceToken
  * @returns {Promise<{code:string, data:any, message:string, status:string}>}
  */
-export const registerDeviceToken = async (userId, deviceToken) => {
-  const res = await api.post(`/api/users/${encodeURIComponent(userId)}/device-token`, {
+export const registerDeviceToken = async (deviceToken) => {
+  const res = await api.post(`/api/auth/device-tokens`, {
     deviceToken,
   })
   return res.data
