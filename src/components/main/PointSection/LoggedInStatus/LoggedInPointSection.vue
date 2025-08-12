@@ -33,7 +33,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/authStore'
 import { useToastStore } from '@/stores/toast'
@@ -71,6 +71,15 @@ onMounted(async () => {
     authStore.setUserPoint(point)
   } catch (e) {
     console.error('포인트 불러오기 실패:', e)
+  }
+  if (getIsLoggedIn.value) {
+    await refreshPointBalance()
+  }
+})
+
+watch(getIsLoggedIn, async (loggedIn) => {
+  if (loggedIn) {
+    await refreshPointBalance()
   }
 })
 
