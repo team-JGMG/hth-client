@@ -8,7 +8,7 @@ import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import router from './router'
 import { useKakao } from 'vue3-kakao-maps'
-
+const { useAuthStore } = await import('@/stores/authStore')
 useKakao('4215b6b611faa29a4ce872b00b8f8e8b', { libraries: ['services'] })
 
 Promise.all([
@@ -26,6 +26,8 @@ Promise.all([
   app.use(pinia)
   app.use(router)
 
+  const auth = useAuthStore(pinia)
+  await auth.loadUserInfo()
   // ✅ FCM 초기화 (권한/토큰/업서트)
   try {
     const { useFcmStore } = await import('@/stores/fcm')
