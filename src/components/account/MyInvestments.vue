@@ -1,7 +1,7 @@
 <!-- MyInvestments.vue -->
 <script setup>
 import { ref, onMounted, nextTick, onBeforeUnmount, watch, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { getUserFundingOrders, getUserShares, refundFundingOrder } from '@/api/funding'
 import { getAllocations, unwrapAllocations } from '@/api/allocation'
 import { formatAmount } from '@/utils/format'
@@ -12,6 +12,40 @@ import BaseModal from '@/components/common/Modal/BaseModal.vue'
 import NoInvestmentItems from './NoInvestmentItems.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
+
+const route = useRoute()
+
+async function resetAndReload() {
+  console.log('[MY] resetAndReload start, r=', route.query.r)
+
+  // 목록/커서 전부 초기화
+  fundingItems.value = []
+  ownedItems.value = []
+  fundingCursor.value = 0
+  fundingPage.value = 0
+  fundingHasNext.value = true
+  sharesPage.value = 0
+  sharesHasNext.value = true
+
+  initialLoading.value = true
+  await Promise.all([fetchFundingPage(), fetchSharesPage()])
+  initialLoading.value = false
+  await nextTick()
+  setupFundingObserver()
+  setupSharesObserver()
+}
+
+// 초기 진입
+onMounted(resetAndReload)
+
+// /account/my-page?r=... 변경될 때마다 새로고침
+watch(
+  () => route.query.r,
+  () => {
+    console.log('[MY] route query.r changed -> reload')
+    resetAndReload()
+  },
+)
 
 const router = useRouter()
 function goFundingDetail(fundingId) {
@@ -133,7 +167,7 @@ const confirmCancel = async () => {
 }
 
 /** ---------- 무한스크롤: 펀딩(주문) ---------- **/
-const fundingStatusOrder = ['pending', 'refunded']
+const fundingStatusOrder = ['all']
 const fundingCursor = ref(0)
 const fundingPage = ref(0)
 const fundingHasNext = ref(true)
@@ -152,6 +186,14 @@ async function fetchFundingPage() {
     await delay(2000)
 
     const content = res?.data?.data?.content ?? []
+    console.log('[ORDERS][RES]', {
+      status,
+      page: fundingPage.value,
+      size: PAGE_SIZE,
+      count: content.length,
+      hasNext: res?.data?.data?.hasNext,
+      first: content[0],
+    })
     const mapped = content.map((item) => {
       const sUpper =
         String(item.status ?? item.orderStatus ?? '')
@@ -298,15 +340,15 @@ watch(
 )
 
 /** ---------- 초기 로딩 & 옵저버 ---------- **/
-onMounted(async () => {
-  initialLoading.value = true
-  await Promise.all([fetchFundingPage(), fetchSharesPage()])
-  initialLoading.value = false
+// onMounted(async () => {
+//   initialLoading.value = true
+//   await Promise.all([fetchFundingPage(), fetchSharesPage()])
+//   initialLoading.value = false
 
-  await nextTick()
-  setupFundingObserver()
-  setupSharesObserver()
-})
+//   await nextTick()
+//   setupFundingObserver()
+//   setupSharesObserver()
+// })
 
 onBeforeUnmount(() => {
   if (fundingObserver) fundingObserver.disconnect()
