@@ -57,10 +57,11 @@
           <InputField
             v-model="store.propertyDetail.roomCount"
             type="number"
-            class="flex-1"
-            placeholder="방 수"
+            class="w-7"
+            placeholder="0"
             @focus="touched.roomCount = true"
           />
+          <span class="text-base text-black whitespace-nowrap -translate-y-2"> 개</span>
         </div>
 
         <!-- 욕실 수 -->
@@ -70,10 +71,11 @@
           <InputField
             v-model="store.propertyDetail.bathroomCount"
             type="number"
-            class="flex-1"
-            placeholder="욕실 수"
+            class="w-7"
+            placeholder="0"
             @focus="touched.bathroomCount = true"
           />
+          <span class="text-base text-black whitespace-nowrap -translate-y-2"> 개</span>
         </div>
       </div>
       <BaseTypography
