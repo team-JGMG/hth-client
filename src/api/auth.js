@@ -5,7 +5,7 @@ import api from '@/libs/axios'
 
 // 카카오 로그인 URL 요청
 export const getKakaoLoginUrl = async () => {
-  const response = await api.get('http://localhost:8080/api/auth/login/kakao', {
+  const response = await api.get('/api/auth/login/kakao', {
     withCredentials: true,
   })
   return response.data
