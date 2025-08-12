@@ -6,17 +6,16 @@ import { useNotificationStore } from '@/stores/notification'
 import { useToastStore } from '@/stores/toast'
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyBlGyTkWCcpa5wBnilUyuKq0aLnzVrOEnU',
-  authDomain: 'half-to-half.firebaseapp.com',
-  projectId: 'half-to-half',
-  storageBucket: 'half-to-half.firebasestorage.app',
-  messagingSenderId: '901490480152',
-  appId: '1:901490480152:web:8b80dc3923fb3b7be81f6d',
-  measurementId: 'G-CNNPB8N62Y',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 }
-const VAPID_PUBLIC_KEY =
-  'BDQGH97rGd2TYNHX40Cw392hDAkQO139lLlEjMHQP9T55Cq3Vifi4BGgddISfPQEa9NxRFlTYV20ssiJHOGewkU'
 
+const VAPID_PUBLIC_KEY = import.meta.env.VITE_FIREBASE_VAPID_PUBLIC_KEY
 const app = initializeApp(firebaseConfig)
 const LAST_REG_KEY = 'fcm:lastReg' // { uid, token }
 
@@ -58,6 +57,7 @@ export const useFcmStore = defineStore('fcm', {
       }
 
       // 로그인된 경우에만 토큰 등록/업서트
+      // 로그인된 경우에만 토큰 등록/업서트
       try {
         const [{ useAuthStore }, { registerDeviceToken }] = await Promise.all([
           import('@/stores/authStore'),
@@ -68,7 +68,17 @@ export const useFcmStore = defineStore('fcm', {
         if (uid && this.token) {
           const last = JSON.parse(localStorage.getItem(LAST_REG_KEY) || 'null')
           if (!last || last.uid !== uid || last.token !== this.token) {
-            await registerDeviceToken(uid, this.token) // POST /api/users/{uid}/device-token
+            // ✅ 콘솔 추가 - 요청 전
+            console.log('[FCM] registerDeviceToken 요청', {
+              uid,
+              token: this.token,
+            })
+
+            const res = await registerDeviceToken(uid, this.token) // POST /api/users/{uid}/device-token
+
+            // ✅ 콘솔 추가 - 요청 후
+            console.log('[FCM] registerDeviceToken 응답', res)
+
             localStorage.setItem(LAST_REG_KEY, JSON.stringify({ uid, token: this.token }))
           }
         }
