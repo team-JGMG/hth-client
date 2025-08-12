@@ -11,16 +11,21 @@
 import { onMounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useFcmStore } from '@/stores/fcm'
+import { useNotificationStore } from '@/stores/notification'
 import BaseToast from './components/BaseToast.vue'
 
 const authStore = useAuthStore()
 const fcmStore = useFcmStore()
+const notificationStore = useNotificationStore()
 const fcmInitializing = ref(false)
 
 onMounted(async () => {
   const refreshToken = localStorage.getItem('refreshToken')
   if (refreshToken) {
     await authStore.loadUserInfo()
+    if (authStore.getIsLoggedIn) {
+      notificationStore.fetch()
+    }
   } else {
     authStore.logout()
   }
