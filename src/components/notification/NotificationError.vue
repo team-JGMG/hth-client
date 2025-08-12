@@ -8,5 +8,5 @@ defineProps({
 </script>
 
 <template>
-  <div class="text-center text-red-500 py-4">{{ error }}</div>
+  <BaseTypography color="red" class="text-center py-4">{{ error }}</BaseTypography>
 </template>

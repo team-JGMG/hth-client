@@ -1,3 +1,7 @@
+<script setup>
+import BaseTypography from '../common/Typography/BaseTypography.vue'
+</script>
+
 <template>
-  <div class="text-center text-gray-500 py-4">불러오는 중…</div>
+  <BaseTypography color="gray-1" class="text-center py-4">불러오는 중…</BaseTypography>
 </template>

@@ -11,10 +11,12 @@
 import { onMounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useFcmStore } from '@/stores/fcm'
+import { useNotificationStore } from '@/stores/notification'
 import BaseToast from './components/BaseToast.vue'
 
 const authStore = useAuthStore()
 const fcmStore = useFcmStore()
+const notificationStore = useNotificationStore()
 const fcmInitializing = ref(false)
 
 onMounted(async () => {
@@ -24,6 +26,7 @@ onMounted(async () => {
     if (authStore.getIsLoggedIn) {
       const point = await getPointBalance(authStore.userId)
       authStore.setUserPoint(point)
+      notificationStore.fetch()
     }
   } else {
     authStore.logout()
