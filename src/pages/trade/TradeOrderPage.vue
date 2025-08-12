@@ -17,7 +17,7 @@
           :refreshTrigger="chartRefreshTrigger"
           :fundingId="tradeId"
         />
-        <TradeHistoryChart
+        <TradingChartContainer
           ref="tradeHistoryChart"
           v-if="currentFundingStatus === 'stockChart'"
           :fundingId="tradeId"
@@ -41,9 +41,9 @@ import BlankLayout from '@/layouts/BlankLayout.vue'
 import DetailHeader from '@/layouts/DetailHeader.vue'
 import BuyAndSellAccodian from '@/components/trade/BuyAndSell/BuyAndSellAccodian.vue'
 import CurrentPrice from '@/components/trade/CurrentPrice.vue'
-import TradeHistoryChart from '@/components/trade/TradeHistoryChart.vue'
 import OrderbookChart from '@/components/trade/Hoga/OrderbookChart.vue'
 import { getFundingById } from '@/api/funding'
+import TradingChartContainer from '@/components/trade/TradeListChart/TradingChartContainer.vue'
 
 const route = useRoute()
 const tradeId = ref(Number(route.params.id)) // 반응형으로 처리
