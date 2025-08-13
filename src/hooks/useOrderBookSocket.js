@@ -1,4 +1,5 @@
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+
 import { Client } from '@stomp/stompjs'
 import SockJS from 'sockjs-client'
 import { parseOrderbookData } from '@/utils/ParseOrderBookData'
@@ -12,7 +13,7 @@ export function useOrderBookSocket(fundingId, onUpdate) {
     if (stompClient && stompClient.active) {
       stompClient.deactivate()
     }
-    const socket = new SockJS('http://localhost:8080/order-book')
+    const socket = new SockJS('https://half-to-half.site/order-book')
     stompClient = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
