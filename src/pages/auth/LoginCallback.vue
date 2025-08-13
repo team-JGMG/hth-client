@@ -10,13 +10,15 @@ const authStore = useAuthStore()
 // ✅ status, email은 query에서 가져옴
 const status = route.query.status
 const email = route.query.email
-
 const handleCallback = async () => {
   console.log('[소셜 로그인 콜백 시작]')
   console.log('status:', status)
   console.log('email:', email)
 
-  if (status === 'SUCCESS') {
+  if (status === 'ADMIN') {
+    // ✅ 관리자일 경우 바로 관리자 페이지로 이동
+    router.push('/admin/property-review')
+  } else if (status === 'SUCCESS') {
     try {
       // ✅ 유저 정보 로드 (쿠키 기반 인증)
       await authStore.loadUserInfo()
@@ -32,15 +34,12 @@ const handleCallback = async () => {
     // ✅ accessToken 삭제 (회원가입은 preAuthToken만 남겨야 함)
     document.cookie = 'accessToken=; Max-Age=0; path=/'
 
-    // ✅ 0.5초 지연 후 회원가입 페이지로 이동
-    // setTimeout(() => {
     router.push({
       path: '/auth/signup',
       query: {
         email: email || '',
       },
     })
-    // }, 0)
   } else {
     console.warn('[잘못된 status]', status)
     router.push('/auth/login?error=invalid_status')
