@@ -109,10 +109,10 @@ import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import BaseButton from '../common/Button/BaseButton.vue'
 import NoTradeItems from './NoTradeItems.vue'
 import { format, formatAmount } from '@/utils/format'
-import api from '@/libs/axios'
+
 import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
-
+import { fetchUserPropertiesByStatus } from '@/api/property'
 // ✅ 그룹 설정
 const groupConfig = [
   { key: 'APPROVED_ACTIVE', title: '거래 진행중인 매물', status: 'approved' },
@@ -200,6 +200,7 @@ const isEmpty = computed(() => {
 })
 
 // ✅ API 호출
+// ✅ API 호출 (정리본)
 const fetchProperties = async (groupKey, statusParam) => {
   const info = pageInfo[groupKey]
   if (info.isLoading || !info.hasNextPage || !effectiveUserId.value) return
@@ -209,12 +210,14 @@ const fetchProperties = async (groupKey, statusParam) => {
 
   info.isLoading = true
   try {
-    const res = await api.get(`/api/auth/property/user`, {
-      params: { page: info.page, size: PAGE_SIZE, status: statusParam },
+    const { content, last } = await fetchUserPropertiesByStatus({
+      status: statusParam, // 'pending' | 'approved' | 'rejected' | 'sold'
+      page: info.page,
+      size: PAGE_SIZE,
     })
 
-    await delay(2000) // 요청 후 2초 대기
-    const content = res.data?.data?.content || []
+    // 요청 후 2초 대기 유지 (원하면 위치 조정 가능)
+    await delay(2000)
 
     if (groupKey === 'APPROVED_ACTIVE') {
       listings[groupKey].push(
@@ -226,7 +229,7 @@ const fetchProperties = async (groupKey, statusParam) => {
       listings[groupKey].push(...content)
     }
 
-    info.hasNextPage = !res.data?.data?.last
+    info.hasNextPage = !last
     info.page++
     info.fetchedOnce = true
   } catch (e) {
