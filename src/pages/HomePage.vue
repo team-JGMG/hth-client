@@ -1,3 +1,18 @@
+<template>
+  <div>
+    <OnboardingPage v-if="!hasVisited" />
+
+    <BaseLayout v-else>
+      <PointSection />
+      <div class="flex space-x-3">
+        <FundingListSection class="flex-1" />
+        <TradeListSection class="flex-1" />
+      </div>
+      <PropertySection />
+      <SaleCompleted />
+    </BaseLayout>
+  </div>
+</template>
 <script setup>
 import { useAuthStore } from '@/stores/authStore'
 import { useOnboardingStore } from '@/stores/onboarding'
@@ -20,19 +35,3 @@ const { hasVisited } = storeToRefs(onboardingStore)
 console.log('로그인 상태:', getIsLoggedIn.value)
 console.log('온보딩 완료 여부:', hasVisited.value)
 </script>
-
-<template>
-  <div>
-    <OnboardingPage v-if="!hasVisited" />
-
-    <BaseLayout v-else>
-      <PointSection />
-      <div class="flex space-x-3">
-        <FundingListSection class="flex-1" />
-        <TradeListSection class="flex-1" />
-      </div>
-      <PropertySection />
-      <SaleCompleted />
-    </BaseLayout>
-  </div>
-</template>
