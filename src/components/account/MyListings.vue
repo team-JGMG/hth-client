@@ -200,7 +200,7 @@ const isEmpty = computed(() => {
 })
 
 // ✅ API 호출
-// ✅ API 호출 (정리본)
+
 const fetchProperties = async (groupKey, statusParam) => {
   const info = pageInfo[groupKey]
   if (info.isLoading || !info.hasNextPage || !effectiveUserId.value) return
