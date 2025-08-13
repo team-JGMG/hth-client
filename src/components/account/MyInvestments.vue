@@ -164,13 +164,11 @@ const confirmCancel = async () => {
         body: res?.data?.message || '환불 처리에 실패했습니다.',
       })
     }
-  } catch (e) {
+  } catch {
     toast.error({
       title: '환불 실패',
       body: '환불 처리 중 오류가 발생했습니다.',
     })
-    console.error('환불 실패', e)
-    alert('환불 처리 중 오류가 발생했습니다.')
   } finally {
     isCancelLoading.value = false
     closeModal()

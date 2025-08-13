@@ -102,9 +102,11 @@ import CompletedModal from '@/components/common/Modal/CompletedModal.vue'
 
 import { usePropertyRegisterStore } from '@/stores/propertyRegister'
 import { registerPropertyWithFormData } from '@/api/property'
+import { useToastStore } from '@/stores/toast'
 
 const store = usePropertyRegisterStore()
 const router = useRouter()
+const toast = useToastStore()
 
 //문서 첨부 항목 정의
 const documentFields = [
@@ -191,9 +193,15 @@ const handleFinalSubmit = async () => {
 
     showConfirmModal.value = false
     showCompleteModal.value = true
-  } catch (err) {
-    console.error('매물 등록 실패:', err)
-    alert('매물 등록 중 오류가 발생했습니다.')
+    toast.success({
+      title: '매물 접수 완료',
+      body: '매물이 성공적으로 등록되었습니다.',
+    })
+  } catch {
+    toast.error({
+      title: '매물 등록 실패',
+      body: '매물 등록 중 오류가 발생했습니다.',
+    })
   }
 }
 

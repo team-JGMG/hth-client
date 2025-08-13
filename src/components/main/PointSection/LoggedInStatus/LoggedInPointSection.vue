@@ -129,14 +129,21 @@ const requestPay = async (amount) => {
   try {
     const merchant_uid = await requestChargeMerchantUid(Number(amount))
     if (!merchant_uid) {
-      alert('결제 식별자(merchant_uid) 발급 실패')
+      toast.error({ title: '결제 식별자 발급 실패', body: '충전 요청을 다시 시도해주세요.' })
       return
     }
 
     const { IMP } = window
-    if (!IMP) return alert('PortOne 스크립트가 로드되지 않았습니다.')
+    if (!IMP)
+      return toast.error({
+        title: '로드 실패',
+        body: 'PortOne 스크립트가 로드되지 않았습니다.',
+      })
     if (!import.meta.env.VITE_PORTONE_IMP_KEY) {
-      return alert('포트원 키가 설정되지 않았습니다. VITE_PORTONE_IMP_KEY 확인')
+      return toast.error({
+        title: '오류',
+        body: '포트원 키가 설정되지 않았습니다. VITE_PORTONE_IMP_KEY 확인',
+      })
     }
 
     IMP.init(import.meta.env.VITE_PORTONE_IMP_KEY)
@@ -156,7 +163,10 @@ const requestPay = async (amount) => {
       },
       async (rsp) => {
         if (!rsp?.success) {
-          alert('❌ 결제 실패: ' + (rsp?.error_msg || '사용자 취소 또는 오류'))
+          toast.error({
+            title: '결제 실패',
+            body: rsp?.error_msg || '사용자 취소 또는 오류',
+          })
           return
         }
 
@@ -172,7 +182,6 @@ const requestPay = async (amount) => {
           chargeAmount.value = 0
           await refreshPointBalance()
         } catch (err) {
-          console.error(err)
           toast.error({
             title: '검증 실패',
             body: err?.response?.data?.message || err?.message || '서버 검증 실패',

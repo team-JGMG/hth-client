@@ -216,6 +216,9 @@ import BaseButton from '@/components/common/Button/BaseButton.vue'
 import BaseModal from '@/components/common/Modal/BaseModal.vue'
 import { signUpWithPreAuth } from '@/api/auth'
 import { useAuthStore } from '@/stores/authStore'
+import { useToastStore } from '@/stores/toast'
+
+const toast = useToastStore()
 const authStore = useAuthStore()
 const agreeAndClose = () => {
   if (activeModal.value) {
@@ -355,9 +358,11 @@ const handleSubmit = async () => {
     await authStore.loadUserInfo()
 
     router.push('/')
-  } catch (e) {
-    console.error('회원가입 실패:', e)
-    alert('회원가입에 실패했습니다. 다시 시도해주세요.')
+  } catch {
+    toast.error({
+      title: '회원가입 실패',
+      body: '회원가입에 실패했습니다. 다시 시도해주세요.',
+    })
   }
 }
 </script>
