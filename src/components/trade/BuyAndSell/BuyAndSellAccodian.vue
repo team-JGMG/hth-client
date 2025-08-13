@@ -1,3 +1,51 @@
+<script setup>
+import { ref } from 'vue'
+import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
+import TradeForm from './TradeForm.vue'
+import { getOrderBookByFundingId } from '@/api/orderbook'
+
+const props = defineProps({
+  fundingId: { type: Number, required: true },
+})
+
+const emit = defineEmits(['trade-completed'])
+
+const isOpen = ref(false)
+const activeMode = ref('buy')
+const currentPrice = ref(0)
+
+const fetchCurrentPrice = async () => {
+  try {
+    const res = await getOrderBookByFundingId(Number(props.fundingId))
+    currentPrice.value = res?.data?.data?.currentPrice ?? 0
+  } catch (e) {
+    console.error('현재가 조회 실패:', e)
+    currentPrice.value = 0
+  }
+}
+
+const toggleOpen = async () => {
+  if (!isOpen.value) {
+    await fetchCurrentPrice() // 현재가 확보
+    isOpen.value = true
+  } else {
+    isOpen.value = false
+  }
+}
+
+const setActiveMode = async (mode) => {
+  activeMode.value = mode
+  if (isOpen.value && mode === 'buy') {
+    await fetchCurrentPrice()
+  }
+}
+
+const handleTradeCompleted = () => {
+  isOpen.value = false
+  emit('trade-completed')
+}
+</script>
+
 <template>
   <div
     class="bg-white overflow-hidden shadow-up"
@@ -32,48 +80,21 @@
       <span
         class="material-symbols-outlined text-white transition-transform duration-300"
         :class="{ 'rotate-180': isOpen }"
+        >expand_less</span
       >
-        expand_less
-      </span>
     </div>
 
     <transition name="slide-up">
       <div v-if="isOpen" class="p-4 pt-0 bg-black text-white">
         <TradeForm
           :type="activeMode"
-          @completed="handleTradeCompleted"
           :fundingId="props.fundingId"
+          :isOpen="isOpen"
+          :initial-price="currentPrice"
+          @completed="handleTradeCompleted"
         />
         <div class="mb-18"></div>
       </div>
     </transition>
   </div>
 </template>
-
-<script setup>
-import { ref, defineProps } from 'vue'
-import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import TradeForm from './TradeForm.vue'
-
-const props = defineProps({
-  fundingId: { type: Number, required: true },
-})
-
-const isOpen = ref(false)
-const activeMode = ref('buy')
-
-const emit = defineEmits(['trade-completed'])
-
-const toggleOpen = () => {
-  isOpen.value = !isOpen.value
-}
-
-const setActiveMode = (mode) => {
-  activeMode.value = mode
-}
-
-const handleTradeCompleted = () => {
-  isOpen.value = false
-  emit('trade-completed')
-}
-</script>
