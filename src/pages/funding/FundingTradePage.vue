@@ -213,6 +213,7 @@ import { storeToRefs } from 'pinia'
 import { getFundingOrderLimit, createFundingOrder } from '@/api/fundingtrade'
 import { getFundingById } from '@/api/funding'
 import { requestChargeMerchantUid, verifyPayment, getPointBalance } from '@/api/point'
+import { useToastStore } from '@/stores/toast'
 
 import BaseModal from '@/components/common/Modal/BaseModal.vue'
 import CompletedModal from '@/components/common/Modal/CompletedModal.vue'
@@ -250,6 +251,7 @@ const route = useRoute()
 const router = useRouter()
 const fundingId = Number(route.params.id)
 
+const toast = useToastStore()
 const authStore = useAuthStore()
 const { getIsLoggedIn, userId } = storeToRefs(authStore)
 
@@ -278,9 +280,9 @@ const handleCharge = () => {
 const moneyIcon = new URL('@/assets/images/moneyIcon.png', import.meta.url).href
 
 const handleFunding = () => {
-  if (!isStepValid.value) return alert('구매할 수량을 입력해주세요.')
+  if (!isStepValid.value) return toast.show('구매할 수량을 입력해주세요.')
   if (totalPrice.value > Number(item.value.userPoints || 0)) {
-    alert('포인트가 부족합니다. 충전 후 이용해주세요.')
+    toast.warn('포인트가 부족합니다. 충전 후 이용해주세요.')
     return
   }
   showConfirmModal.value = true
@@ -304,18 +306,23 @@ const handleFinalSubmit = async () => {
       // 필요하면 수량 리셋
       // quantity.value = 0
     } else {
-      alert(`펀딩 실패: ${res.message || '알 수 없는 오류'}`)
+      toast.error({
+        title: '펀딩 실패',
+        body: res.message || '알 수 없는 오류',
+      })
       showConfirmModal.value = false
     }
   } catch (err) {
-    console.error('펀딩 오류:', err?.response?.data || err)
-    alert(err?.response?.data?.message || '펀딩 처리 중 오류가 발생했습니다.')
+    toast.error({
+      title: '펀딩 오류',
+      body: err?.response?.data?.message || '펀딩 처리 중 오류가 발생했습니다.',
+    })
     showConfirmModal.value = false
   }
 }
 
 const goToMyPage = () =>
-  +router.push({ path: '/account/my-page/investments', query: { r: Date.now().toString() } })
+  router.push({ path: '/account/my-page/investments', query: { r: Date.now().toString() } })
 
 const isStepValid = computed(() => Number(quantity.value) > 0)
 
@@ -351,25 +358,25 @@ const onChargeSubmit = async () => {
   await nextTick() // 자식 → 부모 v-model 전파 보장
   const amt = Number(chargeAmount.value)
   if (!Number.isFinite(amt) || amt <= 0) {
-    alert('충전할 금액을 입력해주세요.')
+    toast.warn('충전할 금액을 입력해주세요.')
     return
   }
   await requestPay(amt)
 }
 
 const requestPay = async (amount) => {
-  if (!getIsLoggedIn.value) return alert('로그인이 필요합니다.')
+  if (!getIsLoggedIn.value) return toast.warn('로그인이 필요합니다.')
   const amt = Number(amount)
-  if (!Number.isFinite(amt) || amt <= 0) return alert('충전할 금액을 입력해주세요.')
+  if (!Number.isFinite(amt) || amt <= 0) return toast.warn('충전할 금액을 입력해주세요.')
 
   try {
     const merchant_uid = await requestChargeMerchantUid(amt)
-    if (!merchant_uid) return alert('결제 식별자(merchant_uid) 발급 실패')
+    if (!merchant_uid) return toast.error('결제 식별자(merchant_uid) 발급 실패')
 
     const { IMP } = window
-    if (!IMP) return alert('PortOne 스크립트가 로드되지 않았습니다.')
+    if (!IMP) return toast.error('PortOne 스크립트가 로드되지 않았습니다.')
     if (!import.meta.env.VITE_PORTONE_IMP_KEY)
-      return alert('포트원 키가 설정되지 않았습니다. VITE_PORTONE_IMP_KEY 확인')
+      return toast.error('포트원 키가 설정되지 않았습니다. VITE_PORTONE_IMP_KEY 확인')
 
     IMP.init(import.meta.env.VITE_PORTONE_IMP_KEY)
     IMP.request_pay(
@@ -388,7 +395,10 @@ const requestPay = async (amount) => {
       },
       async (rsp) => {
         if (!rsp?.success) {
-          alert('❌ 결제 실패: ' + (rsp?.error_msg || '사용자 취소 또는 오류'))
+          toast.error({
+            title: '결제 실패',
+            body: rsp?.error_msg || '사용자 취소 또는 오류',
+          })
           return
         }
         try {
@@ -397,19 +407,24 @@ const requestPay = async (amount) => {
             amount: rsp.paid_amount,
             merchantUid: merchant_uid,
           })
-          alert('포인트 충전이 완료되었습니다.')
+          toast.success('포인트 충전이 완료되었습니다.')
           isChargeModalOpen.value = false
           chargeAmount.value = 0
           await refreshPointBalance()
         } catch (err) {
-          console.error(err)
-          alert('❌ 서버 검증 실패: ' + (err?.response?.data?.message || err?.message))
+          toast.error({
+            title: '서버 검증 실패',
+            body:
+              err?.response?.data?.message || err?.message || '결제 검증 중 오류가 발생했습니다.',
+          })
         }
       },
     )
   } catch (err) {
-    console.error(err)
-    alert('❌ 결제 요청 오류: ' + (err?.response?.data?.message || err?.message))
+    toast.error({
+      title: '결제 요청 오류',
+      body: err?.response?.data?.message || err?.message || '결제 요청 중 오류가 발생했습니다.',
+    })
   }
 }
 
@@ -480,9 +495,11 @@ watch(
 
       // 그리고 '진짜 잔액'으로 최종 오버라이드
       await refreshPointBalance()
-    } catch (e) {
-      console.error('초기화 실패:', e)
-      alert('펀딩 정보를 가져오는 데 실패했습니다.')
+    } catch {
+      toast.error({
+        title: '초기화 실패',
+        body: '펀딩 정보를 가져오는 데 실패했습니다.',
+      })
     } finally {
       loaded.value = true
     }
