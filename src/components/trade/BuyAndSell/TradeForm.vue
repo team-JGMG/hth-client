@@ -9,6 +9,7 @@
           placeholder="0"
           class="flex-1 bg-transparent outline-none text-black text-lg min-w-0"
           min="0"
+          @input="userTouched = true"
         />
         <div class="flex items-center gap-x-1 ml-2 shrink-0">
           <BaseTypography weight="medium" class="text-black text-lg">원</BaseTypography>
@@ -43,6 +44,7 @@
           placeholder="0"
           class="flex-1 bg-transparent outline-none text-black text-lg min-w-0"
           min="0"
+          @input="userTouched = false"
         />
         <div class="flex items-center gap-x-1 ml-2 shrink-0">
           <BaseTypography weight="medium" class="text-black text-lg">주</BaseTypography>
@@ -101,7 +103,7 @@
 </template>
 
 <script setup>
-import { ref, computed, defineProps } from 'vue'
+import { ref, computed, defineProps, watch, onMounted } from 'vue'
 import CompletedButton from '@/components/common/Button/CompletedButton.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import TradeConfirmModal from './Modal/TradeConfirmModal.vue'
@@ -110,6 +112,8 @@ import { useAuthStore } from '@/stores/authStore'
 const props = defineProps({
   type: { type: String, default: 'buy' },
   fundingId: { type: Number, required: true },
+  isOpen: { type: Boolean, default: false },
+  initialPrice: { type: Number, default: 0 },
 })
 
 const authStore = useAuthStore()
@@ -119,16 +123,32 @@ const amount = ref(0)
 const quantity = ref(0)
 const isConfirmOpen = ref(false)
 
+onMounted(() => {
+  if (props.type === 'buy' && props.initialPrice > 0) {
+    amount.value = props.initialPrice
+  }
+})
+
+watch(
+  () => props.type,
+  (newType, oldType) => {
+    if (!props.isOpen || newType === oldType) return
+    if (newType === 'buy') {
+      amount.value = props.initialPrice || 0
+    } else {
+      amount.value = props.initialPrice || 0
+      quantity.value = 0
+    }
+  },
+)
+
 const incrementAmount = () => (amount.value += 10)
 const decrementAmount = () => (amount.value = Math.max(0, amount.value - 10))
 const incrementQuantity = () => (quantity.value += 1)
 const decrementQuantity = () => (quantity.value = Math.max(0, quantity.value - 1))
 
 const emit = defineEmits(['completed'])
-
-const handleTradeCompleted = () => {
-  emit('completed')
-}
+const handleTradeCompleted = () => emit('completed')
 
 const openConfirmModal = () => {
   if (!isLoggedIn.value) return
