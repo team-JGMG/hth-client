@@ -10,6 +10,7 @@ const handleKakaoLogin = () => {
 </script>
 
 <template>
+  <div class="py-6"></div>
   <BlankLayout>
     <div class="flex flex-col items-center justify-center w-full h-full px-6 py-12">
       <img src="@/assets/images/logo.png" alt="로고" class="w-32 h-32 mb-8" />
