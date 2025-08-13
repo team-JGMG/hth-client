@@ -114,7 +114,12 @@ export const getPropertyDetail = async (fundingId) => {
   return data
 }
 
-// export const getPropertyCoordinates = async (propertyId) => {
-//   const response = await api.get(`/api/property/map/coordinate/${propertyId}`)
-//   return response.data // { latitude, longitude } 형태라고 가정
-// }
+export const fetchUserPropertiesByStatus = async ({ status, page = 0, size = 10 }) => {
+  const { data } = await api.get('/api/auth/property/user', {
+    params: { page, size, status },
+  })
+  return {
+    content: data?.data?.content ?? [],
+    last: !!data?.data?.last,
+  }
+}
