@@ -87,7 +87,7 @@
     <div class="mb-12 relative">
       <div class="flex items-center w-full gap-3">
         <div class="flex-1">
-          <InputField
+          <CurrencyInput
             v-model="store.propertyBasic.price"
             label="희망 매매가"
             placeholder="금액을 입력해주세요."
@@ -102,7 +102,11 @@
         size="xs"
         class="absolute mt-1 left-0 top-full"
       >
-        {{ store.propertyBasic.price.trim() ? '* 숫자만 입력해주세요.' : '* 필수 항목입니다.' }}
+        {{
+          (store.propertyBasic.price ?? '').toString().trim()
+            ? '* 숫자만 입력해주세요.'
+            : '* 필수 항목입니다.'
+        }}
       </BaseTypography>
     </div>
 
@@ -153,8 +157,16 @@ import InputField from '@/components/auth/InputField.vue'
 import BaseButton from '@/components/common/Button/BaseButton.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import CompletedButton from '@/components/common/Button/CompletedButton.vue'
+import CurrencyInput from '@/components/auth/CurrencyInput.vue'
 
 const store = usePropertyRegisterStore()
+
+const toDigits = (v) => (v ?? '').toString().replace(/[^\d]/g, '')
+const normalizeDigits = (s) => {
+  if (s === '') return ''
+  const n = s.replace(/^0+/, '')
+  return n === '' ? '0' : n
+}
 
 const touched = ref({
   title: false,
@@ -194,13 +206,21 @@ const searchAddress = () => {
   })
 }
 
-// 유효성 검사
-const titleValid = computed(() => store.propertyBasic.title.trim() !== '')
-const addressValid = computed(() => store.propertyBasic.address.trim() !== '')
-const detailAddressValid = computed(() => store.propertyBasic.detailAddress.trim() !== '')
-const sizeValid = computed(() => /^[0-9]+$/.test(store.propertyBasic.size.trim()))
-const priceValid = computed(() => /^[0-9]+$/.test(store.propertyBasic.price.trim()))
-const periodValid = computed(() => /^[0-9]+$/.test(store.propertyBasic.period.trim()))
+// ===== 유효성 검사 (안전하게 문자열 변환 후 숫자만 검사) =====
+const titleValid = computed(() => (store.propertyBasic.title ?? '').toString().trim() !== '')
+const addressValid = computed(() => (store.propertyBasic.address ?? '').toString().trim() !== '')
+const detailAddressValid = computed(
+  () => (store.propertyBasic.detailAddress ?? '').toString().trim() !== '',
+)
+
+// 숫자 필드는 콤마/공백/문자 제거 후 검사
+const sizeDigits = computed(() => toDigits(store.propertyBasic.size))
+const priceDigits = computed(() => toDigits(store.propertyBasic.price))
+const periodDigits = computed(() => toDigits(store.propertyBasic.period))
+
+const sizeValid = computed(() => sizeDigits.value !== '')
+const priceValid = computed(() => priceDigits.value !== '')
+const periodValid = computed(() => periodDigits.value !== '')
 
 const isStepValid = computed(
   () =>
@@ -212,10 +232,24 @@ const isStepValid = computed(
     periodValid.value,
 )
 
+// ===== 다음 단계 처리 =====
 const handleNext = () => {
   Object.keys(touched.value).forEach((key) => (touched.value[key] = true))
-  if (isStepValid.value) {
-    store.goToNextStep()
-  }
+  if (!isStepValid.value) return
+
+  // 서버 전송 전에 숫자만 남겨 정규화 (선행 0 처리 포함)
+  store.propertyBasic.size = normalizeDigits(sizeDigits.value)
+  store.propertyBasic.price = normalizeDigits(priceDigits.value)
+  store.propertyBasic.period = normalizeDigits(periodDigits.value)
+
+  // 필요 시 숫자형으로 변환해서 사용 예:
+  // const payload = {
+  //   ...store.propertyBasic,
+  //   price: Number(store.propertyBasic.price),
+  //   size: Number(store.propertyBasic.size),
+  //   period: Number(store.propertyBasic.period),
+  // }
+
+  store.goToNextStep()
 }
 </script>
