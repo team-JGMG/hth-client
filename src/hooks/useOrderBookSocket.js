@@ -14,9 +14,15 @@ export function useOrderBookSocket(fundingId, onUpdate) {
       stompClient.deactivate()
     }
     const socket = new SockJS('https://half-to-half.site/order-book')
+    const token = localStorage.getItem('accessToken')
+    console.log('🔑 토큰:', token)
     stompClient = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
+      connectHeaders: {
+        Authorization: `Bearer ${token}`, // JWT 토큰
+        // 필요하면 사용자 아이디도 보냄
+      },
       debug: (str) => console.log('[STOMP]', str),
       onConnect: () => {
         console.log('[WebSocket 연결됨]')
