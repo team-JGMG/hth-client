@@ -3,19 +3,13 @@
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import CancelConfirmModal from './CancelConfirmModal.vue'
-import { formatDateTime } from '@/utils/format.js'
+import { formatDateTime, formatDate } from '@/utils/format.js'
 import { getOrderHistory, cancelOrder } from '@/api/trade'
-
 import { useToastStore } from '@/stores/toast'
 
 const toast = useToastStore()
 
-function toIso(dateStr) {
-  return typeof dateStr === 'string' ? dateStr.replace(' ', 'T') : dateStr
-}
-function parseDate(dateStr) {
-  return new Date(toIso(dateStr))
-}
+/* ========= 숫자 유틸 ========= */
 function n(v, d = 0) {
   const num = Number(v)
   return Number.isFinite(num) ? num : d
@@ -23,21 +17,44 @@ function n(v, d = 0) {
 function nfmt(v) {
   return n(v).toLocaleString()
 }
-function formatToMMDD(dateStr) {
-  const [datePart] = formatDateTime(toIso(dateStr)).split(' ')
-  const [, mm, dd] = (datePart || '').split('.')
-  return `${String(mm || '00').padStart(2, '0')}.${String(dd || '00').padStart(2, '0')}`
-}
-function formatToHHMM(dateStr) {
-  const [, timePart] = formatDateTime(toIso(dateStr)).split(' ')
-  return timePart || ''
-}
-const prepareOrders = (arr) => arr.map((o) => ({ ...o, _ui: { dragX: 0, touchStartX: 0 } }))
 
-/* 🔧 테스트 유저: 데이터 있는 ID */
-// -------------------------------------------
+/* ========= 날짜 유틸 (utils/format.js 기반) ========= */
+function toDateFlexible(dt) {
+  if (Array.isArray(dt)) {
+    const [y, m, d, hh = 0, mm = 0, ss = 0] = dt.map(Number)
+    return new Date(y, (m || 1) - 1, d || 1, hh, mm, ss)
+  }
+  if (typeof dt === 'string') return new Date(dt.replace(' ', 'T'))
+  return new Date(dt)
+}
+const z2 = (x) => String(x).padStart(2, '0')
 
-// -------------------------------------------
+function formatToMMDD(val) {
+  // 배열 → utils.formatDateTime 결과에서 MM.DD 추출
+  if (Array.isArray(val)) {
+    const out = formatDateTime(val) // "YYYY.M.D HH:MM"
+    const datePart = out.split(' ')[0] || ''
+    const [, m = '', d = ''] = datePart.split('.')
+    return `${z2(m)}.${z2(d)}`
+  }
+  // 문자열/Date → utils.formatDate(YYYY.MM.DD)에서 MM.DD만 추출
+  const full = formatDate(val) // "YYYY.MM.DD" | "-"
+  if (!full || full === '-') return ''
+  const [, mm, dd] = full.split('.')
+  return `${mm}.${dd}`
+}
+
+function formatToHHMM(val) {
+  if (Array.isArray(val)) {
+    const out = formatDateTime(val) // "YYYY.M.D HH:MM"
+    return out.split(' ')[1] || ''
+  }
+  const d = toDateFlexible(val)
+  if (isNaN(d)) return ''
+  return `${z2(d.getHours())}:${z2(d.getMinutes())}`
+}
+
+/* ========= 상태 ========= */
 const orders = ref([])
 const isFirstLoad = ref(true)
 const loadError = ref(null)
@@ -52,10 +69,13 @@ const isLoading = ref(false)
 const page = ref(0)
 const hasNext = ref(true)
 
-const bufferedMode = ref(false) // 서버가 배열만 줄 때 true
-const bufferAll = ref([]) // 전체 배열
-const bufferCursor = ref(0) // 다음 슬라이스 시작 인덱스
+const bufferedMode = ref(false)
+const bufferAll = ref([])
+const bufferCursor = ref(0)
 
+const prepareOrders = (arr) => arr.map((o) => ({ ...o, _ui: { dragX: 0, touchStartX: 0 } }))
+
+/* ========= API → UI 매핑 ========= */
 function mapApiOrderToUi(o) {
   const pricePer = n(o?.orderPricePerShare ?? o?.pricePerShare ?? o?.price_per_share)
   const shareCnt = n(o?.orderShareCount ?? o?.shareCount ?? o?.shares)
@@ -65,7 +85,7 @@ function mapApiOrderToUi(o) {
     o?.createdDate ??
     o?.orderDate ??
     o?.timestamp ??
-    new Date().toISOString()
+    new Date().toISOString() // 배열/문자열/Date 어떤 형태든 그대로 보관
 
   return {
     id: o?.orderId ?? o?.id ?? o?.historyId ?? o?.order_id ?? o?.history_id,
@@ -78,13 +98,13 @@ function mapApiOrderToUi(o) {
         : o?.orderType === 'SELL'
           ? '매도'
           : (o?.orderType ?? o?.type ?? ''),
-    createdAt: toIso(created),
+    createdAt: created,
     pendingShares: n(o?.remainingShareCount ?? o?.pendingShares ?? 0),
     _raw: o,
   }
 }
 
-/* ---------- 언랩 ---------- */
+/* ========= 언랩 ========= */
 function findFirstArray(obj, depth = 0) {
   if (!obj || typeof obj !== 'object' || depth > 3) return null
   if (Array.isArray(obj)) return obj
@@ -110,29 +130,25 @@ function unwrapArray(res) {
   return Array.isArray(arr) ? arr : null
 }
 
-// 🔎 취소 상태 판별 (영문/한글 모두)
+/* ========= 취소 상태 필터 ========= */
 function isCancelledStatus(raw) {
   const s = String(raw ?? '').trim()
   if (!s) return false
   const u = s.toUpperCase()
   return u.includes('CANCEL') || u === 'CANCELED' || u === 'CANCELLED' || s === '취소'
 }
-
-// ✅ 취소 건 제외하고 매핑
 function mapAndFilter(list) {
   return list
     .map(mapApiOrderToUi)
     .filter((o) => !isCancelledStatus(o?._raw?.orderStatus ?? o?._raw?.status ?? o?.status))
 }
 
-/** ---- 서버/배열 모두 "취소 제외 후 최소 PAGE_SIZE개" 채워 넣기 ---- **/
-
+/* ========= 로딩 ========= */
 async function fetchOrdersPage() {
   if (isLoading.value) return
 
-  // 클라 청크 모드면 청크 쪽으로 위임
   if (bufferedMode.value) {
-    return appendNextChunk(PAGE_SIZE) // 항상 PAGE_SIZE만큼 채우도록 요청
+    return appendNextChunk(PAGE_SIZE)
   }
 
   if (!hasNext.value) return
@@ -149,19 +165,7 @@ async function fetchOrdersPage() {
       const paged = unwrapServerPaging(res)
 
       if (paged) {
-        // ✅ 서버 페이징: 취소 제외 후 누적
         const mapped = mapAndFilter(paged.content || [])
-        console.log('[orders page append]', {
-          page: page.value,
-          got: (paged.content || []).length,
-          mapped: mapped.length,
-          meta: {
-            hasNext: paged.meta?.hasNext,
-            last: paged.meta?.last,
-            totalPages: paged.meta?.totalPages,
-            number: paged.meta?.number,
-          },
-        })
         orders.value.push(...prepareOrders(mapped))
         added += mapped.length
 
@@ -170,31 +174,19 @@ async function fetchOrdersPage() {
         hasNext.value = !!nextFlag
         if (nextFlag) page.value += 1
       } else {
-        // ✅ 배열 모드: 여기서 즉시( isLoading=true 여도 ) 5개가 모일 때까지 채워 넣기
         const arr = unwrapArray(res) || []
-        console.log('[orders array mode]', { total: arr.length })
-
         bufferedMode.value = true
         bufferAll.value = arr
         bufferCursor.value = 0
 
-        // 최초 호출이면 "항상 최소 5개"를 보장
         const target = Math.max(PAGE_SIZE - added, PAGE_SIZE)
         while (added < target && bufferCursor.value < bufferAll.value.length) {
           const slice = bufferAll.value.slice(bufferCursor.value, bufferCursor.value + PAGE_SIZE)
           bufferCursor.value += slice.length
-
-          const mapped = mapAndFilter(slice) // ⬅️ 취소 제외 여기서
-          console.log('[orders buffer immediate]', {
-            from: bufferCursor.value - slice.length,
-            size: slice.length,
-            mapped: mapped.length,
-          })
+          const mapped = mapAndFilter(slice)
           orders.value.push(...prepareOrders(mapped))
           added += mapped.length
         }
-
-        // 다음 호출(스크롤)부터는 appendNextChunk가 계속 채움
         break
       }
 
@@ -209,7 +201,6 @@ async function fetchOrdersPage() {
   }
 }
 
-/** ---- 버퍼(배열만 내려올 때)에서도 "취소 제외 후 최소 N개" 채우기 ---- **/
 async function appendNextChunk(minToFill = PAGE_SIZE) {
   if (isLoading.value) return
   const total = bufferAll.value.length
@@ -222,16 +213,10 @@ async function appendNextChunk(minToFill = PAGE_SIZE) {
 
     while (added < minToFill && bufferCursor.value < total && iter < 50) {
       await delay(20)
-      // 원본은 PAGE_SIZE 단위로 자르되, 필터링 후 부족하면 다음 슬라이스 계속 가져감
       const slice = bufferAll.value.slice(bufferCursor.value, bufferCursor.value + PAGE_SIZE)
       bufferCursor.value += slice.length
 
-      const mapped = mapAndFilter(slice) // ⬅️ 여기서 취소 제외
-      console.log('[orders buffer append]', {
-        from: bufferCursor.value - slice.length,
-        size: slice.length,
-        mapped: mapped.length,
-      })
+      const mapped = mapAndFilter(slice)
       orders.value.push(...prepareOrders(mapped))
       added += mapped.length
 
@@ -245,7 +230,7 @@ async function appendNextChunk(minToFill = PAGE_SIZE) {
   }
 }
 
-/** ---- 트리거 완화 (sentinel이 조금만 보여도 로드) ---- **/
+/* ========= 옵저버 ========= */
 function setupObserver() {
   if (observer) observer.disconnect()
   observer = new IntersectionObserver(
@@ -257,10 +242,7 @@ function setupObserver() {
         fetchOrdersPage()
       }
     },
-    {
-      threshold: 0,
-      rootMargin: '0px 0px 200px 0px',
-    },
+    { threshold: 0, rootMargin: '0px 0px 200px 0px' },
   )
   if (bottomRef.value) observer.observe(bottomRef.value)
 }
@@ -274,10 +256,22 @@ onBeforeUnmount(() => {
   if (observer) observer.disconnect()
 })
 
+/* ========= 정렬/연도 ========= */
 const sortedOrders = computed(() =>
-  [...orders.value].sort((a, b) => parseDate(b.createdAt) - parseDate(a.createdAt)),
+  [...orders.value].sort((a, b) => toDateFlexible(b.createdAt) - toDateFlexible(a.createdAt)),
 )
 
+function getYear(dateLike) {
+  return toDateFlexible(dateLike).getFullYear()
+}
+function isNewYear(index) {
+  if (index === 0) return true
+  const currentYear = getYear(sortedOrders.value[index].createdAt)
+  const prevYear = getYear(sortedOrders.value[index - 1].createdAt)
+  return currentYear !== prevYear
+}
+
+/* ========= 슬라이드/모달 ========= */
 const isModalOpen = ref(false)
 const selectedOrder = ref(null)
 
@@ -290,9 +284,7 @@ function openDeleteModal(order) {
   isModalOpen.value = true
 }
 function closeModal() {
-  if (selectedOrder.value) {
-    selectedOrder.value._ui.dragX = 0
-  }
+  if (selectedOrder.value) selectedOrder.value._ui.dragX = 0
   isModalOpen.value = false
   selectedOrder.value = null
 }
@@ -300,16 +292,17 @@ function closeModal() {
 async function confirmDelete() {
   if (!selectedOrder.value || isSubmitting.value) return
   const targetId = selectedOrder.value.id
-  if (!targetId) return
-  toast.error({
-    title: '주문 ID 오류',
-    body: '주문 ID를 찾을 수 없습니다.',
-  })
+  if (!targetId) {
+    toast.error({
+      title: '주문 ID 오류',
+      body: '주문 ID를 찾을 수 없습니다.',
+    })
+    return
+  }
   isSubmitting.value = true
   try {
     await cancelOrder(targetId)
     orders.value = orders.value.filter((o) => o.id !== targetId)
-    // 삭제 성공 시에도 동일하게 원복 + 닫기
     closeModal()
   } catch (e) {
     toast.error({
@@ -321,16 +314,7 @@ async function confirmDelete() {
   }
 }
 
-/* 터치 슬라이드 삭제 UI */
-function getYear(dateStr) {
-  return parseDate(dateStr).getFullYear()
-}
-function isNewYear(index) {
-  if (index === 0) return true
-  const currentYear = getYear(sortedOrders.value[index].createdAt)
-  const prevYear = getYear(sortedOrders.value[index - 1].createdAt)
-  return currentYear !== prevYear
-}
+/* ========= 터치 삭제 슬라이드 ========= */
 function handleTouchStart(e, order) {
   orders.value.forEach((o) => {
     if (o !== order) o._ui.dragX = 0
@@ -433,10 +417,10 @@ function handleTouchEnd(order) {
         </div>
       </template>
 
-      <!-- 📌 무한스크롤 트리거 -->
+      <!-- 무한스크롤 트리거 -->
       <div ref="bottomRef" class="h-2"></div>
 
-      <!-- ✅ 동일 로딩 아이콘 -->
+      <!-- 로딩 아이콘 -->
       <div v-if="isLoading" class="flex justify-center py-4">
         <img
           src="@/assets/images/character/loading.png"
