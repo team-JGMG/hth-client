@@ -1,7 +1,6 @@
 <template>
   <BlankLayout>
     <DetailHeader> 매물등록 </DetailHeader>
-
     <div>
       <component :is="currentStepComponent" />
     </div>

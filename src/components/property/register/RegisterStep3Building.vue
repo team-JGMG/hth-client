@@ -39,7 +39,7 @@
               @focus="touched.landSize = true"
             />
           </div>
-          <span class="text-base text-black mr-4 -translate-y-2">㎡</span>
+          <span class="text-base text-black -translate-y-2">㎡</span>
         </div>
         <div class="flex items-center w-full gap-3">
           <span class="material-symbols-outlined -translate-y-2"> apartment </span>
@@ -52,7 +52,7 @@
               @focus="touched.buildingSize = true"
             />
           </div>
-          <span class="text-base text-black mr-4 -translate-y-2">㎡</span>
+          <span class="text-base text-black -translate-y-2">㎡</span>
         </div>
         <!-- 에러 메시지 -->
         <BaseTypography
@@ -230,7 +230,7 @@
     </div>
 
     <!-- 연면적 평단가 -->
-    <div class="mb-12 relative">
+    <div class="mb-28 relative">
       <BaseTypography class="mb-2">연면적 평단가 (평/공모금액 기준)</BaseTypography>
       <div class="flex items-center w-full gap-3">
         <div class="flex-1">
@@ -255,7 +255,7 @@
     </div>
 
     <!-- 다음 버튼 -->
-    <div class="pb-28">
+    <div class="pb-12">
       <CompletedButton
         :color="isStepValid ? 'black' : 'gray-300'"
         :text-color="isStepValid ? 'white' : 'gray-400'"
@@ -352,19 +352,3 @@ onMounted(() => {
   window.scrollTo(0, 0)
 })
 </script>
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
-.material-symbols-outlined {
-  font-family: 'Material Symbols Outlined';
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px;
-  display: inline-block;
-  line-height: 1;
-  letter-spacing: normal;
-  text-transform: none;
-  white-space: nowrap;
-  direction: ltr;
-}
-</style>

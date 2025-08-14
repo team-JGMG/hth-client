@@ -1,6 +1,6 @@
 <template>
-  <div class="w-full max-w-md mx-auto px-4 pb-32">
-    <BaseTypography class="text-xl font-bold mb-3">매물 관련 서류를 입력해주세요.</BaseTypography>
+  <div class="w-full max-w-md mx-auto px-4 pb-12">
+    <BaseTypography class="text-xl font-bold mb-2">매물 관련 서류를 입력해주세요.</BaseTypography>
 
     <!-- 안내 멘트 -->
     <BaseTypography class="mb-12" size="xs" color="gray-1">
@@ -8,7 +8,7 @@
     </BaseTypography>
 
     <div v-for="(doc, index) in documentFields" :key="index" class="mb-12 relative">
-      <BaseTypography class="mb-1 text-base font-medium">{{ doc.label }}</BaseTypography>
+      <BaseTypography class="mb-1 text-base font-bold">{{ doc.label }}</BaseTypography>
 
       <label
         class="flex items-center justify-between w-full cursor-pointer border-b border-gray-400 py-2 text-base text-gray-700"
@@ -33,7 +33,7 @@
     </div>
 
     <!-- 등록하기 버튼 -->
-    <div class="pb-28">
+    <div class="pb-12">
       <CompletedButton
         :color="isStepValid ? 'black' : 'gray-300'"
         :text-color="isStepValid ? 'white' : 'gray-400'"

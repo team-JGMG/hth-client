@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full max-w-md mx-auto px-4 pb-32">
+  <div class="w-full max-w-md mx-auto px-4 pb-8">
     <BaseTypography class="mb-6" size="xl" weight="bold">매물 정보를 입력해주세요.</BaseTypography>
 
     <!-- 매물명 -->
@@ -21,47 +21,50 @@
     </div>
 
     <!-- 주소 -->
-    <div class="mb-12 relative">
-      <div class="flex items-center gap-2">
-        <InputField
-          v-model="store.propertyBasic.rawdCd"
-          label="매물 주소 조회"
-          placeholder="시군구코드"
-          class="flex-1"
-          readonly
-        />
-        <BaseButton class="h-[38px] bg-gray-600 hover:bg-gray-600 text-sm" @click="searchAddress">
-          주소 검색
-        </BaseButton>
-      </div>
-      <div v-show="show" class="relative w-full h-[400px] border mt-2 rounded overflow-hidden">
-        <div id="daum-postcode" class="absolute top-0 left-0 w-full h-full"></div>
-      </div>
-      <InputField
-        v-model="store.propertyBasic.address"
-        placeholder="주소를 입력해주세요."
-        class="mt-1 mb-7"
-        readonly
-        @focus="touched.address = true"
-      />
-      <InputField
-        v-model="store.propertyBasic.detailAddress"
-        placeholder="상세주소를 입력해주세요."
-        class="mt-1"
-        @focus="touched.detailAddress = true"
-      />
-      <BaseTypography
-        v-if="(touched.address || touched.detailAddress) && (!addressValid || !detailAddressValid)"
-        color="red-1"
-        size="xs"
-        class="absolute mt-1 left-0 top-full"
-      >
-        * 주소 및 상세주소를 입력해주세요.
-      </BaseTypography>
-    </div>
+    <!-- 매물 주소 조회 -->
+    <Basetypography size="sm" weight="bold" class="block mb-1">매물 주소 조회</Basetypography>
 
+    <!-- 입력창 + 버튼 한 줄 -->
+    <div class="flex items-center gap-2">
+      <InputField
+        v-model="store.propertyBasic.rawdCd"
+        placeholder="시군구 코드"
+        class="flex-1"
+        readonly
+      />
+      <BaseButton
+        class="h-[38px] px-4 whitespace-nowrap bg-gray-600 hover:bg-gray-600 text-sm -translate-y-[8px]"
+        @click="searchAddress"
+      >
+        주소 검색
+      </BaseButton>
+    </div>
+    <div v-show="show" class="relative w-full h-[400px] border mt-2 rounded overflow-hidden">
+      <div id="daum-postcode" class="absolute top-0 left-0 w-full h-full"></div>
+    </div>
+    <InputField
+      v-model="store.propertyBasic.address"
+      placeholder="주소를 입력해주세요."
+      class="mt-1 mb-2"
+      readonly
+      @focus="touched.address = true"
+    />
+    <InputField
+      v-model="store.propertyBasic.detailAddress"
+      placeholder="상세주소를 입력해주세요."
+      class="mt-1"
+      @focus="touched.detailAddress = true"
+    />
+    <BaseTypography
+      v-if="(touched.address || touched.detailAddress) && (!addressValid || !detailAddressValid)"
+      color="red-1"
+      size="xs"
+      class="absolute mt-1 left-0 top-full"
+    >
+      * 주소 및 상세주소를 입력해주세요.
+    </BaseTypography>
     <!-- 매물 크기 -->
-    <div class="mb-12 relative">
+    <div class="mb-12 relative mt-12">
       <div class="flex items-center w-full gap-3">
         <div class="flex-1">
           <InputField
@@ -111,7 +114,7 @@
     </div>
 
     <!-- 공고 기간 -->
-    <div class="mb-12 relative">
+    <div class="mb-28 relative">
       <div class="flex items-center w-full gap-3">
         <div class="flex-1">
           <InputField
@@ -135,7 +138,7 @@
     </div>
 
     <!-- 다음 버튼 -->
-    <div class="pb-28">
+    <div class="pb-12">
       <CompletedButton
         :color="isStepValid ? 'black' : 'gray-300'"
         :text-color="isStepValid ? 'white' : 'gray-400'"
