@@ -270,6 +270,6 @@ onMounted(async () => {
 
 <style scoped>
 .animate-spin {
-  animation: spin 0.4s linear infinite;
+  animation: spin 0.8s linear infinite;
 }
 </style>

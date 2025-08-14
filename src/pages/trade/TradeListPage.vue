@@ -42,7 +42,7 @@ const fetchTradeItems = async () => {
   try {
     const res = await getEndedFundings(page.value, size)
     await new Promise((r) => setTimeout(r, 300)) // 딜레이 추가
-    await delay(300)
+    await delay(20)
     tradeItems.value.push(...res.data.data.content)
     hasNextPage.value = !res.data.data.last
     page.value += 1
