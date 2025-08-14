@@ -4,7 +4,7 @@ import { ref, onMounted, nextTick, onBeforeUnmount, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getUserFundingOrders, getUserShares, refundFundingOrder } from '@/api/funding'
 import { getAllocations, unwrapAllocations } from '@/api/allocation'
-import { formatAmount } from '@/utils/format'
+import { formatAmount, formatPriceInManwon } from '@/utils/format'
 import BaseButton from '@/components/common/Button/BaseButton.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import CancelConfirmModal from '@/components/account/CancelConfirmModal.vue'
@@ -371,7 +371,7 @@ const groupedDividends = computed(() => {
       year: new Date(a.date).getFullYear(),
       date: a.date,
       dateMd: formatDateMd(a.date),
-      amount: formatPlusAmount(a.total ?? a.totalDividendAmount),
+      amount: formatPlusAmount(a.perShare ?? a.dividendPerShare),
     }))
     // 최신 날짜가 위로 오도록 정렬
     .sort((a, b) => new Date(b.date) - new Date(a.date))
@@ -436,7 +436,7 @@ const groupedDividends = computed(() => {
 
             <BaseTypography class="text-xs !text-gray-500 mt-1">
               남은 주(금액): {{ Number(item.left).toLocaleString() }} /
-              {{ formatAmount(item.total) }}
+              {{ formatPriceInManwon(item.total) }}
             </BaseTypography>
           </div>
         </div>
@@ -508,7 +508,7 @@ const groupedDividends = computed(() => {
           <BaseButton
             variant="secondary"
             @click="openDividendModal(item)"
-            class="text-xs px-0.5 mb-1 !py-0.5"
+            class="text-xs px-0.5 mb-1 !py-0.5 btn-fixed"
           >
             <BaseTypography class="text-[10px] font-medium !text-white">
               배당금 내역</BaseTypography
@@ -584,6 +584,14 @@ const groupedDividends = computed(() => {
 
 <style scoped>
 .animate-spin {
-  animation: spin 0.8s linear infinite;
+  animation: spin 0.4s linear infinite;
+}
+:deep(.btn-fixed) {
+  width: 70px;
+  height: 20px;
+  padding: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
