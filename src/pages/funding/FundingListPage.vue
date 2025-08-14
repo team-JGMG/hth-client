@@ -136,7 +136,7 @@ const fetchFundingList = async () => {
       size,
     )
 
-    await delay(300)
+    await delay(20)
 
     fundingList.value.push(...res.data.data.content)
     hasNextPage.value = !res.data.data.last
@@ -191,6 +191,6 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .animate-spin {
-  animation: spin 0.4s linear infinite;
+  animation: spin 0.8s linear infinite;
 }
 </style>
