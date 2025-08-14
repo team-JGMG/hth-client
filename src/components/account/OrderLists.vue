@@ -6,6 +6,7 @@ import CancelConfirmModal from './CancelConfirmModal.vue'
 import { formatDateTime } from '@/utils/format.js'
 import { getOrderHistory, cancelOrder } from '@/api/trade'
 
+
 function toIso(dateStr) {
   return typeof dateStr === 'string' ? dateStr.replace(' ', 'T') : dateStr
 }
@@ -296,7 +297,11 @@ function closeModal() {
 async function confirmDelete() {
   if (!selectedOrder.value || isSubmitting.value) return
   const targetId = selectedOrder.value.id
-  if (!targetId) return alert('주문 ID를 찾을 수 없습니다.')
+  if (!targetId) return
+  toast.error({
+    title: '주문 ID 오류',
+    body: '주문 ID를 찾을 수 없습니다.',
+  })
   isSubmitting.value = true
   try {
     await cancelOrder(targetId)
@@ -304,8 +309,10 @@ async function confirmDelete() {
     // 삭제 성공 시에도 동일하게 원복 + 닫기
     closeModal()
   } catch (e) {
-    console.error('[confirmDelete] cancel failed:', e?.response?.status, e?.response?.data, e)
-    alert(e?.response?.data?.message || e?.message || '주문 취소에 실패했습니다.')
+    toast.error({
+      title: '주문 취소 실패',
+      body: e?.response?.data?.message || e?.message || '주문 취소에 실패했습니다.',
+    })
   } finally {
     isSubmitting.value = false
   }

@@ -1,13 +1,13 @@
 <template>
   <div
-    class="fixed top-6 left-1/2 -translate-x-1/2 z-[10000] flex flex-col gap-3 pointer-events-none"
+    class="fixed top-8 left-1/2 -translate-x-1/2 z-[10000] flex flex-col gap-3 pointer-events-none"
     v-if="toast.items.length"
   >
     <div
       v-for="t in toast.items"
       :key="t.id"
       @click="toast.remove(t.id)"
-      class="pointer-events-auto min-w-[240px] max-w-[90vw] rounded-[14px] px-5 py-3 text-center shadow-lg bg-white text-black animate-slideDown [animation-delay:0s,calc(var(--life,3)*1s-0.22s)] transition-opacity"
+      class="pointer-events-auto min-w-[300px] max-w-[90vw] rounded-[14px] px-5 py-3 text-center shadow-lg bg-white text-black animate-slideDown [animation-delay:0s,calc(var(--life,3)*1s-0.22s)] transition-opacity"
       :class="{
         'bg-[rgba(188,253,188,0.92)]': t.type === 'success',
         'bg-[rgba(253,197,197,0.92)]': t.type === 'error',

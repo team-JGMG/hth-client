@@ -34,7 +34,6 @@ export const getUserShares = (page = 0, size = 10) => {
 }
 
 // 환불(주문 취소)
-// 환불(주문 취소)
 export const refundFundingOrder = (fundingId, orderId, orderPrice) => {
   // 모두 정수/숫자로 강제 변환
   const params = {

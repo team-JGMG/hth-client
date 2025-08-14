@@ -73,7 +73,7 @@ const handleButtonClick = () => {
   if (authStore.getIsLoggedIn) {
     router.push('/property/register')
   } else {
-    toast.show('로그인 후 이용 가능합니다.')
+    toast.warn('로그인 후 이용 가능합니다.')
     router.push('/auth/login')
   }
 }

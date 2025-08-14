@@ -171,7 +171,9 @@ import CompletedButton from '@/components/common/Button/CompletedButton.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { formatPhoneNumber } from '@/utils/format'
+import { useToastStore } from '@/stores/toast'
 
+const toast = useToastStore()
 const authStore = useAuthStore()
 const store = usePropertyRegisterStore()
 
@@ -184,9 +186,11 @@ onMounted(async () => {
     store.ownerInfo.phone = authStore.userInfo.phone
     store.ownerInfo.email = authStore.userInfo.email
     store.ownerInfo.userId = authStore.userInfo.userId
-  } catch (error) {
-    console.error('자동완성 실패:', error)
-    alert('자동완성에 실패했습니다. 로그인 상태를 확인해주세요.')
+  } catch {
+    toast.error({
+      title: '자동완성 실패',
+      body: '자동완성에 실패했습니다. 로그인 상태를 확인해주세요.',
+    })
   }
 })
 

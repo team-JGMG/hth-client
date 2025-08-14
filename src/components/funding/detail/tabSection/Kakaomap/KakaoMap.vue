@@ -80,7 +80,7 @@ const loadMap = async () => {
     const center = new window.kakao.maps.LatLng(latitude, longitude) // ✅ 고정 좌표 사용
     const map = new window.kakao.maps.Map(mapContainer.value, {
       center, // ✅ 지도 중심 고정
-      level: 3,
+      level: 6,
     })
 
     // 메인 마커

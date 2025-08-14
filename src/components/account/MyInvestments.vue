@@ -12,8 +12,10 @@ import BaseModal from '@/components/common/Modal/BaseModal.vue'
 import NoInvestmentItems from './NoInvestmentItems.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
+import { useToastStore } from '@/stores/toast'
 
 const route = useRoute()
+const toast = useToastStore()
 
 async function resetAndReload() {
   console.log('[MY] resetAndReload start, r=', route.query.r)
@@ -119,7 +121,7 @@ const openDividendModal = async (item) => {
     isDividendModalOpen.value = true
   } catch (e) {
     console.error('배당금 조회 실패', e)
-    alert('배당금 내역을 가져오지 못했습니다.')
+    toast.show('배당금 내역을 가져오지 못했습니다.')
   } finally {
     isDividendLoading.value = false
   }
@@ -133,7 +135,7 @@ const openCancelModal = (item) => {
     orderPrice: Number(item.orderPrice),
   }
   if (!payload.fundingId || !payload.orderId || !payload.orderPrice) {
-    alert('환불에 필요한 주문 정보가 없습니다. (fundingId / orderId / orderPrice)')
+    toast.error({ title: '환불 실패', body: '환불에 필요한 주문 정보가 없습니다.' })
     return
   }
   selectedOrder.value = payload
@@ -152,14 +154,21 @@ const confirmCancel = async () => {
 
     if (res?.data?.status === 'success') {
       fundingItems.value = fundingItems.value.filter((x) => x.orderId !== orderId)
-      alert('주문이 취소(환불)되었습니다.')
+      toast.success({
+        title: '주문 취소 완료',
+        body: '주문이 취소(환불)되었습니다.',
+      })
     } else {
-      console.warn('환불 응답:', res?.data)
-      alert(res?.data?.message || '환불 처리에 실패했습니다.')
+      toast.warn({
+        title: '요청 오류',
+        body: res?.data?.message || '환불 처리에 실패했습니다.',
+      })
     }
-  } catch (e) {
-    console.error('환불 실패', e)
-    alert('환불 처리 중 오류가 발생했습니다.')
+  } catch {
+    toast.error({
+      title: '환불 실패',
+      body: '환불 처리 중 오류가 발생했습니다.',
+    })
   } finally {
     isCancelLoading.value = false
     closeModal()

@@ -19,7 +19,7 @@ const buttonClass = computed(() => {
 
   const variantClasses = {
     primary: 'bg-blue-500 text-white border-none hover:bg-blue-600',
-    outline: 'bg-transparent border-2 border-blue-500 text-blue-500 hover:bg-blue-50',
+    outline: 'bg-transparent border border-blue-500 text-blue-500 hover:bg-blue-50',
     pill: 'bg-emerald-500 text-white rounded-full border-none hover:bg-emerald-600',
     secondary: 'bg-gray-500 text-white border-none hover:bg-gray-600',
     success: 'bg-green-500 text-white border-none hover:bg-green-600',
