@@ -3,11 +3,6 @@
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import { getPointTransactions } from '@/api/point' // 경로 확인
-import { useAuthStore } from '@/stores/authStore'
-import { storeToRefs } from 'pinia'
-const auth = useAuthStore()
-const { userId: storeUserId } = storeToRefs(auth)
-const userId = computed(() => storeUserId.value ?? 3)
 
 /* ========= 날짜 유틸 ========= */
 function toDateFlexible(dt) {
@@ -123,7 +118,7 @@ async function fetchLogsPage() {
       sort: 'createdAt,DESC',
     })
     console.log('[PointInfo] raw response:', res) // 🔍 디버깅
-    await delay(2000)
+    await delay(20)
 
     const paged = unwrapServerPaging(res)
     if (paged) {
@@ -163,7 +158,7 @@ async function appendNextChunk() {
 
   isLoading.value = true
   try {
-    await delay(2000)
+    await delay(20)
     const slice = bufferAll.value.slice(bufferCursor.value, bufferCursor.value + PAGE_SIZE)
     bufferCursor.value += slice.length
     logs.value.push(...slice.map(mapTx))

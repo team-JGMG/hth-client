@@ -144,7 +144,7 @@ async function fetchOrdersPage() {
     while (added < PAGE_SIZE && hasNext.value && iter < 10) {
       const res = await getOrderHistory(page.value, PAGE_SIZE)
       console.log('[orders fetch]', { page: page.value, raw: res?.data })
-      await delay(10)
+      await delay(20)
 
       const paged = unwrapServerPaging(res)
 
@@ -221,7 +221,7 @@ async function appendNextChunk(minToFill = PAGE_SIZE) {
     let iter = 0
 
     while (added < minToFill && bufferCursor.value < total && iter < 50) {
-      await delay(10)
+      await delay(20)
       // 원본은 PAGE_SIZE 단위로 자르되, 필터링 후 부족하면 다음 슬라이스 계속 가져감
       const slice = bufferAll.value.slice(bufferCursor.value, bufferCursor.value + PAGE_SIZE)
       bufferCursor.value += slice.length
