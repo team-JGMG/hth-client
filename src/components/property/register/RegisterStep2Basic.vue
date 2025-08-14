@@ -120,7 +120,6 @@
           <InputField
             v-model="store.propertyBasic.period"
             label="희망 공고 기간"
-            type="date"
             placeholder="개월 수를 숫자로 입력해주세요."
             @focus="touched.period = true"
           />
