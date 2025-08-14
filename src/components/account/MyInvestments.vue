@@ -192,7 +192,7 @@ async function fetchFundingPage() {
   fundingIsLoading.value = true
   try {
     const res = await getUserFundingOrders(status, fundingPage.value, PAGE_SIZE)
-    await delay(2000)
+    await delay(20)
 
     const content = res?.data?.data?.content ?? []
     console.log('[ORDERS][RES]', {
@@ -269,7 +269,7 @@ async function fetchSharesPage() {
   sharesIsLoading.value = true
   try {
     const res = await getUserShares(sharesPage.value, PAGE_SIZE)
-    await delay(600)
+    await delay(20)
 
     const data = res?.data?.data ?? res?.data
     let content = []

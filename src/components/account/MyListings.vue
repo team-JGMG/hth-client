@@ -217,7 +217,7 @@ const fetchProperties = async (groupKey, statusParam) => {
     })
 
     // 요청 후 2초 대기 유지 (원하면 위치 조정 가능)
-    await delay(2000)
+    await delay(20)
 
     if (groupKey === 'APPROVED_ACTIVE') {
       listings[groupKey].push(
