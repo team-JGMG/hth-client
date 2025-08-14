@@ -63,7 +63,7 @@ function updateChart(parsed) {
   const idx = parsed.prices.findIndex((p) => p === parsed.currentPrice)
   emit('centerIndex', idx, parsed.prices)
   const option = generateOrderBookChartOption(parsed)
-  chartInstance?.setOption(option, true) // replaceMerge 원하면 옵션 조절
+  chartInstance?.setOption(option, false) // replaceMerge 원하면 옵션 조절
 }
 
 // parsedData 변경 시에만 차트 갱신
