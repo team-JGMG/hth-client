@@ -5,8 +5,7 @@ import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import CancelConfirmModal from './CancelConfirmModal.vue'
 import { formatDateTime } from '@/utils/format.js'
 import { getOrderHistory, cancelOrder } from '@/api/trade'
-import { useAuthStore } from '@/stores/authStore'
-import { storeToRefs } from 'pinia'
+
 import { useToastStore } from '@/stores/toast'
 
 const toast = useToastStore()
@@ -284,7 +283,7 @@ const selectedOrder = ref(null)
 
 function openDeleteModal(order) {
   if (!order.pendingShares || order.pendingShares === 0) {
-    alert('체결된 주문은 취소할 수 없습니다.')
+    toast.warn('체결된 주문은 취소할 수 없습니다.')
     return
   }
   selectedOrder.value = order
