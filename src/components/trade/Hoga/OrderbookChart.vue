@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick, onMounted, toRefs } from 'vue'
+import { ref, nextTick, onMounted, toRefs, watch } from 'vue'
 import AskingPriceComponent from './AskingPriceComponent.vue'
 import { useOrderBookSocket } from '@/hooks/useOrderBookSocket'
 import { getOrderBookByFundingId } from '@/api/orderbook'
@@ -57,7 +57,7 @@ function buildMergedSeries(buyOrders = [], sellOrders = []) {
   return { prices, buyVolumes, sellVolumes }
 }
 
-onMounted(async () => {
+async function fetchOrderBookData() {
   try {
     const res = await getOrderBookByFundingId(fundingId.value)
     const payload = res?.data?.data ?? res?.data
@@ -85,7 +85,16 @@ onMounted(async () => {
   } catch (e) {
     console.error('초기 호가 REST 데이터 로딩 실패:', e)
   }
-})
+}
+
+onMounted(fetchOrderBookData)
+
+watch(
+  () => props.refreshTrigger,
+  () => {
+    fetchOrderBookData()
+  },
+)
 
 // 이후 실시간 WebSocket 업데이트
 useOrderBookSocket(fundingId.value, (data) => {
