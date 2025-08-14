@@ -30,7 +30,7 @@ export function formatPriceInManwon(val) {
 }
 //금액 억 변환
 export function formatPriceInEokwon(val) {
-  return val ? `${(val / 100000000).toFixed(0)}억` : '-'
+  return val ? `${(val / 100000000).toFixed(1)}억` : '-'
 }
 
 //미터제곱 평 변환 (1㎡ ≒ 0.3025평)
