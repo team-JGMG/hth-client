@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full max-w-md mx-auto px-4 pb-32">
+  <div class="w-full max-w-md mx-auto px-4 pb-12">
     <BaseTypography class="mb-6" size="xl" weight="bold">
       매물 상세 정보를 입력해주세요.
     </BaseTypography>
@@ -141,7 +141,7 @@
     </div>
 
     <!-- 매물 사진 첨부 -->
-    <div class="mb-12 relative">
+    <div class="mb-28 relative">
       <label class="text-base font-medium block mb-2">매물 사진 첨부</label>
 
       <input type="file" class="hidden" id="fileInput" multiple @change="handleFiles" />
@@ -173,7 +173,7 @@
     </div>
 
     <!-- 다음 버튼 -->
-    <div class="pb-28">
+    <div class="pb-12">
       <CompletedButton
         :color="isStepValid ? 'black' : 'gray-300'"
         :text-color="isStepValid ? 'white' : 'gray-400'"

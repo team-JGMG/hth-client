@@ -5,7 +5,7 @@
     </BaseTypography>
 
     <!-- 이름 -->
-    <div class="mb-12 relative">
+    <div class="mb-10 relative">
       <label class="text-base font-medium">이름</label>
       <div class="mt-1 text-base text-black border-b border-gray-300 p-2">
         {{ store.ownerInfo.name ? store.ownerInfo.name : '-' }}
@@ -73,7 +73,7 @@
     </div>
 
     <!-- 약관 동의 -->
-    <div class="mb-12 relative">
+    <div class="mb-16 relative">
       <BaseTypography class="mb-2" weight="semibold">약관 동의</BaseTypography>
 
       <div class="flex items-center mb-3 cursor-pointer" @click="toggleAll">
@@ -149,7 +149,7 @@
     </div>
 
     <!-- 다음 버튼 -->
-    <div class="pb-28">
+    <div class="pb-12">
       <CompletedButton
         :color="isStepValid ? 'black' : 'gray-300'"
         :text-color="isStepValid ? 'white' : 'gray-400'"
