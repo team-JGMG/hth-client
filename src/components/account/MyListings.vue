@@ -15,7 +15,7 @@
       </BaseButton>
     </div>
 
-    <!-- ⏳ 0단계: 첫 진입 시 전역 스피너만 표시 (리스트/그룹 타이틀 전부 숨김) -->
+    <!-- ⏳ 0단계 -->
     <div v-if="globalInitialLoading" class="w-full flex justify-center py-12">
       <img
         src="@/assets/images/character/loading.png"
@@ -24,19 +24,18 @@
       />
     </div>
 
-    <!-- 💤 모든 그룹이 비어있을 때 -->
+    <!-- 💤 비었을 때 -->
     <div v-else-if="isEmpty" class="w-full">
       <NoTradeItems />
     </div>
 
-    <!-- ✅ 그룹별 매물 목록 + 무한스크롤 (전역 스피너 종료 후 노출) -->
+    <!-- ✅ 그룹별 목록 -->
     <div v-else class="w-full space-y-6">
       <div v-for="group in groupConfig" :key="group.key">
         <BaseTypography class="text-lg !font-bold mb-2">
           {{ group.title }}
         </BaseTypography>
 
-        <!-- ⏳ 1단계: 그룹별 첫 페이지 로딩 -->
         <div v-if="pageInfo[group.key].initialLoading" class="flex justify-center py-6">
           <img
             src="@/assets/images/character/loading.png"
@@ -45,9 +44,7 @@
           />
         </div>
 
-        <!-- ✅ 2단계: 첫 페이지 이후 리스트 표시 -->
         <template v-else>
-          <!-- ✅ 카드 전체를 RouterLink로 변경 -->
           <RouterLink
             v-for="item in listings[group.key]"
             :key="getItemId(item)"
@@ -79,7 +76,8 @@
                 </div>
                 <BaseTypography class="text-xs !text-gray-500">
                   남은 주(금액): {{ format(item.remainingShares ?? 0) }} /
-                  {{ formatAmount(item.price) }}
+                  {{ formatPriceInEokwon(item.price) }}
+                  <!-- ⬅️ 억 → 만원 -->
                 </BaseTypography>
               </div>
             </div>
@@ -108,11 +106,12 @@ import { useRouter, RouterLink } from 'vue-router'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import BaseButton from '../common/Button/BaseButton.vue'
 import NoTradeItems from './NoTradeItems.vue'
-import { format, formatAmount } from '@/utils/format'
+import { format, formatPriceInEokwon } from '@/utils/format' // ⬅️ 만원 포맷터 import
 
 import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
 import { fetchUserPropertiesByStatus } from '@/api/property'
+
 // ✅ 그룹 설정
 const groupConfig = [
   { key: 'APPROVED_ACTIVE', title: '거래 진행중인 매물', status: 'approved' },
@@ -164,7 +163,7 @@ const defaultImg = new URL('@/assets/images/sample-buliding.png', import.meta.ur
 // ✅ 페이지 크기
 const PAGE_SIZE = 5
 
-// ✅ 딜레이(요청 후 2초)
+// ✅ 딜레이
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 // ✅ 스토어 userId | 없으면 3
@@ -183,7 +182,7 @@ const goToPropertyRegisterPage = () => {
   router.push('/property/register')
 }
 
-// ✅ 전역 초기 로딩: 모든 그룹이 아직 첫 로딩 중일 때만 true
+// ✅ 전역 초기 로딩
 const globalInitialLoading = computed(() =>
   Object.values(pageInfo).every((info) => info.initialLoading),
 )
@@ -193,14 +192,13 @@ const anyInitialLoading = computed(() =>
   Object.values(pageInfo).some((info) => info.initialLoading),
 )
 
-// ✅ 모든 그룹 비어있는지 체크 (초기 로딩 중엔 false)
+// ✅ 모든 그룹 비어있는지 체크
 const isEmpty = computed(() => {
   if (anyInitialLoading.value) return false
   return Object.values(listings).every((list) => list.length === 0)
 })
 
 // ✅ API 호출
-
 const fetchProperties = async (groupKey, statusParam) => {
   const info = pageInfo[groupKey]
   if (info.isLoading || !info.hasNextPage || !effectiveUserId.value) return
@@ -211,12 +209,11 @@ const fetchProperties = async (groupKey, statusParam) => {
   info.isLoading = true
   try {
     const { content, last } = await fetchUserPropertiesByStatus({
-      status: statusParam, // 'pending' | 'approved' | 'rejected' | 'sold'
+      status: statusParam,
       page: info.page,
       size: PAGE_SIZE,
     })
 
-    // 요청 후 2초 대기 유지 (원하면 위치 조정 가능)
     await delay(20)
 
     if (groupKey === 'APPROVED_ACTIVE') {
@@ -256,11 +253,9 @@ const setupObserverForGroup = (groupKey, statusParam) => {
   }
 }
 
-// ✅ onMounted에서 초기 로딩 + 옵저버 등록
+// ✅ onMounted
 onMounted(async () => {
   if (!effectiveUserId.value) return
-  // 순차로 요청하여 "전역 스피너만" 상태가 초반에 한 번 보였다가,
-  // 첫 완료 시점부터 그룹 섹션이 나타나게 됨.
   for (const group of groupConfig) {
     await fetchProperties(group.key, group.status)
     nextTick(() => setupObserverForGroup(group.key, group.status))
