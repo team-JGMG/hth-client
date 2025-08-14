@@ -5,8 +5,7 @@ import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import CancelConfirmModal from './CancelConfirmModal.vue'
 import { formatDateTime } from '@/utils/format.js'
 import { getOrderHistory, cancelOrder } from '@/api/trade'
-import { useAuthStore } from '@/stores/authStore'
-import { storeToRefs } from 'pinia'
+
 function toIso(dateStr) {
   return typeof dateStr === 'string' ? dateStr.replace(' ', 'T') : dateStr
 }
@@ -33,9 +32,7 @@ const prepareOrders = (arr) => arr.map((o) => ({ ...o, _ui: { dragX: 0, touchSta
 
 /* 🔧 테스트 유저: 데이터 있는 ID */
 // -------------------------------------------
-const auth = useAuthStore()
-const { userId: storeUserId } = storeToRefs(auth)
-const userId = computed(() => storeUserId.value ?? 3) // 스토어 없으면 3로 폴백
+
 // -------------------------------------------
 const orders = ref([])
 const isFirstLoad = ref(true)
@@ -125,7 +122,7 @@ function mapAndFilter(list) {
 }
 
 /** ---- 서버/배열 모두 "취소 제외 후 최소 PAGE_SIZE개" 채워 넣기 ---- **/
-/** ---- 서버/배열 모두 "취소 제외 후 최소 PAGE_SIZE개" 채워 넣기 ---- **/
+
 async function fetchOrdersPage() {
   if (isLoading.value) return
 
@@ -143,7 +140,7 @@ async function fetchOrdersPage() {
     while (added < PAGE_SIZE && hasNext.value && iter < 10) {
       const res = await getOrderHistory(page.value, PAGE_SIZE)
       console.log('[orders fetch]', { page: page.value, raw: res?.data })
-      await delay(2000)
+      await delay(10)
 
       const paged = unwrapServerPaging(res)
 
@@ -220,7 +217,7 @@ async function appendNextChunk(minToFill = PAGE_SIZE) {
     let iter = 0
 
     while (added < minToFill && bufferCursor.value < total && iter < 50) {
-      await delay(2000)
+      await delay(10)
       // 원본은 PAGE_SIZE 단위로 자르되, 필터링 후 부족하면 다음 슬라이스 계속 가져감
       const slice = bufferAll.value.slice(bufferCursor.value, bufferCursor.value + PAGE_SIZE)
       bufferCursor.value += slice.length
@@ -281,9 +278,21 @@ const isModalOpen = ref(false)
 const selectedOrder = ref(null)
 
 function openDeleteModal(order) {
+  if (!order.pendingShares || order.pendingShares === 0) {
+    alert('체결된 주문은 취소할 수 없습니다.')
+    return
+  }
   selectedOrder.value = order
   isModalOpen.value = true
 }
+function closeModal() {
+  if (selectedOrder.value) {
+    selectedOrder.value._ui.dragX = 0
+  }
+  isModalOpen.value = false
+  selectedOrder.value = null
+}
+
 async function confirmDelete() {
   if (!selectedOrder.value || isSubmitting.value) return
   const targetId = selectedOrder.value.id
@@ -292,8 +301,8 @@ async function confirmDelete() {
   try {
     await cancelOrder(targetId)
     orders.value = orders.value.filter((o) => o.id !== targetId)
-    isModalOpen.value = false
-    selectedOrder.value = null
+    // 삭제 성공 시에도 동일하게 원복 + 닫기
+    closeModal()
   } catch (e) {
     console.error('[confirmDelete] cancel failed:', e?.response?.status, e?.response?.data, e)
     alert(e?.response?.data?.message || e?.message || '주문 취소에 실패했습니다.')
@@ -430,7 +439,7 @@ function handleTouchEnd(order) {
 
   <CancelConfirmModal
     :isOpen="isModalOpen"
-    @close="isModalOpen = false"
+    @close="closeModal"
     @submit="confirmDelete"
     title="정말 취소하시겠습니까?"
     description="주문 취소 시<br/>미체결 된 주식 전량이 취소됩니다."

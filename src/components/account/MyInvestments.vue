@@ -339,17 +339,6 @@ watch(
   },
 )
 
-/** ---------- 초기 로딩 & 옵저버 ---------- **/
-// onMounted(async () => {
-//   initialLoading.value = true
-//   await Promise.all([fetchFundingPage(), fetchSharesPage()])
-//   initialLoading.value = false
-
-//   await nextTick()
-//   setupFundingObserver()
-//   setupSharesObserver()
-// })
-
 onBeforeUnmount(() => {
   if (fundingObserver) fundingObserver.disconnect()
   if (sharesObserver) sharesObserver.disconnect()
