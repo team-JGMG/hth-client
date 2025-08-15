@@ -195,14 +195,12 @@ const handleFinalSubmit = async () => {
 
     showConfirmModal.value = false
     showCompleteModal.value = true
-    // 성공 후엔 그대로 true 유지 → 재클릭 불가
-  } catch (e) {
-    isSubmitting.value = false // 실패 시에만 재시도 허용
+  } catch {
+    isSubmitting.value = false
     toast.error({ title: '매물 등록 실패', body: '매물 등록 중 오류가 발생했습니다.' })
   }
 }
 
-// 완료 후 마이페이지 이동
 const goToMyPage = () => {
   router.push('/account/my-page/listings')
   showCompleteModal.value = false
