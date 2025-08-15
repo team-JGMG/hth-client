@@ -201,26 +201,41 @@
               property.description
             }}</BaseTypography>
 
-            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
-              >이미지</BaseTypography
-            >
-            <BaseTypography weight="regular" class="px-3 py-2">
-              <template v-if="property.images?.length">
-                <ul class="list-none space-y-1">
-                  <li v-for="(img, i) in property.images" :key="img.photoUrl">
-                    <a
-                      :href="img.photoUrl"
-                      class="text-blue-600 underline break-all"
-                      target="_blank"
-                      :download="`${property.title}_이미지` || `image-${i + 1}`"
-                    >
-                      {{ `${property.title} 이미지 ` || `image-${i + 1}` }}
-                    </a>
-                  </li>
-                </ul>
-              </template>
-              <span v-else class="text-gray-500">등록된 이미지가 없습니다.</span>
+            <BaseTypography class="bg-gray-50 px-3 py-2 col-span-2" weight="regular" color="gray-1">
+              이미지
             </BaseTypography>
+            <div class="col-span-2 p-3">
+              <div class="relative w-full h-60">
+                <img
+                  :src="property.images?.[currentImageIndex]?.photoUrl || '/fallback.png'"
+                  class="w-full h-full object-contain mx-auto"
+                  alt="매물 이미지"
+                />
+                <div
+                  v-if="imageCount > 1"
+                  class="absolute left-0 top-0 w-1/2 h-full cursor-pointer"
+                  @click="prevImage"
+                ></div>
+                <div
+                  v-if="imageCount > 1"
+                  class="absolute right-0 top-0 w-1/2 h-full cursor-pointer"
+                  @click="nextImage"
+                ></div>
+                <div
+                  v-if="imageCount > 1"
+                  class="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-white/70 rounded-full px-2 py-1"
+                >
+                  <button
+                    v-for="(_, i) in imageCount"
+                    :key="i"
+                    class="w-1.5 h-1.5 rounded-full transition-all"
+                    :class="i === currentImageIndex ? 'w-3 h-1.5 bg-black' : 'bg-gray-300'"
+                    @click.stop="goTo(i)"
+                    :aria-label="`이미지 ${i + 1} 보기`"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -296,6 +311,20 @@ function getDocumentName(type) {
       return '기타 문서'
   }
 }
+
+//이미지 - 여러개일 때 하단 이동 '...' 표시 보임
+const currentImageIndex = ref(0)
+
+const images = computed(() => property.value?.images ?? [])
+const imageCount = computed(() => images.value.length)
+
+const goTo = (i) => {
+  const n = imageCount.value
+  if (!n) return
+  currentImageIndex.value = (i + n) % n
+}
+const nextImage = () => goTo(currentImageIndex.value + 1)
+const prevImage = () => goTo(currentImageIndex.value - 1)
 
 onMounted(async () => {
   try {
