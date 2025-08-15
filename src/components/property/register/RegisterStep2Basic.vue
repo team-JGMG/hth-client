@@ -32,12 +32,14 @@
       </div>
       <BaseButton
         class="h-[38px] px-4 whitespace-nowrap bg-gray-600 hover:bg-gray-600 text-sm flex-shrink-0 mb-5"
-        @click="searchAddress"
+        @click="toggleAddressSearch"
       >
-        주소 검색
+        {{ show ? '닫기' : '주소 검색' }}
       </BaseButton>
     </div>
-    <div v-show="show" class="relative w-full h-[400px] border mt-2 rounded overflow-hidden">
+
+    <!-- 우편번호 레이어 -->
+    <div v-show="show" class="relative w-full h-[430px] border mt-2 rounded overflow-hidden">
       <div id="daum-postcode" class="absolute top-0 left-0 w-full h-full"></div>
     </div>
     <InputField
@@ -88,7 +90,7 @@
     <div class="mb-12 relative">
       <div class="flex items-center w-full gap-3">
         <div class="flex-1">
-          <CurrencyInput
+          <InputField
             v-model="store.propertyBasic.price"
             label="희망 매매가"
             placeholder="금액을 입력해주세요."
@@ -103,16 +105,12 @@
         size="xs"
         class="absolute mt-1 left-0 top-full"
       >
-        {{
-          (store.propertyBasic.price ?? '').toString().trim()
-            ? '* 숫자만 입력해주세요.'
-            : '* 필수 항목입니다.'
-        }}
+        {{ store.propertyBasic.price.trim() ? '* 숫자만 입력해주세요.' : '* 필수 항목입니다.' }}
       </BaseTypography>
     </div>
 
     <!-- 공고 기간 -->
-    <div class="mb-28 relative">
+    <div class="mb-10 relative">
       <div class="flex items-center w-full gap-3">
         <div class="flex-1">
           <InputField
@@ -151,13 +149,12 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, nextTick, onBeforeUnmount } from 'vue'
 import { usePropertyRegisterStore } from '@/stores/propertyRegister'
 import InputField from '@/components/auth/InputField.vue'
 import BaseButton from '@/components/common/Button/BaseButton.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import CompletedButton from '@/components/common/Button/CompletedButton.vue'
-import CurrencyInput from '@/components/auth/CurrencyInput.vue'
 
 const store = usePropertyRegisterStore()
 
@@ -179,41 +176,60 @@ const touched = ref({
 
 const show = ref(false)
 
-const searchAddress = () => {
-  show.value = true
-  setTimeout(() => {
-    new daum.Postcode({
-      oncomplete: function (data) {
-        let fullAddr = data.address
-        let extraAddr = ''
-
-        if (data.addressType === 'R') {
-          if (data.bname !== '') extraAddr += data.bname
-          if (data.buildingName !== '') {
-            extraAddr += extraAddr !== '' ? ', ' + data.buildingName : data.buildingName
-          }
-          fullAddr += extraAddr !== '' ? ' (' + extraAddr + ')' : ''
-        }
-
-        store.propertyBasic.address = fullAddr
-        store.propertyBasic.rawdCd = data.bcode?.slice(0, 5) || ''
-        touched.value.address = true
-        show.value = false
-      },
-      width: '100%',
-      height: '100%',
-    }).embed(document.getElementById('daum-postcode'))
-  })
+// 닫기
+const closePostcode = () => {
+  show.value = false
+  const el = document.getElementById('daum-postcode')
+  if (el) el.innerHTML = ''
 }
 
-// ===== 유효성 검사 (안전하게 문자열 변환 후 숫자만 검사) =====
+// 열기(매번 새 인스턴스 생성)
+const openPostcode = async () => {
+  show.value = true
+  await nextTick()
+
+  const wrap = document.getElementById('daum-postcode')
+  if (!wrap) return
+
+  const pc = new window.daum.Postcode({
+    oncomplete(data) {
+      let fullAddr = data.address
+      let extraAddr = ''
+      if (data.addressType === 'R') {
+        if (data.bname) extraAddr += data.bname
+        if (data.buildingName) extraAddr += extraAddr ? ', ' + data.buildingName : data.buildingName
+        if (extraAddr) fullAddr += ` (${extraAddr})`
+      }
+      store.propertyBasic.address = fullAddr
+      store.propertyBasic.rawdCd = data.bcode?.slice(0, 5) || ''
+      touched.value.address = true
+      closePostcode()
+    },
+    width: '100%',
+    height: '100%',
+  })
+
+  pc.embed(wrap)
+}
+
+const toggleAddressSearch = () => (show.value ? closePostcode() : openPostcode())
+
+// ESC 키로 닫기
+const onKeydown = (e) => {
+  if (e.key === 'Escape' && show.value) {
+    closePostcode()
+  }
+}
+onMounted(() => window.addEventListener('keydown', onKeydown))
+onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
+
+// ===== 유효성 검사 =====
 const titleValid = computed(() => (store.propertyBasic.title ?? '').toString().trim() !== '')
 const addressValid = computed(() => (store.propertyBasic.address ?? '').toString().trim() !== '')
 const detailAddressValid = computed(
   () => (store.propertyBasic.detailAddress ?? '').toString().trim() !== '',
 )
 
-// 숫자 필드는 콤마/공백/문자 제거 후 검사
 const sizeDigits = computed(() => toDigits(store.propertyBasic.size))
 const priceDigits = computed(() => toDigits(store.propertyBasic.price))
 const periodDigits = computed(() => toDigits(store.propertyBasic.period))
@@ -232,24 +248,13 @@ const isStepValid = computed(
     periodValid.value,
 )
 
-// ===== 다음 단계 처리 =====
+// ===== 다음 단계 =====
 const handleNext = () => {
-  Object.keys(touched.value).forEach((key) => (touched.value[key] = true))
+  Object.keys(touched.value).forEach((k) => (touched.value[k] = true))
   if (!isStepValid.value) return
-
-  // 서버 전송 전에 숫자만 남겨 정규화 (선행 0 처리 포함)
   store.propertyBasic.size = normalizeDigits(sizeDigits.value)
   store.propertyBasic.price = normalizeDigits(priceDigits.value)
   store.propertyBasic.period = normalizeDigits(periodDigits.value)
-
-  // 필요 시 숫자형으로 변환해서 사용 예:
-  // const payload = {
-  //   ...store.propertyBasic,
-  //   price: Number(store.propertyBasic.price),
-  //   size: Number(store.propertyBasic.size),
-  //   period: Number(store.propertyBasic.period),
-  // }
-
   store.goToNextStep()
 }
 </script>
