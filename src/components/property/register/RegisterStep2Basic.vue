@@ -21,19 +21,17 @@
     </div>
 
     <!-- 주소 -->
-    <!-- 매물 주소 조회 -->
-    <Basetypography size="sm" weight="bold" class="block mb-1">매물 주소 조회</Basetypography>
-
-    <!-- 입력창 + 버튼 한 줄 -->
-    <div class="flex items-center gap-2">
-      <InputField
-        v-model="store.propertyBasic.rawdCd"
-        placeholder="시군구 코드"
-        class="flex-1"
-        readonly
-      />
+    <div class="flex items-end gap-2">
+      <div class="flex-1">
+        <InputField
+          v-model="store.propertyBasic.rawdCd"
+          placeholder="시군구 코드"
+          label="매물 주소 조회"
+          readonly
+        />
+      </div>
       <BaseButton
-        class="h-[38px] px-4 whitespace-nowrap bg-gray-600 hover:bg-gray-600 text-sm -translate-y-[8px]"
+        class="h-[38px] px-4 whitespace-nowrap bg-gray-600 hover:bg-gray-600 text-sm flex-shrink-0 mb-5"
         @click="searchAddress"
       >
         주소 검색
