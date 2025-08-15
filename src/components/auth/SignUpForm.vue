@@ -39,30 +39,36 @@
       </div>
     </div>
 
-    <!-- 전화번호 -->
     <div class="mb-12 relative">
-      <div class="flex items-center gap-3">
-        <InputField
-          v-model="phone"
-          label="전화번호"
-          placeholder="전화번호를 입력해주세요."
-          class="flex-1 h-[50px] p-0"
-          maxlength="11"
-          inputmode="numeric"
-          pattern="\d*"
-          @input="onPhoneInput"
-          @focus="touched.phone = true"
-        />
+      <!-- 인풋은 가변(1fr), 버튼은 고정폭 -->
+      <div class="flex items-center w-full gap-3">
+        <div class="flex-1">
+          <InputField
+            v-model="phone"
+            label="전화번호"
+            placeholder="전화번호를 입력해주세요."
+            class="!w-full h-full p-0"
+            maxlength="11"
+            inputmode="numeric"
+            pattern="\d*"
+            @input="onPhoneInput"
+            @focus="touched.phone = true"
+          />
+        </div>
+
         <BaseButton
           :disabled="isPhoneVerified"
           @click="verifyPhone"
           variant="none"
-          class="h-[38px] text-sm self-end hover:bg-gray-800"
-          :class="isPhoneVerified ? 'bg-gray-300 text-white' : 'bg-gray-700 text-white'"
+          class="h-9.9 w-[80.4px] text-sm rounded-md transition-colors"
+          :class="
+            isPhoneVerified ? 'bg-gray-300 text-white' : 'bg-gray-800 text-white hover:bg-gray-700'
+          "
         >
           {{ isPhoneVerified ? '인증완료' : '인증하기' }}
         </BaseButton>
       </div>
+
       <BaseTypography
         v-if="phone && !isPhoneValid"
         color="red-1"
