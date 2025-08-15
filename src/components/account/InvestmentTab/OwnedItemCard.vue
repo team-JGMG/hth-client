@@ -40,7 +40,7 @@ function onDividendClick(e) {
       <BaseButton
         variant="secondary"
         @click="onDividendClick"
-        class="text-xs px-0.5 mb-1 !py-0.5 btn-fixed"
+        class="text-xs px-0.6 mb-1 !py-0.5 btn-fixed whitespace-nowrap min-w-[76px]"
       >
         <BaseTypography class="text-[10px] font-medium !text-white">배당금 내역</BaseTypography>
       </BaseButton>
