@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full max-w-md mx-auto px-4">
+  <div class="w-full max-w-md mx-auto px-4 pb-8">
     <BaseTypography class="mb-6" size="xl" weight="bold">
       매도자 정보를 확인해주세요.
     </BaseTypography>
@@ -10,22 +10,6 @@
       <div class="mt-1 text-base text-black border-b border-gray-300 p-2">
         {{ store.ownerInfo.name ? store.ownerInfo.name : '-' }}
       </div>
-      <!-- 주석 내용 : 기존 수동입력 및 유효성 처리 -->
-      <!-- <InputField
-        v-model="store.ownerInfo.name"
-        label="이름"
-        placeholder="이름을 입력해주세요."
-        :readonly="true"
-      />
-      @focus="touched.name = true"
-      <BaseTypography
-        v-if="touched.name && !isNameValid"
-        color="red-1"
-        size="xs"
-        class="absolute mt-1 left-0 top-full"
-      >
-        * 필수 항목입니다.
-      </BaseTypography> -->
     </div>
 
     <!-- 전화번호 -->
@@ -34,20 +18,6 @@
       <div class="mt-1 text-base text-black border-b border-gray-300 p-2">
         {{ store.ownerInfo.phone ? formatPhoneNumber(store.ownerInfo.phone) : '-' }}
       </div>
-      <!-- <InputField
-        v-model="store.ownerInfo.phone"
-        label="전화번호"
-        placeholder="전화번호를 입력해주세요."
-        @focus="touched.phone = true"
-      />
-      <BaseTypography
-        v-if="touched.phone && !isPhoneValid"
-        color="red-1"
-        size="xs"
-        class="absolute mt-1 left-0 top-full"
-      >
-        {{ phoneRaw ? '* 전화번호 형식에 맞지 않습니다.' : '* 필수 항목입니다.' }}
-      </BaseTypography> -->
     </div>
 
     <!-- 이메일 -->
@@ -56,24 +26,10 @@
       <div class="mt-1 text-base text-black border-b border-gray-300 p-2">
         {{ store.ownerInfo.email ? store.ownerInfo.email : '-' }}
       </div>
-      <!-- <InputField
-        v-model="store.ownerInfo.email"
-        label="이메일"
-        placeholder="이메일을 입력해주세요."
-        @focus="touched.email = true"
-      />
-      <BaseTypography
-        v-if="touched.email && !isEmailValid"
-        color="red-1"
-        size="xs"
-        class="absolute mt-1 left-0 top-full"
-      >
-        {{ emailRaw ? '* 이메일 형식에 맞지 않습니다.' : '* 필수 항목입니다.' }}
-      </BaseTypography> -->
     </div>
 
     <!-- 약관 동의 -->
-    <div class="mb-16 relative">
+    <div class="mb-10 relative">
       <BaseTypography class="mb-2" weight="semibold">약관 동의</BaseTypography>
 
       <div class="flex items-center mb-3 cursor-pointer" @click="toggleAll">
@@ -212,7 +168,6 @@ const isPartiallyChecked = computed(() => {
 })
 
 const allChecked = computed(() => agreements.terms && agreements.privacy && agreements.age)
-
 const isStepValid = computed(() => allChecked.value)
 
 const handleNext = () => {
