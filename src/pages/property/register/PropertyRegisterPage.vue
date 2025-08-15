@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onUnmounted } from 'vue'
 import { usePropertyRegisterStore } from '@/stores/propertyRegister'
 
 import RegisterStep1Owner from '@/components/property/register/RegisterStep1Owner.vue'
@@ -31,5 +31,9 @@ const currentStepComponent = computed(() => {
     5: RegisterStep5Documents,
   }
   return map[store.step]
+})
+
+onUnmounted(() => {
+  store.resetStore()
 })
 </script>
