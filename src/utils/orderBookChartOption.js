@@ -54,7 +54,7 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
       .map((_, i) => ({
         type: 'category',
         gridIndex: i,
-        inverse: false, // 큰 가격이 위로 보이게 (prices는 내림차순)
+        inverse: true, // 큰 가격이 위로 보이게 (prices는 내림차순)
         data: p,
         axisLine: { show: false },
         axisTick: { show: false },
@@ -83,9 +83,9 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
         xAxisIndex: 0,
         yAxisIndex: 0,
         data: s, // ✅ 부모 정렬 기준과 동일 인덱스
-        barWidth: 30,
+        barWidth: 25,
         barCategoryGap: '60%',
-        itemStyle: { color: '#fbd5d5', borderRadius: [4, 4, 4, 4] },
+        itemStyle: { color: '#fbd5d5', borderRadius: [12, 0, 0, 12] },
         label: {
           show: true,
           position: 'insideRight',
@@ -100,9 +100,9 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
         xAxisIndex: 1,
         yAxisIndex: 1,
         data: b, // ✅ 부모 정렬 기준과 동일 인덱스
-        barWidth: 30,
+        barWidth: 25,
         barCategoryGap: '40%',
-        itemStyle: { color: '#cce5ff', borderRadius: [4, 4, 4, 4] },
+        itemStyle: { color: '#cce5ff', borderRadius: [0, 12, 12, 0] },
         label: {
           show: true,
           position: 'insideLeft',

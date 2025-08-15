@@ -4,7 +4,7 @@
       <div class="shrink-0">
         <DetailHeader>{{ tradeItem.title }}</DetailHeader>
         <div class="bg-white pt-0">
-          <CurrentPrice :fundingId="tradeId" />
+          <CurrentPrice :currentPrice="parsedData?.currentPrice" />
           <div class="flex justify-center px-4 mb-4">
             <div class="flex bg-transparent">
               <button
@@ -37,9 +37,8 @@
       <div class="flex-1 overflow-y-auto pb-28 no-scrollbar">
         <OrderbookChart
           v-if="currentFundingStatus === 'askingPrice'"
-          :refreshTrigger="chartRefreshTrigger"
-          :fundingId="tradeId"
-          :key="`orderbook-${tradeId}-${chartRefreshTrigger}`"
+          :parsedData="parsedData"
+          :key="`orderbook-${tradeId}`"
         />
         <TradingChartContainer
           ref="tradeHistoryChart"
@@ -67,12 +66,14 @@ import CurrentPrice from '@/components/trade/CurrentPrice.vue'
 import OrderbookChart from '@/components/trade/Hoga/OrderbookChart.vue'
 import { getFundingById } from '@/api/funding'
 import TradingChartContainer from '@/components/trade/TradeListChart/TradingChartContainer.vue'
+import { useOrderBookSocket } from '@/hooks/useOrderBookSocket'
+import { getOrderBookByFundingId } from '@/api/orderbook'
 
 const route = useRoute()
 const tradeId = ref(Number(route.params.id))
 const tradeItem = ref({})
 const tradeHistoryChart = ref(null)
-const chartRefreshTrigger = ref(0)
+const parsedData = ref(null)
 
 const fetchFundingDetail = async (id) => {
   try {
@@ -83,24 +84,94 @@ const fetchFundingDetail = async (id) => {
   }
 }
 
-// 페이지 포커스 시 자동 새로고침
-const handleWindowFocus = () => {
-  if (currentFundingStatus.value === 'askingPrice') {
-    chartRefreshTrigger.value++
+function buildSeriesByCurrentPrice(buyOrders = [], sellOrders = []) {
+  const map = new Map()
+
+  // Process buy orders
+  buyOrders.forEach((o) => {
+    if (o?.price == null) return
+    const priceNum = Number(o.price)
+    const qty = Number(o.quantity) || 0
+    const k = String(priceNum)
+    if (!map.has(k)) map.set(k, { buy: 0, sell: 0 })
+    const prev = map.get(k)
+    map.set(k, { ...prev, buy: (prev.buy || 0) + qty })
+  })
+
+  // Process sell orders
+  sellOrders.forEach((o) => {
+    if (o?.price == null) return
+    const priceNum = Number(o.price)
+    const qty = Number(o.quantity) || 0
+    const k = String(priceNum)
+    if (!map.has(k)) map.set(k, { buy: 0, sell: 0 })
+    const prev = map.get(k)
+    map.set(k, { ...prev, sell: (prev.sell || 0) + qty })
+  })
+
+  // 가격 내림차순 (큰 값이 위)
+  const sortedKeys = [...map.keys()].sort((a, b) => Number(b) - Number(a))
+
+  const prices = []
+  const buyVolumes = []
+  const sellVolumes = []
+
+  for (const k of sortedKeys) {
+    prices.push(Number(k))
+    const v = map.get(k)
+    buyVolumes.push(v.buy)
+    sellVolumes.push(v.sell)
+  }
+
+  return { prices, buyVolumes, sellVolumes }
+}
+
+async function fetchOrderBookData() {
+  try {
+    const res = await getOrderBookByFundingId(tradeId.value)
+    const payload = res?.data?.data ?? res?.data
+    if (!payload || !Array.isArray(payload.buyOrders) || !Array.isArray(payload.sellOrders)) {
+      return
+    }
+
+    const { prices, buyVolumes, sellVolumes } = buildSeriesByCurrentPrice(
+      payload.buyOrders,
+      payload.sellOrders,
+    )
+
+    parsedData.value = {
+      currentPrice: payload.currentPrice,
+      upperLimitPrice: payload.upperLimitPrice,
+      lowerLimitPrice: payload.lowerLimitPrice,
+      prices,
+      buyVolumes,
+      sellVolumes,
+      timestamp: Date.now(),
+    }
+  } catch (e) {
+    console.error('❌ REST API 호가 데이터 로딩 실패:', e)
   }
 }
 
-// 페이지 가시성 변경 시 자동 새로고침
+const { reconnect } = useOrderBookSocket(tradeId.value, (data) => {
+  parsedData.value = { ...data, timestamp: Date.now() }
+})
+
+const handleWindowFocus = () => {
+  if (currentFundingStatus.value === 'askingPrice') {
+    fetchOrderBookData()
+  }
+}
+
 const handleVisibilityChange = () => {
   if (!document.hidden && currentFundingStatus.value === 'askingPrice') {
-    chartRefreshTrigger.value++
+    fetchOrderBookData()
   }
 }
 
 onMounted(() => {
   fetchFundingDetail(tradeId.value)
-
-  // 자동 갱신을 위한 이벤트 리스너
+  fetchOrderBookData()
   window.addEventListener('focus', handleWindowFocus)
   document.addEventListener('visibilitychange', handleVisibilityChange)
 })
@@ -115,7 +186,8 @@ watch(
   (newId) => {
     tradeId.value = Number(newId)
     fetchFundingDetail(tradeId.value)
-    chartRefreshTrigger.value++ // 새로운 fundingId로 변경될 때도 갱신
+    fetchOrderBookData()
+    reconnect()
   },
 )
 
@@ -123,16 +195,14 @@ const handleTradeCompleted = () => {
   if (tradeHistoryChart.value) {
     tradeHistoryChart.value.fetchChartData()
   }
-  chartRefreshTrigger.value++
-  console.log('TradeOrderPage - chartRefreshTrigger incremented to:', chartRefreshTrigger.value)
+  fetchOrderBookData()
 }
 
 const currentFundingStatus = ref('askingPrice')
 
-// 호가 탭으로 전환할 때도 새로고침
 watch(currentFundingStatus, (newStatus) => {
   if (newStatus === 'askingPrice') {
-    chartRefreshTrigger.value++
+    fetchOrderBookData()
   }
 })
 </script>
