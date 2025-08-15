@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
+import { fetchUserInfo, logout as logoutRequest } from '@/api/auth'
 
 import { defineStore } from 'pinia'
-import { fetchUserInfo } from '@/api/auth'
 
 export const useAuthStore = defineStore(
   'auth',
@@ -52,15 +52,28 @@ export const useAuthStore = defineStore(
       if (userInfo.value) userInfo.value.point = point
     }
 
-    // 🔒 로그아웃
+    // 🔒 로그아웃 (서버 + FCM 디바이스 토큰 삭제 + 클라이언트 정리)
     async function logout() {
-      userInfo.value = null
-      localStorage.removeItem('refreshToken')
       try {
+        // FCM 스토어 가져오기
         const { useFcmStore } = await import('@/stores/fcm')
-        useFcmStore().reset()
+        const fcm = useFcmStore()
+
+        // FCM 초기화(토큰 확보)
+        await fcm.init()
+        const deviceToken = fcm.token || null
+
+        // 서버 로그아웃 요청 (디바이스 토큰 전달하여 삭제)
+        await logoutRequest(deviceToken)
+
+        // FCM 상태 리셋
+        fcm.reset()
       } catch (e) {
-        console.warn('[FCM] 리셋 실패:', e)
+        console.warn('[로그아웃 처리 중 일부 실패]', e)
+      } finally {
+        // 로컬 유저 정보 정리
+        userInfo.value = null
+        localStorage.removeItem('refreshToken')
       }
     }
 
