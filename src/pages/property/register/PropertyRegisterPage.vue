@@ -1,14 +1,14 @@
 <template>
   <BlankLayout>
     <DetailHeader> 매물등록 </DetailHeader>
-    <div>
-      <component :is="currentStepComponent" />
+    <div ref="stepRoot">
+      <component :is="currentStepComponent" :key="store.step" />
     </div>
   </BlankLayout>
 </template>
 
 <script setup>
-import { computed, onUnmounted } from 'vue'
+import { computed, onUnmounted, watch, nextTick, ref } from 'vue'
 import { usePropertyRegisterStore } from '@/stores/propertyRegister'
 
 import RegisterStep1Owner from '@/components/property/register/RegisterStep1Owner.vue'
@@ -32,6 +32,38 @@ const currentStepComponent = computed(() => {
   }
   return map[store.step]
 })
+
+const stepRoot = ref(null)
+
+const scrollToTop = () => {
+  let scroller = null
+  if (stepRoot.value && typeof stepRoot.value.closest === 'function') {
+    scroller = stepRoot.value.closest('[data-scroll-container]')
+  }
+
+  if (!scroller) {
+    scroller = document.querySelector('[data-scroll-container]')
+  }
+
+  if (!scroller) {
+    scroller = document.scrollingElement || document.documentElement || document.body || null
+  }
+  if (!scroller) return
+
+  if (typeof scroller.scrollTo === 'function') {
+    scroller.scrollTo({ top: 0, behavior: 'auto' })
+  } else {
+    scroller.scrollTop = 0
+  }
+}
+
+watch(
+  () => store.step,
+  async () => {
+    await nextTick()
+    requestAnimationFrame(scrollToTop)
+  },
+)
 
 onUnmounted(() => {
   store.resetStore()
