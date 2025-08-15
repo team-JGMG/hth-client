@@ -1,8 +1,11 @@
 import api from '@/libs/axios'
 
 // 알림 목록 조회
-export const getNotifications = async () => {
-  const res = await api.get('/api/auth/notifications')
+export const getNotifications = async (params = {}) => {
+  const { page = 0, size = 20, readStatus } = params
+  const res = await api.get('/api/auth/notifications', {
+    params: { page, size, ...(readStatus ? { readStatus } : {}) },
+  })
   return res.data
 }
 
