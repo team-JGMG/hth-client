@@ -66,11 +66,11 @@
       </template>
       <template #submit>
         <CompletedButton
+          :disabled="!isStepValid || isSubmitting"
+          class="w-full font-semibold py-3"
           :color="isStepValid ? 'black' : 'gray-300'"
           :text-color="isStepValid ? 'white' : 'gray-400'"
           :active-color="isStepValid ? 'gray-700' : 'gray-300'"
-          :disabled="!isStepValid"
-          class="w-full font-semibold py-3"
           @click="handleFinalSubmit"
         >
           최종 등록하기
@@ -104,6 +104,7 @@ import { usePropertyRegisterStore } from '@/stores/propertyRegister'
 import { registerPropertyWithFormData } from '@/api/property'
 import { useToastStore } from '@/stores/toast'
 
+const isSubmitting = ref(false)
 const store = usePropertyRegisterStore()
 const router = useRouter()
 const toast = useToastStore()
@@ -138,6 +139,7 @@ const handleFileUpload = (event, index) => {
 
 //등록하기 클릭 시 (확인 모달 열기)
 const handleSubmit = () => {
+  if (isSubmitting.value) return // 중복 클릭 차단
   submitTried.value = true
   if (!isStepValid.value) return
   showConfirmModal.value = true
@@ -145,6 +147,8 @@ const handleSubmit = () => {
 
 //최종 등록 요청
 const handleFinalSubmit = async () => {
+  if (isSubmitting.value || !isStepValid.value) return
+  isSubmitting.value = true
   try {
     store.documentFiles = documents.value.map((doc) => doc)
     store.documentTypes = documentFields.map((field) => field.value)
@@ -156,7 +160,6 @@ const handleFinalSubmit = async () => {
       area: parseFloat(store.propertyBasic.size),
       price: parseFloat(store.propertyBasic.price),
       postingPeriod: parseInt(store.propertyBasic.period),
-
       usageDistrict: store.propertyBuilding.landUsageZone,
       landArea: parseFloat(store.propertyBuilding.landSize),
       buildingArea: parseFloat(store.propertyBuilding.buildingSize),
@@ -167,15 +170,14 @@ const handleFinalSubmit = async () => {
       approvalDate: store.propertyBuilding.builtDate
         ? (() => {
             const d = new Date(store.propertyBuilding.builtDate)
-            const year = d.getFullYear()
-            const month = String(d.getMonth() + 1).padStart(2, '0')
+            const y = d.getFullYear()
+            const m = String(d.getMonth() + 1).padStart(2, '0')
             const day = String(d.getDate()).padStart(2, '0')
-            return `${year}-${month}-${day}`
+            return `${y}-${m}-${day}`
           })()
         : null,
       officialLandPrice: parseFloat(store.propertyBuilding.officialPrice),
       unitPricePerPyeong: parseFloat(store.propertyBuilding.marketPrice),
-
       propertyType: store.propertyDetail.type,
       roomCount: parseInt(store.propertyDetail.roomCount),
       bathroomCount: parseInt(store.propertyDetail.bathroomCount),
@@ -193,15 +195,10 @@ const handleFinalSubmit = async () => {
 
     showConfirmModal.value = false
     showCompleteModal.value = true
-    toast.success({
-      title: '매물 접수 완료',
-      body: '매물이 성공적으로 등록되었습니다.',
-    })
-  } catch {
-    toast.error({
-      title: '매물 등록 실패',
-      body: '매물 등록 중 오류가 발생했습니다.',
-    })
+    // 성공 후엔 그대로 true 유지 → 재클릭 불가
+  } catch (e) {
+    isSubmitting.value = false // 실패 시에만 재시도 허용
+    toast.error({ title: '매물 등록 실패', body: '매물 등록 중 오류가 발생했습니다.' })
   }
 }
 
