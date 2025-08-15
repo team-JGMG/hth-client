@@ -108,7 +108,6 @@
             !store.propertyDetail.options.includes(hashtagOptions.indexOf(tag) + 1)
           "
           :class="[
-            // 선택된 상태면 활성화
             'px-3 py-1 rounded-full text-sm border',
             store.propertyDetail.options.includes(hashtagOptions.indexOf(tag) + 1)
               ? 'bg-black text-white border-black'
@@ -144,23 +143,40 @@
     <div class="mb-28 relative">
       <label class="text-base font-medium block mb-2">매물 사진 첨부</label>
 
-      <input type="file" class="hidden" id="fileInput" multiple @change="handleFiles" />
+      <input
+        id="fileInput"
+        type="file"
+        class="hidden"
+        multiple
+        accept="image/*"
+        @change="handleFiles"
+      />
 
       <label
         for="fileInput"
         class="flex items-center justify-between w-full cursor-pointer border-b border-gray-400 py-2 text-base text-gray-700"
         @click="touched.image = true"
       >
-        <!-- 파일명 또는 기본 텍스트 -->
-        <span class="truncate">
-          {{
-            store.photoFiles.length > 0 ? `${store.photoFiles.length}개 파일 선택됨` : '파일 선택'
-          }}
+        <!-- 파일명 라벨 -->
+        <span class="truncate" :title="fileTitle">
+          {{ fileLabel }}
         </span>
 
         <!-- 클립 아이콘 -->
         <span class="material-symbols-outlined text-gray-500">attach_file</span>
       </label>
+
+      <!-- 선택된 파일명 뱃지 -->
+      <div v-if="store.photoFiles.length" class="mt-2 flex flex-wrap gap-2">
+        <span
+          v-for="(f, i) in store.photoFiles"
+          :key="i"
+          class="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-gray-300 text-xs text-gray-700 bg-white"
+        >
+          <span class="material-symbols-outlined text-[14px]">image</span>
+          {{ f.name }}
+        </span>
+      </div>
 
       <BaseTypography
         v-if="touched.image && !store.photoFiles[0]"
@@ -237,11 +253,24 @@ const toggleTag = (tag) => {
   touched.value.options = true
 }
 
+// ▼ 파일명 라벨/툴팁
+const fileLabel = computed(() => {
+  const len = store.photoFiles?.length || 0
+  if (len === 0) return '파일 선택'
+  if (len === 1) return store.photoFiles[0].name
+  return `${store.photoFiles[0].name} 외 ${len - 1}개`
+})
+const fileTitle = computed(() => (store.photoFiles || []).map((f) => f.name).join(', '))
+
 const handleFiles = (e) => {
   const files = e.target.files
-  if (files.length > 0) {
+  if (files && files.length > 0) {
     store.photoFiles = Array.from(files)
+  } else {
+    store.photoFiles = []
   }
+  // 동일 파일 재선택 허용
+  e.target.value = ''
 }
 
 const isNumber = (value) => /^[0-9]+$/.test(value)
