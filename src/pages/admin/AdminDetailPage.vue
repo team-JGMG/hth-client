@@ -9,139 +9,241 @@
         </BaseTypography>
       </section>
 
-      <section v-if="property.seller" class="border p-4 rounded-lg bg-white mt-1">
+      <!-- 매도자 정보 -->
+      <section v-if="property.seller" class="mt-1 px-2 bg-white">
         <BaseTypography class="mb-2" weight="semibold" size="lg">매도자 정보</BaseTypography>
-        <BaseTypography weight="regular">이름: {{ property.seller.name }}</BaseTypography>
-        <BaseTypography weight="regular">전화번호: {{ property.seller.phone }}</BaseTypography>
-        <BaseTypography weight="regular">이메일: {{ property.seller.email }}</BaseTypography>
+        <div class="px-1 pb-2">
+          <div class="grid grid-cols-[115px,1fr] text-sm border rounded-md overflow-hidden">
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >이름</BaseTypography
+            >
+            <BaseTypography weight="regular" class="px-3 py-2">{{
+              property.seller?.name || '-'
+            }}</BaseTypography>
+
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >전화번호</BaseTypography
+            >
+            <BaseTypography weight="regular" class="px-3 py-2">{{
+              property.seller?.phone || '-'
+            }}</BaseTypography>
+
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >이메일</BaseTypography
+            >
+            <BaseTypography weight="regular" class="px-3 py-2">{{
+              property.seller?.email || '-'
+            }}</BaseTypography>
+          </div>
+        </div>
       </section>
 
-      <section class="border p-4 rounded-lg bg-white mt-4">
+      <!-- 매물 정보 -->
+      <section class="mt-4 px-2 bg-white">
         <BaseTypography class="mb-2" weight="semibold" size="lg">매물 정보</BaseTypography>
-        <BaseTypography weight="regular">매물명: {{ property.title }}</BaseTypography>
-        <BaseTypography weight="regular">매물 주소: {{ property.address }}</BaseTypography>
-        <BaseTypography weight="regular"
-          >매물 면적: {{ property.area }}㎡({{ formatAreaToPyeong(property.area) }})
-        </BaseTypography>
-        <BaseTypography weight="regular"
-          >희망 매매가: {{ formatPriceInManwon(property.price) }}
-        </BaseTypography>
-        <BaseTypography weight="regular"
-          >희망 공모 기간: {{ property.postingPeriod }}개월
-        </BaseTypography>
+        <div class="px-1 pb-2">
+          <div class="grid grid-cols-[115px,1fr] text-sm border rounded-md overflow-hidden">
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >매물명</BaseTypography
+            >
+            <BaseTypography weight="regular" class="px-3 py-2">{{ property.title }}</BaseTypography>
+
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >매물 주소</BaseTypography
+            >
+            <BaseTypography weight="regular" class="px-3 py-2">
+              {{ property.address }}</BaseTypography
+            >
+
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >매물 면적</BaseTypography
+            >
+            <BaseTypography weight="regular" class="px-3 py-2"
+              >{{ property.area }}㎡({{ formatAreaToPyeong(property.area) }})</BaseTypography
+            >
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >희망 매매가</BaseTypography
+            >
+            <BaseTypography weight="regular" class="px-3 py-2">{{
+              formatPriceInManwon(property.price)
+            }}</BaseTypography>
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >희망 공모 기간</BaseTypography
+            >
+            <BaseTypography weight="regular" class="px-3 py-2"
+              >{{ property.postingPeriod }}개월</BaseTypography
+            >
+          </div>
+        </div>
       </section>
 
-      <section class="border p-4 rounded-lg bg-white mt-4">
+      <!-- 매물의 건축물 대장 정보 -->
+      <section class="mt-4 px-2 bg-white">
         <BaseTypography class="mb-2" weight="semibold" size="lg"
           >매물의 건축물 대장 정보</BaseTypography
         >
-        <BaseTypography weight="regular">용도지역: {{ property.usageDistrict }}</BaseTypography>
-        <BaseTypography weight="regular">
-          대지 면적(매물): {{ property.landArea }}㎡({{ formatAreaToPyeong(property.landArea) }})
-        </BaseTypography>
-        <BaseTypography weight="regular">
-          대지 면적(건물): {{ property.buildingArea }}㎡({{
-            formatAreaToPyeong(property.buildingArea)
-          }})
-        </BaseTypography>
-        <BaseTypography weight="regular">
-          연면적(매물): {{ property.totalFloorAreaProperty }}㎡({{
-            formatAreaToPyeong(property.totalFloorAreaProperty)
-          }})
-        </BaseTypography>
-        <BaseTypography weight="regular">
-          연면적(건물): {{ property.totalFloorAreaBuilding }}㎡({{
-            formatAreaToPyeong(property.totalFloorAreaBuilding)
-          }})
-        </BaseTypography>
-        <BaseTypography weight="regular"
-          >건물 규모: 지하 {{ property.basementFloors }}층 / 지상
-          {{ property.groundFloors }}층</BaseTypography
-        >
-        <BaseTypography weight="regular"
-          >준공일: {{ formatDate(property.approvalDate) }}</BaseTypography
-        >
-        <BaseTypography weight="regular"
-          >공시지가: {{ formatPriceInManwon(property.officialLandPrice) }}</BaseTypography
-        >
-        <BaseTypography weight="regular"
-          >연면적 평단가(평/공모금액 기준):
-          {{ formatPriceInManwon(property.unitPricePerPyeong) }}</BaseTypography
-        >
-      </section>
-
-      <section class="border p-4 rounded-lg bg-white mt-4">
-        <BaseTypography class="mb-2" weight="semibold" size="lg">매물 상세 정보</BaseTypography>
-        <BaseTypography weight="regular">방 수: {{ property.roomCount }}개</BaseTypography>
-        <BaseTypography weight="regular">욕실 수: {{ property.bathroomCount }}개</BaseTypography>
-        <BaseTypography weight="regular">해당 층 수: {{ property.floor }}층</BaseTypography>
-        <BaseTypography weight="regular" v-if="normalizedTags.length" class="flex flex-wrap gap-1">
-          해시 태그:
-          <span
-            v-for="(tag, i) in normalizedTags"
-            :key="tag + '-' + i"
-            class="bg-gray-100 px-1.5 py-1 rounded-full text-xs text-gray-600"
-            :title="tag"
-          >
-            #{{ tag }}
-          </span>
-        </BaseTypography>
-        <BaseTypography weight="regular">세부 정보: {{ property.description }}</BaseTypography>
-        <!-- <BaseTypography weight="regular">
-        이미지:
-        <img
-          :src="property.thumbnail.photoUrl"
-          class="w-full max-w-sm border rounded-md"
-          alt="대표 이미지"
-        />
-      </BaseTypography> -->
-
-        <BaseTypography weight="regular">
-          이미지:
-          <div class="relative w-full max-w-sm h-60 mt-2">
-            <!-- 이미지 -->
-            <img
-              :src="property.images?.[currentImageIndex]?.photoUrl || '/fallback.png'"
-              class="w-full h-full object-contain border rounded-md mx-auto"
-              alt="매물 이미지"
-            />
-
-            <!-- 좌우 터치 영역 -->
-            <div class="absolute left-0 top-0 w-1/2 h-full cursor-pointer" @click="prevImage"></div>
-            <div
-              class="absolute right-0 top-0 w-1/2 h-full cursor-pointer"
-              @click="nextImage"
-            ></div>
-
-            <!-- 좌우 아이콘 (희미하게 보이도록) -->
-            <span
-              class="absolute left-2 top-1/2 -translate-y-1/2 material-symbols-outlined text-3xl text-black/30 pointer-events-none select-none"
+        <div class="px-1 pb-2">
+          <div class="grid grid-cols-[115px,1fr] text-sm border rounded-md overflow-hidden">
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >용도지역</BaseTypography
             >
-              chevron_left
-            </span>
-            <span
-              class="absolute right-2 top-1/2 -translate-y-1/2 material-symbols-outlined text-3xl text-black/30 pointer-events-none select-none"
+            <BaseTypography weight="regular" class="px-3 py-2">{{
+              property.usageDistrict
+            }}</BaseTypography>
+
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >대지 면적(매물)</BaseTypography
             >
-              chevron_right
-            </span>
+            <BaseTypography weight="regular" class="px-3 py-2">
+              {{ property.landArea }}㎡({{ formatAreaToPyeong(property.landArea) }})</BaseTypography
+            >
+
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >대지 면적(건물)</BaseTypography
+            >
+            <BaseTypography weight="regular" class="px-3 py-2"
+              >{{ property.buildingArea }}㎡({{
+                formatAreaToPyeong(property.buildingArea)
+              }})</BaseTypography
+            >
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >연면적(매물)</BaseTypography
+            >
+            <BaseTypography weight="regular" class="px-3 py-2"
+              >{{ property.totalFloorAreaProperty }}㎡({{
+                formatAreaToPyeong(property.totalFloorAreaProperty)
+              }})</BaseTypography
+            >
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >연면적(건물)</BaseTypography
+            >
+            <BaseTypography weight="regular" class="px-3 py-2">
+              {{ property.totalFloorAreaBuilding }}㎡({{
+                formatAreaToPyeong(property.totalFloorAreaBuilding)
+              }})</BaseTypography
+            >
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >건물 규모</BaseTypography
+            >
+            <BaseTypography weight="regular" class="px-3 py-2">
+              지하 {{ property.basementFloors }}층 / 지상
+              {{ property.groundFloors }}층</BaseTypography
+            >
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >준공일</BaseTypography
+            >
+            <BaseTypography weight="regular" class="px-3 py-2">
+              {{ formatDate(property.approvalDate) }}</BaseTypography
+            >
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >공시지가</BaseTypography
+            >
+            <BaseTypography weight="regular" class="px-3 py-2">
+              {{ formatPriceInManwon(property.officialLandPrice) }}</BaseTypography
+            >
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >연면적 평단가
+              <span class="text-xs text-gray-500">(평/공모금액 기준)</span></BaseTypography
+            >
+            <BaseTypography weight="regular" class="px-3 py-2">
+              {{ formatPriceInManwon(property.unitPricePerPyeong) }}</BaseTypography
+            >
           </div>
-        </BaseTypography>
+        </div>
       </section>
 
-      <section class="border p-4 rounded-lg bg-white mt-4 mb-16">
-        <BaseTypography class="mb-2" weight="semibold" size="lg">매물 서류</BaseTypography>
-        <ul>
-          <li v-for="doc in property.documents" :key="doc.fileUrl">
-            <a
-              :href="doc.fileUrl"
-              class="text-blue-500 underline"
-              target="_blank"
-              :download="getDocumentName(doc.documentType)"
+      <!-- 매물 상세 정보 -->
+      <section class="mt-4 px-2 bg-white">
+        <BaseTypography class="mb-2" weight="semibold" size="lg">매물 상세 정보</BaseTypography>
+        <div class="px-1 pb-2">
+          <div class="grid grid-cols-[115px,1fr] text-sm border rounded-md overflow-hidden">
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >방 수</BaseTypography
             >
-              {{ getDocumentName(doc.documentType) }}
-            </a>
-          </li>
-        </ul>
+            <BaseTypography weight="regular" class="px-3 py-2">
+              {{ property.roomCount }}개</BaseTypography
+            >
+
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >욕실 수</BaseTypography
+            >
+            <BaseTypography weight="regular" class="px-3 py-2">
+              {{ property.bathroomCount }}개</BaseTypography
+            >
+
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >해당 층 수</BaseTypography
+            >
+            <BaseTypography weight="regular" class="px-3 py-2"
+              >{{ property.floor }}층</BaseTypography
+            >
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >해시 태그</BaseTypography
+            >
+            <BaseTypography
+              weight="regular"
+              class="px-3 py-2 flex flex-wrap gap-1"
+              v-if="normalizedTags.length"
+            >
+              <span
+                v-for="(tag, i) in normalizedTags"
+                :key="tag + '-' + i"
+                class="bg-gray-100 px-1.5 py-1 rounded-full text-xs text-gray-600"
+                :title="tag"
+              >
+                #{{ tag }}
+              </span></BaseTypography
+            >
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >세부 정보</BaseTypography
+            >
+            <BaseTypography weight="regular" class="px-3 py-2">{{
+              property.description
+            }}</BaseTypography>
+
+            <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
+              >이미지</BaseTypography
+            >
+            <BaseTypography weight="regular" class="px-3 py-2">
+              <template v-if="property.images?.length">
+                <ul class="list-none space-y-1">
+                  <li v-for="(img, i) in property.images" :key="img.photoUrl">
+                    <a
+                      :href="img.photoUrl"
+                      class="text-blue-600 underline break-all"
+                      target="_blank"
+                      :download="`${property.title}_이미지` || `image-${i + 1}`"
+                    >
+                      {{ `${property.title} 이미지 ` || `image-${i + 1}` }}
+                    </a>
+                  </li>
+                </ul>
+              </template>
+              <span v-else class="text-gray-500">등록된 이미지가 없습니다.</span>
+            </BaseTypography>
+          </div>
+        </div>
+      </section>
+
+      <!-- 매물 서류 -->
+      <section v-if="property.seller" class="mt-4 px-2 bg-white">
+        <BaseTypography class="mb-2" weight="semibold" size="lg">매물 서류</BaseTypography>
+        <div class="px-1 pb-2">
+          <div class="p-4 grid text-sm border rounded-md overflow-hidden">
+            <ul>
+              <li v-for="doc in property.documents" :key="doc.fileUrl">
+                <a
+                  :href="doc.fileUrl"
+                  class="text-blue-500 underline pb-3"
+                  target="_blank"
+                  :download="getDocumentName(doc.documentType)"
+                >
+                  {{ getDocumentName(doc.documentType) }}
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
       </section>
     </div>
   </main>
@@ -159,21 +261,10 @@ import DetailHeader from '@/layouts/DetailHeader.vue'
 
 const route = useRoute()
 const propertyId = Number(route.params.id)
-console.log('🔍 propertyId:', propertyId)
 
 const property = ref(null)
 const loading = ref(true)
 const error = ref(null)
-
-const currentImageIndex = ref(0)
-
-function prevImage() {
-  currentImageIndex.value =
-    (currentImageIndex.value - 1 + property.value.images.length) % property.value.images.length
-}
-function nextImage() {
-  currentImageIndex.value = (currentImageIndex.value + 1) % property.value.images.length
-}
 
 //해시태그
 const maxTagsToShow = 6
