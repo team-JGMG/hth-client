@@ -3,7 +3,7 @@
     <CommonHeader />
 
     <BaseButton
-      class="absolute top-11 right-6 h-[28px] bg-gray-600 hover:bg-gray-700 text-[11px] text-white z-[100] flex items-center gap-1 rounded-md"
+      class="absolute top-8 right-16 h-[28px] bg-gray-600 hover:bg-gray-700 text-[10px] text-white z-[100] flex items-center gap-0.5 rounded-md"
       @click="handleLogout"
     >
       <span class="material-symbols-outlined leading-none" style="font-size: 14px"> logout </span>

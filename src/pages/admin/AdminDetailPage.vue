@@ -1,9 +1,7 @@
 <template>
-  <BlankLayout>
+  <main class="py-6 px-6 w-full bg-white text-black relative">
     <div v-if="property">
-      <div class="flex justify-between items-start">
-        <DetailHeader size="xl" weight="bold">{{ property.title }}</DetailHeader>
-      </div>
+      <DetailHeader size="xl" weight="bold">{{ property.title }}</DetailHeader>
 
       <section class="bg-white px-2">
         <BaseTypography class="self-end" size="sm" color="gray-2">
@@ -146,7 +144,7 @@
         </ul>
       </section>
     </div>
-  </BlankLayout>
+  </main>
 </template>
 
 <script setup>
@@ -156,7 +154,7 @@ import { fetchPropertyDetail } from '@/api/admin'
 import { formatDate, formatDateTime, formatPriceInManwon, formatAreaToPyeong } from '@/utils/format'
 
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import BlankLayout from '@/layouts/BlankLayout.vue'
+
 import DetailHeader from '@/layouts/DetailHeader.vue'
 
 const route = useRoute()
