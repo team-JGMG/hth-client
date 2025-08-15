@@ -39,6 +39,7 @@
           v-if="currentFundingStatus === 'askingPrice'"
           :refreshTrigger="chartRefreshTrigger"
           :fundingId="tradeId"
+          :key="`orderbook-${tradeId}-${chartRefreshTrigger}`"
         />
         <TradingChartContainer
           ref="tradeHistoryChart"
@@ -57,7 +58,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import BlankLayout from '@/layouts/BlankLayout.vue'
 import DetailHeader from '@/layouts/DetailHeader.vue'
@@ -82,8 +83,31 @@ const fetchFundingDetail = async (id) => {
   }
 }
 
+// 페이지 포커스 시 자동 새로고침
+const handleWindowFocus = () => {
+  if (currentFundingStatus.value === 'askingPrice') {
+    chartRefreshTrigger.value++
+  }
+}
+
+// 페이지 가시성 변경 시 자동 새로고침
+const handleVisibilityChange = () => {
+  if (!document.hidden && currentFundingStatus.value === 'askingPrice') {
+    chartRefreshTrigger.value++
+  }
+}
+
 onMounted(() => {
   fetchFundingDetail(tradeId.value)
+
+  // 자동 갱신을 위한 이벤트 리스너
+  window.addEventListener('focus', handleWindowFocus)
+  document.addEventListener('visibilitychange', handleVisibilityChange)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('focus', handleWindowFocus)
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 
 watch(
@@ -91,6 +115,7 @@ watch(
   (newId) => {
     tradeId.value = Number(newId)
     fetchFundingDetail(tradeId.value)
+    chartRefreshTrigger.value++ // 새로운 fundingId로 변경될 때도 갱신
   },
 )
 
@@ -103,6 +128,13 @@ const handleTradeCompleted = () => {
 }
 
 const currentFundingStatus = ref('askingPrice')
+
+// 호가 탭으로 전환할 때도 새로고침
+watch(currentFundingStatus, (newStatus) => {
+  if (newStatus === 'askingPrice') {
+    chartRefreshTrigger.value++
+  }
+})
 </script>
 
 <style scoped>
