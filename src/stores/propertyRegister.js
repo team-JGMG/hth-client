@@ -59,6 +59,51 @@ export const usePropertyRegisterStore = defineStore('propertyRegister', () => {
     if (step.value > 1) step.value--
   }
 
+  const resetStore = () => {
+    step.value = 1
+    ownerInfo.value = {
+      userId: '',
+      agreements: {
+        terms: false,
+        privacy: false,
+        age: false,
+      },
+    }
+    propertyBasic.value = {
+      title: '',
+      rawdCd: '',
+      address: '',
+      detailAddress: '',
+      size: '',
+      price: '',
+      period: '',
+    }
+    propertyBuilding.value = {
+      landUsageZone: '',
+      landSize: '',
+      buildingSize: '',
+      landTotalArea: '',
+      buildingTotalArea: '',
+      floorUnder: '',
+      floorAbove: '',
+      builtDate: '',
+      officialPrice: '',
+      marketPrice: '',
+    }
+    propertyDetail.value = {
+      type: '',
+      roomCount: '',
+      bathroomCount: '',
+      floor: '',
+      options: [],
+      memo: '',
+    }
+    documentFiles.value = []
+    documentTypes.value = []
+    photoFiles.value = []
+    documents.value = []
+  }
+
   return {
     step,
     ownerInfo,
@@ -71,5 +116,6 @@ export const usePropertyRegisterStore = defineStore('propertyRegister', () => {
     photoFiles,
     goToNextStep,
     goToPrevStep,
+    resetStore,
   }
 })
