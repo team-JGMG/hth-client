@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full max-w-md mx-auto px-4 pb-12">
+  <div class="w-full max-w-md mx-auto px-4 pb-8">
     <BaseTypography class="text-xl font-bold mb-2">매물 관련 서류를 입력해주세요.</BaseTypography>
 
     <!-- 안내 멘트 -->

@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full max-w-md mx-auto px-4 pb-12">
+  <div class="w-full max-w-md mx-auto px-4 pb-8">
     <BaseTypography class="mb-6" size="xl" weight="bold">
       매물 상세 정보를 입력해주세요.
     </BaseTypography>
@@ -135,12 +135,12 @@
       <textarea
         v-model="store.propertyDetail.memo"
         class="w-full border rounded-lg p-3 text-sm resize-none h-32 focus:outline-none focus:ring focus:ring-black/30"
-        placeholder="- 매물 정보와 관련없는 홍보성 정보는 입력할 수 없습니다.      - 매물주변과 무관한 정보도 제한될 수 있습니다."
+        placeholder="- 매물 정보와 관련없는 홍보성 정보는 입력할 수 없습니다.&#10;- 매물 주변과 무관한 정보도 제한될 수 있습니다."
       />
     </div>
 
     <!-- 매물 사진 첨부 -->
-    <div class="mb-28 relative">
+    <div class="mb-12 relative">
       <label class="text-base font-medium block mb-2">매물 사진 첨부</label>
 
       <input
