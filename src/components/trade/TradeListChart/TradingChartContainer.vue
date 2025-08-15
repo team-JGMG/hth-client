@@ -19,12 +19,11 @@ defineProps({
 })
 
 const timeRangeTabs = [
-  { label: '1년', value: '1y' },
   { label: '3개월', value: '3m' },
   { label: '1개월', value: '1m' },
 ]
 
-const timeRange = ref('1y')
+const timeRange = ref('3m')
 const chartRef = ref(null)
 
 const handleTimeRangeChange = (newRange) => {
