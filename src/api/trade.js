@@ -13,11 +13,12 @@ export const createOrder = (payload, type) => {
 }
 
 //거래 주문 내역 조회
-export const getOrderHistory = async (orderType) => {
-  const params = {}
-  if (orderType) params.orderType = orderType
-  const { data } = await api.get(`/api/auth/orders`, { params })
-  return data
+export function getOrderHistory(page = 0, size = 5, opts = {}) {
+  // opts: { orderType: 'BUY' | 'SELL', sort: 'createdAt,desc', … }
+  const params = { page, size, ...opts }
+  // 디버깅용
+  // console.log('[getOrderHistory] params =>', params)
+  return api.get('/api/auth/orders', { params })
 }
 // 공용 성공판정
 function isOk({ status, data }) {
