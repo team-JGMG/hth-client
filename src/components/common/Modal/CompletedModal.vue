@@ -7,36 +7,36 @@
       <span
         class="material-symbols-outlined text-blue-600"
         style="font-size: 128px; line-height: 1; display: inline-block"
-        >check_circle</span
       >
+        check_circle
+      </span>
     </div>
 
     <template #submit>
-      <CompletedButton @click="goToHome"><slot name="submitText">닫기</slot></CompletedButton>
+      <CompletedButton @click="handleSubmit">
+        <slot name="submitText">닫기</slot>
+      </CompletedButton>
     </template>
   </BaseModal>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
 import BaseModal from './BaseModal.vue'
 import BaseTypography from '../Typography/BaseTypography.vue'
 import CompletedButton from '../Button/CompletedButton.vue'
 
-defineProps({
-  isOpen: {
-    type: Boolean,
-    default: false,
-  },
+const props = defineProps({
+  isOpen: { type: Boolean, default: false },
+  closeOnSubmit: { type: Boolean, default: true },
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'submit'])
 
-const router = useRouter()
-
-const goToHome = () => {
-  router.push('/account/my-page/investments')
-  emit('close')
+const handleSubmit = () => {
+  emit('submit') // 부모에서 라우팅 등 처리
+  if (props.closeOnSubmit) {
+    emit('close')
+  }
 }
 </script>
 
