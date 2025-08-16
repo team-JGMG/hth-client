@@ -1,4 +1,4 @@
-//signUpForm.vue
+회원가입의 알람 추가 //signUpForm.vue
 <template>
   <div class="w-full max-w-md mx-auto px-4">
     <BaseTypography class="mb-6" size="xl" weight="bold">
@@ -25,7 +25,7 @@
       </BaseTypography>
     </div>
 
-    <!-- 주민등록번호 -->
+    <!— 주민등록번호 —>
     <div class="mb-12 relative">
       <div class="flex items-center w-full gap-3">
         <div class="flex-1">
@@ -320,14 +320,28 @@ watch(
   { deep: true },
 )
 watch(nickname, (val) => console.log('nickname 변경됨:', val))
+
+// 전화번호 인증
 const verifyPhone = () => {
-  isPhoneVerified.value = true
+  setTimeout(() => {
+    isPhoneVerified.value = true
+    toast.success({
+      title: '인증확인',
+      body: '전화번호 인증이 완료되었습니다.', // 조금 더 구체적으로
+    })
+  }, 1000)
 }
 
+// 계좌번호 인증
 const verifyAccount = () => {
-  isAccountVerified.value = true
+  setTimeout(() => {
+    isAccountVerified.value = true
+    toast.success({
+      title: '인증확인',
+      body: '계좌번호 인증이 완료되었습니다.', // 조금 더 구체적으로
+    })
+  }, 1000)
 }
-
 const modalVisible = ref(false)
 const activeModal = ref('')
 
