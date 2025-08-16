@@ -1,3 +1,4 @@
+<!-- MyListings.vue -->
 <script setup>
 import { reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
@@ -56,7 +57,13 @@ const anyHasData = computed(() => Object.values(progress).some((p) => p.hasData)
     </div>
 
     <!-- 그룹 섹션들: 항상 마운트 (각 그룹 내부에서 무한스크롤 진행) -->
-    <div class="w-full space-y-6" :class="{ 'opacity-0 pointer-events-none': !allInitDone }">
+    <div
+      class="w-full space-y-6"
+      :class="{
+        'opacity-0 pointer-events-none': !allInitDone, // 초기 로딩 동안만 보이지 않게
+        hidden: allInitDone && !anyHasData, // ✅ 전부 비었으면 완전히 숨김
+      }"
+    >
       <ListingGroup
         v-for="g in groups"
         :key="g.key"
@@ -70,7 +77,7 @@ const anyHasData = computed(() => Object.values(progress).some((p) => p.hasData)
       />
     </div>
 
-    <!-- 전부 비었을 때 -->
+    <!-- 전부 비었을 때: 안내만 노출 -->
     <div v-if="allInitDone && !anyHasData" class="w-full">
       <NoTradeItems />
     </div>
