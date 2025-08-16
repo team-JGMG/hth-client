@@ -1,3 +1,4 @@
+<!-- RegisterStep3Building.vue -->
 <template>
   <div class="w-full max-w-md mx-auto px-4 pb-8">
     <BaseTypography class="mb-6" size="xl" weight="bold">
@@ -254,66 +255,6 @@
       </BaseTypography>
     </div>
 
-    <!-- 🔽 매물 사진 첨부 (최대 3장) -->
-    <div class="mb-28">
-      <label class="text-base font-medium block mb-2">매물 사진 첨부 (최대 3장)</label>
-
-      <input
-        id="fileInputBuilding"
-        type="file"
-        class="hidden"
-        multiple
-        accept="image/*"
-        @change="handleFiles"
-      />
-
-      <label
-        for="fileInputBuilding"
-        class="flex items-center justify-between w-full border-b border-gray-400 py-2 text-base text-gray-700"
-        :class="
-          store.photoFiles.length >= 3
-            ? 'cursor-not-allowed opacity-60 pointer-events-none'
-            : 'cursor-pointer'
-        "
-        @click="touched.image = true"
-      >
-        <!-- 파일명 라벨 -->
-        <span class="truncate" :title="fileTitle">
-          {{ fileLabel }}
-        </span>
-        <span class="material-symbols-outlined text-gray-500">attach_file</span>
-      </label>
-
-      <!-- 선택된 파일 목록 뱃지 -->
-      <div v-if="store.photoFiles.length" class="mt-2 flex flex-wrap gap-2">
-        <span
-          v-for="(f, i) in store.photoFiles"
-          :key="i"
-          class="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-gray-300 text-xs text-gray-700 bg-white"
-        >
-          <span class="material-symbols-outlined text-[14px]">image</span>
-          <span class="truncate max-w-[180px]">{{ f.name }}</span>
-          <button
-            type="button"
-            class="ml-1 text-gray-400 hover:text-gray-600"
-            @click="removeFile(i)"
-            aria-label="파일 삭제"
-            title="삭제"
-          >
-            ×
-          </button>
-        </span>
-      </div>
-
-      <!-- 안내/에러 -->
-      <BaseTypography color="red-1" size="xs" class="mt-2">
-        * 최대 3장까지 첨부할 수 있습니다. ({{ store.photoFiles.length }}/3)
-      </BaseTypography>
-      <BaseTypography v-if="fileError" color="red-1" size="xs" class="mt-1">
-        {{ fileError }}
-      </BaseTypography>
-    </div>
-
     <!-- 다음 버튼 -->
     <div class="pb-12">
       <CompletedButton
@@ -341,7 +282,6 @@ import InputSelect from '@/components/common/Select/InputSelect.vue'
 
 const store = usePropertyRegisterStore()
 const isDatePickerOpen = ref(false)
-const fileError = ref('')
 
 const formattedBuiltDate = computed(() => {
   const raw = store.propertyBuilding.builtDate
@@ -353,7 +293,6 @@ const onBuiltDateFocus = () => {
   isDatePickerOpen.value = true
   touched.value.builtDate = true
 }
-
 const handleDateSelect = () => {
   isDatePickerOpen.value = false
 }
@@ -369,7 +308,6 @@ const touched = ref({
   builtDate: false,
   officialPrice: false,
   marketPrice: false,
-  image: false,
 })
 
 const landUsageZoneTypes = ['주거지역', '상업지역', '기타']
@@ -398,61 +336,12 @@ const getErrorMessage = (value) => {
   return ''
 }
 
-const isStepValid = computed(() => {
-  // 사진은 '최대 3개' 제한만 있고 필수는 아님
-  return Object.values(isValid.value).every(Boolean)
-})
-
-// ---------- 파일 업로드(최대 3장) ----------
-const fileLabel = computed(() => {
-  const len = store.photoFiles?.length || 0
-  if (len === 0) return '파일 선택'
-  if (len === 1) return store.photoFiles[0].name
-  return `${store.photoFiles[0].name} 외 ${len - 1}개`
-})
-
-const fileTitle = computed(() => (store.photoFiles || []).map((f) => f.name).join(', '))
-
-const handleFiles = (e) => {
-  fileError.value = ''
-  const selected = Array.from(e.target.files || [])
-  if (!selected.length) {
-    e.target.value = ''
-    return
-  }
-
-  // 남은 슬롯 계산
-  const current = store.photoFiles || []
-  const available = Math.max(0, 3 - current.length)
-
-  // 최대 3장까지만 추가
-  const toAdd = selected.slice(0, available)
-  const excess = selected.length - toAdd.length
-
-  store.photoFiles = [...current, ...toAdd]
-
-  if (excess > 0) {
-    fileError.value = `초과된 ${excess}개 파일은 제외됐습니다.`
-  }
-
-  // 같은 파일 다시 선택 가능하도록 리셋
-  e.target.value = ''
-}
-
-const removeFile = (idx) => {
-  if (!Array.isArray(store.photoFiles)) return
-  store.photoFiles.splice(idx, 1)
-  fileError.value = ''
-}
+const isStepValid = computed(() => Object.values(isValid.value).every(Boolean))
 
 const handleNext = () => {
   Object.keys(touched.value).forEach((key) => (touched.value[key] = true))
-  if (isStepValid.value) {
-    store.goToNextStep()
-  }
+  if (isStepValid.value) store.goToNextStep()
 }
 
-onMounted(() => {
-  window.scrollTo(0, 0)
-})
+onMounted(() => window.scrollTo(0, 0))
 </script>
