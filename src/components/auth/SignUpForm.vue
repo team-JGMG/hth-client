@@ -59,10 +59,9 @@
         <BaseButton
           :disabled="isPhoneVerified"
           @click="verifyPhone"
-          variant="none"
           class="h-9.9 w-[80.4px] text-sm rounded-md transition-colors"
           :class="
-            isPhoneVerified ? 'bg-gray-300 text-white' : 'bg-gray-800 text-white hover:bg-gray-700'
+            isPhoneVerified ? '!bg-gray-300 text-white' : 'bg-gray-800 text-white hover:bg-gray-800'
           "
         >
           {{ isPhoneVerified ? '인증완료' : '인증하기' }}
@@ -92,7 +91,7 @@
         <BaseButton
           :disabled="isAccountVerified"
           @click="verifyAccount"
-          :class="isAccountVerified ? 'bg-gray-300 text-white' : 'bg-gray-800 text-white'"
+          :class="isAccountVerified ? '!bg-gray-300 text-white' : 'bg-gray-800 text-white'"
           class="h-[38px] text-sm self-end hover:bg-gray-800 px-4 min-w-[80px] whitespace-nowrap"
         >
           {{ isAccountVerified ? '인증완료' : '인증하기' }}
