@@ -39,6 +39,8 @@ onMounted(async () => {
   if (userStore.getIsLoggedIn?.value) {
     await userStore.loadUserInfo()
   }
+  // 마운트 직후 스크롤 최상단
+  window.scrollTo({ top: 0, left: 0 })
 })
 const tabs = [
   { label: '포인트', value: 'points', path: '/account/my-page/points' },
