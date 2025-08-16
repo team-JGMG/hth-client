@@ -9,15 +9,12 @@
 
       <!-- 탭 내용 부분 -->
       <div ref="scrollContainerRef" class="flex-1 overflow-y-auto pb-24 scrollbar-none">
-        <div v-if="currentAdminStatus === 'pending'">
-          <AdminList :list="filteredList" @approve="handleApprove" @reject="handleReject" />
-        </div>
-        <div v-else-if="currentAdminStatus === 'approved'">
-          <AdminListApproved :list="filteredList" />
-        </div>
-        <div v-else-if="currentAdminStatus === 'failed'">
-          <AdminListExpired :list="filteredList" />
-        </div>
+        <AdminList
+          :list="filteredList"
+          :category="currentAdminStatus"
+          @approve="handleApprove"
+          @reject="handleReject"
+        />
 
         <div ref="bottomRef" class="h-2" />
         <div v-if="isLoading" class="flex justify-center py-4">
@@ -62,8 +59,6 @@ import { usePropertyAdmin } from '@/stores/propertyadmin'
 import AdminLayout from '@/layouts/AdminLayout.vue'
 import BaseTab from '@/components/common/Tab/BaseTab.vue'
 import AdminList from '@/components/admin/AdminList.vue'
-import AdminListApproved from '@/components/admin/AdminListApproved.vue'
-import AdminListExpired from '@/components/admin/AdminListExpired.vue'
 import BaseModal from '@/components/common/Modal/BaseModal.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import CompletedButton from '@/components/common/Button/CompletedButton.vue'
