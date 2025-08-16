@@ -24,7 +24,7 @@
     <div class="flex justify-between mb-1">
       <BaseTypography size="xs" weight="medium">전화번호</BaseTypography>
       <BaseTypography size="xs" weight="medium" class="text-right">
-        {{ item.seller?.phone || '-' }}
+        {{ formatPhoneNumber(item.seller?.phone || '-') }}
       </BaseTypography>
     </div>
     <div class="flex justify-between mb-1">
@@ -43,22 +43,6 @@
 
   <BaseTypography tag="h2" size="base" weight="bold" class="mb-2">배당금</BaseTypography>
   <BaseCard class="flex-col space-y-3">
-    <!-- <BaseTypography size="base" weight="bold">{{ dividendData.month }}</BaseTypography>
-
-    <div
-      class="space-y-1 text-xs text-black w-full pb-2"
-      style="border-bottom: 2px dotted #d1d5db; border-image: none"
-    >
-      <div class="flex justify-between">
-        <BaseTypography size="xs">배당 기준일</BaseTypography>
-        <BaseTypography size="xs">{{ dividendData.referenceDate }}</BaseTypography>
-      </div>
-      <div class="flex justify-between">
-        <BaseTypography size="xs">배당 지급일</BaseTypography>
-        <BaseTypography size="xs">{{ dividendData.paymentDate }}</BaseTypography>
-      </div>
-    </div> -->
-
     <div class="bg-gray-100 rounded-lg py-4 text-center w-full">
       <BaseTypography size="lg" weight="bold">{{ item.expectedDividendPerShare }}원</BaseTypography>
       <BaseTypography size="xs" class="text-gray-500 mt-1">1주당 배당금 (세전)</BaseTypography>
@@ -70,7 +54,13 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import BaseCard from '@/components/common/Card/BaseCard.vue'
-import { format, formatDate, formatPriceInManwon, formatAreaToPyeong } from '@/utils/format'
+import {
+  format,
+  formatDate,
+  formatPriceInManwon,
+  formatAreaToPyeong,
+  formatPhoneNumber,
+} from '@/utils/format'
 import { getAllocations } from '@/api/funding'
 
 const props = defineProps({ item: { type: Object, required: true } })
