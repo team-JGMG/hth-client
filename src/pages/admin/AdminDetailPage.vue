@@ -25,7 +25,7 @@
               >전화번호</BaseTypography
             >
             <BaseTypography weight="regular" class="px-3 py-2">{{
-              property.seller?.phone || '-'
+              formatPhoneNumber(property.seller?.phone || '-')
             }}</BaseTypography>
 
             <BaseTypography class="bg-gray-50 px-3 py-2" weight="regular" color="gray-1"
@@ -268,7 +268,13 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { fetchPropertyDetail } from '@/api/admin'
-import { formatDate, formatDateTime, formatPriceInManwon, formatAreaToPyeong } from '@/utils/format'
+import {
+  formatDate,
+  formatDateTime,
+  formatPriceInManwon,
+  formatAreaToPyeong,
+  formatPhoneNumber,
+} from '@/utils/format'
 
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 
