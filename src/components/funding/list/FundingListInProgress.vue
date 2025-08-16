@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import FundingItemCard from '@/components/funding/list/FundingItemCard.vue'
+import FundingItemCard from '@/components/funding/list/FundingListItemCard.vue'
 
 defineProps({
   items: {

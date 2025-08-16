@@ -84,7 +84,7 @@
     </div>
   </div>
 </template>
-<!-- :style="{ width: Math.max(0, item.fundingRate) + '%' }" -->
+
 <script setup>
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import testImage from '@/assets/images/cardtestimage.png'
@@ -93,14 +93,8 @@ import { useRouter } from 'vue-router'
 import { computed } from 'vue'
 
 const props = defineProps({
-  item: {
-    type: Object,
-    required: true,
-  },
-  status: {
-    type: String,
-    required: true,
-  },
+  item: { type: Object, required: true },
+  status: { type: String, required: true },
 })
 
 // 태그 추가
@@ -115,8 +109,25 @@ const normalizedTags = computed(() => {
 
 const router = useRouter()
 
+const stage = computed(() => {
+  switch (props.status) {
+    case '모집 중':
+      return 'inProgress'
+    case '펀딩 완료':
+      return 'completedFunding'
+    case '매각 완료':
+      return 'completedSale'
+    default:
+      return 'inProgress'
+  }
+})
+
 const goToDetail = () => {
-  router.push({ name: 'funding-detail', params: { id: props.item.fundingId } })
+  router.push({
+    name: 'funding-detail',
+    params: { id: props.item.fundingId },
+    query: { stage: stage.value },
+  })
 }
 
 // 상태 뱃지 색상
