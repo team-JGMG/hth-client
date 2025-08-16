@@ -255,7 +255,7 @@ const setSharesBottomRef = (el) => (sharesList.bottomRef.value = el)
     <NoInvestmentItems v-else-if="!fundingItems.length && !ownedItems.length" />
 
     <!-- 펀딩 중인 매물 -->
-    <div v-else class="space-y-4 mb-6 relative pb-8">
+    <div v-else-if="fundingItems.length" class="space-y-4 mb-6 relative pb-8">
       <BaseTypography class="text-lg !font-bold mb-2">펀딩 중인 매물</BaseTypography>
 
       <template v-if="showFundingListSpinner">
@@ -285,7 +285,7 @@ const setSharesBottomRef = (el) => (sharesList.bottomRef.value = el)
     <div class="py-10"></div>
 
     <!-- 보유중인 매물 -->
-    <div class="space-y-4 mb-6 relative pb-8" v-if="!initialLoading">
+    <div class="space-y-4 mb-6 relative pb-8" v-if="ownedItems.length">
       <BaseTypography class="text-lg !font-bold mb-2">보유중인 매물</BaseTypography>
 
       <template v-if="showSharesListSpinner">
