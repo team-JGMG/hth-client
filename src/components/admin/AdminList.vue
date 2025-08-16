@@ -10,9 +10,9 @@
       :status="item.status"
       :image="item.thumbnail?.photoUrl"
       :title="item.title"
+      :category="props.category"
       @approve="$emit('approve', item.propertyId)"
       @reject="$emit('reject', item.propertyId)"
-      category="pending"
     />
   </div>
 </template>
@@ -21,5 +21,8 @@
 import { defineProps } from 'vue'
 import AdminListItemCard from './AdminListItemCard.vue'
 
-const props = defineProps({ list: Array })
+const props = defineProps({
+  list: Array,
+  category: String,
+})
 </script>
