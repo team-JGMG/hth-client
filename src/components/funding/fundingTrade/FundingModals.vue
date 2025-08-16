@@ -28,11 +28,7 @@
   </BaseModal>
 
   <!-- 완료 모달 -->
-  <CompletedModal
-    :isOpen="showComplete"
-    @close="$emit('closeComplete')"
-    @submit="$emit('goToMyPage')"
-  >
+  <CompletedModal :is-open="showComplete" @close="$emit('closeComplete')" @submit="goToMyPage">
     펀딩이 완료되었습니다.
     <template #submitText>닫기</template>
   </CompletedModal>
@@ -48,6 +44,7 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
 import BaseModal from '@/components/common/Modal/BaseModal.vue'
 import CompletedModal from '@/components/common/Modal/CompletedModal.vue'
 import CompletedButton from '@/components/common/Button/CompletedButton.vue'
@@ -70,13 +67,18 @@ defineEmits([
   'closeComplete',
   'closeCharge',
   'finalSubmit',
-  'goToMyPage',
   'chargeSubmit',
   'update:chargeAmount',
 ])
 
+const router = useRouter()
+
 const formatNumber = (num) => {
   const number = Number(num)
   return Number.isNaN(number) ? '0' : number.toLocaleString()
+}
+
+const goToMyPage = () => {
+  router.push('/account/my-page/investments')
 }
 </script>
