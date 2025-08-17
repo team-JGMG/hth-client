@@ -1,15 +1,17 @@
 <template>
   <BlankLayout>
-    <DetailHeader>거래중인 건물</DetailHeader>
+    <div class="flex flex-col h-[calc(100vh-3rem)]">
+      <DetailHeader>거래중인 건물</DetailHeader>
 
-    <div ref="scrollContainerRef" class="flex-1 overflow-y-auto pb-24">
-      <TradingListCard :items="tradeItems" />
-      <div ref="bottomRef" class="h-2" />
-      <div v-if="isLoading" class="flex justify-center py-4">
-        <img
-          src="@/assets/images/character/loading.png"
-          class="w-12 h-12 animate-spin opacity-70"
-        />
+      <div ref="scrollContainerRef" class="flex-1 overflow-y-auto pb-24 scrollbar-none">
+        <TradingListCard :items="tradeItems" />
+        <div ref="bottomRef" class="h-2" />
+        <div v-if="isLoading" class="flex justify-center py-4">
+          <img
+            src="@/assets/images/character/loading.png"
+            class="w-12 h-12 animate-spin opacity-70"
+          />
+        </div>
       </div>
     </div>
   </BlankLayout>
