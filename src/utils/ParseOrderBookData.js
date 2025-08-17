@@ -7,59 +7,40 @@ export function parseOrderbookData(orderBookResponse) {
     sellOrders = [],
   } = orderBookResponse
 
-  const cp = Number(currentPrice)
+  const toNum = (v) => (typeof v === 'number' ? v : Number(v))
+  const cp = toNum(currentPrice)
 
-  // ✅ 매수: 가격 내림차순 → 상단 → 최대 10개
+  // 매수: 내림차순
   const buyList = buyOrders
-    .map(({ price, quantity }) => ({
-      price: Number(price),
-      buy: Number(quantity),
-      sell: 0,
-    }))
+    .map(({ price, quantity }) => ({ price: toNum(price), buy: toNum(quantity), sell: 0 }))
     .sort((a, b) => b.price - a.price)
     .slice(0, 10)
 
-  // ✅ 매도: 가격 오름차순 → 하단 → 최대 10개
+  // 매도: 오름차순
   const sellList = sellOrders
-    .map(({ price, quantity }) => ({
-      price: Number(price),
-      buy: 0,
-      sell: Number(quantity),
-    }))
+    .map(({ price, quantity }) => ({ price: toNum(price), buy: 0, sell: toNum(quantity) }))
     .sort((a, b) => a.price - b.price)
     .slice(0, 10)
 
-  // ✅ 현재가 (중앙)
-  const center = {
-    price: cp,
-    buy: 0,
-    sell: 0,
-  }
+  // 현재가
+  const center = { price: cp, buy: 0, sell: 0 }
 
-  // ✅ 중복 가격 병합
+  // 중복 가격 병합
   const mergeMap = new Map()
-
   ;[...buyList, center, ...sellList].forEach(({ price, buy, sell }) => {
-    if (!mergeMap.has(price)) {
-      mergeMap.set(price, { price, buy, sell })
-    } else {
-      const existing = mergeMap.get(price)
-      mergeMap.set(price, {
-        price,
-        buy: existing.buy + buy,
-        sell: existing.sell + sell,
-      })
-    }
+    const prev = mergeMap.get(price) || { price, buy: 0, sell: 0 }
+    mergeMap.set(price, { price, buy: prev.buy + buy, sell: prev.sell + sell })
   })
 
-  const ordered = Array.from(mergeMap.values())
+  // ✅ 마지막에 '축 기준'으로 한 번 더 정렬(권장: 오름차순)
+  const ordered = Array.from(mergeMap.values()).sort((a, b) => a.price - b.price)
 
   return {
-    prices: ordered.map((p) => p.price),
+    prices: ordered.map((p) => p.price), // yAxis(또는 category) 는 이 배열만 사용
     buyVolumes: ordered.map((p) => p.buy),
     sellVolumes: ordered.map((p) => p.sell),
     currentPrice: cp,
-    upperLimitPrice: Number(upperLimitPrice),
-    lowerLimitPrice: Number(lowerLimitPrice),
+    upperLimitPrice: toNum(upperLimitPrice),
+    lowerLimitPrice: toNum(lowerLimitPrice),
   }
 }
