@@ -1,6 +1,5 @@
 <script setup>
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import { formatDateTime } from '@/utils/format.js'
 
 defineProps({
   order: { type: Object, required: true },
@@ -23,13 +22,18 @@ function nfmt(v) {
   return n(v).toLocaleString()
 }
 function formatToMMDD(dateStr) {
-  const [datePart] = formatDateTime(toIso(dateStr)).split(' ')
-  const [, mm, dd] = (datePart || '').split('.')
-  return `${String(mm || '00').padStart(2, '0')}.${String(dd || '00').padStart(2, '0')}`
+  const d = new Date(toIso(dateStr))
+  if (isNaN(d)) return '00.00'
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${m}.${day}`
 }
 function formatToHHMM(dateStr) {
-  const [, timePart] = formatDateTime(toIso(dateStr)).split(' ')
-  return timePart || ''
+  const d = new Date(toIso(dateStr))
+  if (isNaN(d)) return '00:00'
+  const hh = String(d.getHours()).padStart(2, '0')
+  const mm = String(d.getMinutes()).padStart(2, '0')
+  return `${hh}:${mm}`
 }
 function avgPrice(order) {
   const shares = n(order.shares, 1)
