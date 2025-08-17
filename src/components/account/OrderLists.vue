@@ -1,12 +1,11 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import CancelConfirmModal from './CancelConfirmModal.vue'
 import LoadingSpinner from '../common/Spinner/LoadingSpinner.vue'
 import { useToastStore } from '@/stores/toast'
 import { getOrderHistory, cancelOrder } from '@/api/trade'
 import OrderListItem from './OrderListsTab/OrderListItem.vue'
-
 import { useInfiniteList } from '@/components/account/utils/useInfiniteList.js'
 
 const toast = useToastStore()
@@ -57,30 +56,79 @@ function isCancelledStatus(raw) {
 }
 
 const PAGE_SIZE = 5
+const listContainer = ref(null)
 const isFirstLoad = ref(true)
 const loadError = ref(null)
-
+const noMore = ref(false)
+const seenKeys = ref(new Set())
 const { items, isLoading, bottomRef, fetchNext, setupObserver, teardownObserver } = useInfiniteList(
   {
     pageSize: PAGE_SIZE,
     fetch: async ({ page, pageSize }) => {
       try {
         const res = await getOrderHistory(page, pageSize)
-        return res?.data?.data ?? res?.data ?? []
+        const data = res?.data ?? {}
+        const raw = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : []
+
+        let backendHasNext = false
+        if (typeof data?.hasNext === 'boolean') backendHasNext = data.hasNext
+        else if (typeof data?.last === 'boolean') backendHasNext = data.last === false
+        else if (typeof data?.next === 'boolean') backendHasNext = data.next === true
+        else if (
+          typeof data?.totalPages === 'number' &&
+          typeof (data?.number ?? data?.page) === 'number'
+        ) {
+          const curr = data?.number ?? data?.page
+          backendHasNext = curr + 1 < data.totalPages
+        } else if (typeof data?.totalElements === 'number') {
+          backendHasNext = data.totalElements > (page + 1) * pageSize
+        } else {
+          backendHasNext = raw.length >= pageSize
+        }
+
+        const currentSeen = seenKeys.value
+        const makeKey = (o) => {
+          const id = o?.orderId ?? o?.id ?? o?.historyId ?? o?.order_id ?? o?.history_id
+          const created =
+            o?.createdAt ?? o?.created_at ?? o?.createdDate ?? o?.orderDate ?? o?.timestamp
+          const itemName = o?.propertyTitle ?? o?.title ?? o?.name ?? ''
+          return id ?? `${toIso(created)}-${itemName}`
+        }
+
+        const filtered = raw.filter((row) => {
+          const status = row?.orderStatus ?? row?.status
+          return !isCancelledStatus(status)
+        })
+
+        const newOnes = []
+        for (const row of filtered) {
+          const k = makeKey(row)
+          if (!currentSeen.has(k)) {
+            newOnes.push(row)
+            currentSeen.add(k)
+          }
+          if (newOnes.length >= pageSize) break
+        }
+
+        if (!backendHasNext) noMore.value = true
+
+        return {
+          content: newOnes,
+          hasNext: backendHasNext,
+          page,
+        }
       } catch (err) {
         loadError.value = err
-        return []
+        noMore.value = true
+        return { content: [], hasNext: false, page }
       }
     },
-    map: (row) => {
-      const mapped = mapApiOrderToUi(row)
-      const rawStatus = row?.orderStatus ?? row?.status ?? mapped?.status
-      if (isCancelledStatus(rawStatus)) return null
-      return mapped
-    },
+    map: (row) => mapApiOrderToUi(row),
   },
 )
-
+watch(noMore, (done) => {
+  if (done) teardownObserver()
+})
 const orders = items
 
 const uniqueSortedOrders = computed(() => {
@@ -165,7 +213,8 @@ function handleTouchEnd(order) {
 
 onMounted(async () => {
   await fetchNext()
-  setupObserver()
+  await nextTick()
+  setupObserver?.()
   isFirstLoad.value = false
 })
 onBeforeUnmount(() => {
@@ -175,7 +224,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="py-3"></div>
-  <div class="p-4 min-h-[600px] space-y-0">
+  <div ref="listContainer" class="p-4 min-h-[600px] space-y-0">
     <div v-if="loadError && isFirstLoad" class="py-10 text-center text-red-500">
       거래 내역을 불러오지 못했습니다.
     </div>
@@ -207,7 +256,8 @@ onBeforeUnmount(() => {
       </template>
 
       <div ref="bottomRef" class="h-2"></div>
-      <div v-if="isLoading" class="flex justify-center py-4">
+
+      <div v-if="isLoading && !noMore" class="flex justify-center py-4">
         <LoadingSpinner />
       </div>
     </template>
