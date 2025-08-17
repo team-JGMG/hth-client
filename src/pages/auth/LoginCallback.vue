@@ -2,6 +2,8 @@
 import { onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import BaseLayout from '@/layouts/BaseLayout.vue'
+import SkeletonLoader from '@/components/common/Skeleton/SkeletonLoader.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -41,5 +43,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="text-center mt-20 text-lg text-gray-600">로그인 처리 중입니다...</div>
+  <BaseLayout>
+    <SkeletonLoader />
+  </BaseLayout>
 </template>
+
+<style scoped>
+</style>
