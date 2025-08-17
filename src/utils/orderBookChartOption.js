@@ -1,7 +1,6 @@
 import { labelStyles } from '@/components/constants/chartStyles'
 
 export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, currentPrice }) => {
-  // ✅ 1) 방어코드: prices가 내림차순이 아니면 세 배열을 모두 뒤집어 정렬 일치
   const isDescending =
     Array.isArray(prices) && prices.length > 1
       ? Number(prices[0]) >= Number(prices[prices.length - 1])
@@ -17,7 +16,6 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
     s.reverse()
   }
 
-  // 숫자 비교 안전성
   const currentPriceNum = Number(currentPrice)
   const currentPriceIndex = p.findIndex((v) => Number(v) === currentPriceNum)
 
@@ -28,18 +26,17 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
     animationEasingUpdate: 'cubicOut',
 
     grid: [
-      { top: '0%', bottom: '0%', left: '0%', right: '60%', containLabel: false }, // 매도
-      { top: '0%', bottom: '0%', left: '60%', right: '0%', containLabel: false }, // 매수
-      { top: '0%', bottom: '0%', left: '52%', right: '50%', width: '10%', containLabel: false }, // 가격라벨
+      { top: '0%', bottom: '0%', left: '0%', right: '60%', containLabel: false },
+      { top: '0%', bottom: '0%', left: '60%', right: '0%', containLabel: false },
+      { top: '0%', bottom: '0%', left: '52%', right: '50%', width: '10%', containLabel: false },
     ],
 
-    // 좌/우 그리드는 가로 막대 방향만 다르게(좌측은 왼쪽으로, 우측은 오른쪽으로)
     xAxis: Array(3)
       .fill(0)
       .map((_, i) => ({
         type: 'value',
         position: 'top',
-        inverse: i === 0, // 좌측(매도) 막대는 왼쪽으로 뻗게
+        inverse: i === 0,
         gridIndex: i,
         max: i < 2 ? maxVolume : null,
         axisLine: { show: false },
@@ -48,13 +45,12 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
         splitLine: { show: false },
       })),
 
-    // ✅ 2) 세 yAxis 모두 동일한 prices, 동일한 방향(inverse:false)
     yAxis: Array(3)
       .fill(0)
       .map((_, i) => ({
         type: 'category',
         gridIndex: i,
-        inverse: true, // 큰 가격이 위로 보이게 (prices는 내림차순)
+        inverse: true,
         data: p,
         axisLine: { show: false },
         axisTick: { show: false },
@@ -82,7 +78,7 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
         type: 'bar',
         xAxisIndex: 0,
         yAxisIndex: 0,
-        data: s, // ✅ 부모 정렬 기준과 동일 인덱스
+        data: s,
         barWidth: 30,
         barCategoryGap: '60%',
         itemStyle: { color: '#fbd5d5', borderRadius: [14, 4, 4, 14] },
@@ -99,7 +95,7 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
         type: 'bar',
         xAxisIndex: 1,
         yAxisIndex: 1,
-        data: b, // ✅ 부모 정렬 기준과 동일 인덱스
+        data: b,
         barWidth: 30,
         barCategoryGap: '40%',
         itemStyle: { color: '#cce5ff', borderRadius: [4, 14, 14, 4] },

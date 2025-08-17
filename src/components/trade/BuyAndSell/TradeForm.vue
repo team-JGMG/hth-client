@@ -1,6 +1,5 @@
 <template>
   <div class="p-4 bg-black text-white rounded-b-lg flex flex-col">
-    <!-- 금액 -->
     <div class="mb-2">
       <div class="relative bg-white rounded-md px-3 py-2 flex items-center">
         <input
@@ -35,7 +34,6 @@
       </div>
     </div>
 
-    <!-- 수량 -->
     <div class="mb-8">
       <div class="relative bg-white rounded-md px-3 py-2 flex items-center">
         <input
@@ -70,7 +68,6 @@
       </div>
     </div>
 
-    <!-- 확인 버튼 -->
     <div class="mt-auto flex justify-center">
       <CompletedButton
         type="button"
@@ -88,7 +85,6 @@
       </CompletedButton>
     </div>
 
-    <!-- 확인 모달 -->
     <TradeConfirmModal
       :type="props.type"
       :amount="amount"

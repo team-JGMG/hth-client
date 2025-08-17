@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- 액션 버튼들 -->
     <div class="mb-16">
       <div class="flex justify-center">
         <BaseButton

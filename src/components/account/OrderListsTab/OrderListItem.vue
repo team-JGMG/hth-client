@@ -1,4 +1,3 @@
-<!-- src/components/.../OrderlistsTab/OrderListItem.vue -->
 <script setup>
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import { formatDateTime } from '@/utils/format.js'
@@ -13,7 +12,6 @@ defineProps({
 
 const emit = defineEmits(['delete'])
 
-/** ------ 로컬 보조 함수 (부모와 동일 포맷 유지) ------ */
 function toIso(dateStr) {
   return typeof dateStr === 'string' ? dateStr.replace(' ', 'T') : dateStr
 }
@@ -34,14 +32,13 @@ function formatToHHMM(dateStr) {
   return timePart || ''
 }
 function avgPrice(order) {
-  const shares = n(order.shares, 1) // 0 방지용 디폴트 1
+  const shares = n(order.shares, 1)
   return shares > 0 ? n(order.totalPrice) / shares : 0
 }
 </script>
 
 <template>
   <div class="relative rounded-md overflow-hidden">
-    <!-- 삭제 슬라이드 뒤 배경(우측 빨간 영역) -->
     <div
       class="absolute top-0 bottom-0 right-1 w-[60px] bg-[#FC2E6C] flex items-center justify-center z-0 rounded-md"
       @click="emit('delete', order)"
@@ -49,7 +46,6 @@ function avgPrice(order) {
       <span class="material-symbols-outlined"> delete </span>
     </div>
 
-    <!-- 실제 아이템 한 줄 -->
     <div
       class="relative z-0 flex items-center gap-4 px-3 h-[72px]"
       :style="{
@@ -61,7 +57,6 @@ function avgPrice(order) {
       @touchmove.passive="touchMoveHandler($event, order)"
       @touchend="touchEndHandler(order)"
     >
-      <!-- 날짜/시간 -->
       <div class="flex flex-col justify-center items-end min-w-[50px] h-full">
         <BaseTypography class="text-gray-500 text-xs text-right">
           {{ formatToMMDD(order.createdAt) }}
@@ -71,7 +66,6 @@ function avgPrice(order) {
         </BaseTypography>
       </div>
 
-      <!-- 타이틀/가격 -->
       <div class="flex-1 flex flex-col justify-center h-full overflow-hidden">
         <div class="h-[20px] overflow-hidden">
           <BaseTypography class="!font-bold text-sm truncate whitespace-nowrap">
@@ -91,7 +85,6 @@ function avgPrice(order) {
         </div>
       </div>
 
-      <!— 수량/미체결 —>
       <div class="text-sm !font-black text-right min-w-[70px]">
         <BaseTypography class="text-xs text-gray-500">
           주문량 {{ nfmt(order.shares) }}주

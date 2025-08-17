@@ -1,4 +1,3 @@
-<!-- components/account/LogoutSection.vue -->
 <template>
   <div class="mt-6">
     <LogoutButton />

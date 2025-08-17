@@ -12,31 +12,6 @@
         class="w-36 absolute top-12 right-12"
         style="transform: scaleX(-1) rotate(10deg)"
       />
-      <!--
-      </transition>
-
-      <transition name="slide-fade" appear>
-      -->
-      <!-- 로고 + 앱 화면 영역 전체 주석 처리 -->
-      <!--
-        <div v-if="show3" class="flex flex-col items-end mr-4 absolute inset-0 justify-center">
-          <img
-            src="@/assets/images/logo/longlogo.png"
-            alt="로고"
-            class="w-44 h-auto mt-16"
-            @error="handleImageError"
-          />
-
-          <div class="mt-0 self-start">
-            <img
-              src="@/assets/images/mockup.png"
-              alt="앱 화면"
-              class="w-[250px] max-w-full h-auto mb-4"
-              @error="handleImageError"
-            />
-          </div>
-        </div>
-        -->
     </div>
 
     <div class="mt-10">

@@ -1,4 +1,3 @@
-<!-- components/account/PointInfoTab/PointLogItem.vue -->
 <script setup>
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 
@@ -7,7 +6,6 @@ defineProps({
   index: { type: Number, required: true },
 })
 
-/* ===== 안전한 날짜 포맷 ===== */
 const z2 = (n) => String(n).padStart(2, '0')
 function toDateFlexible(dt) {
   if (Array.isArray(dt)) {
@@ -36,7 +34,6 @@ function formatHHMM(dt) {
       index % 2 === 0 ? 'bg-gray-100' : 'bg-white',
     ]"
   >
-    <!-- 날짜 -->
     <div class="flex flex-col items-end min-w-[50px]">
       <BaseTypography class="text-gray-500 text-xs text-right">
         {{ formatMMDD(log.date) }}
@@ -46,12 +43,10 @@ function formatHHMM(dt) {
       </BaseTypography>
     </div>
 
-    <!-- 제목 -->
     <BaseTypography class="!font-bold text-sm truncate whitespace-nowrap flex-1 mx-3 text-left">
       {{ log.title }}
     </BaseTypography>
 
-    <!-- 금액 -->
     <BaseTypography class="text-sm !font-black min-w-[72px] text-right">
       <span :class="log.amount > 0 ? 'text-blue-600' : 'text-red-600'">
         {{ log.amount > 0 ? '+' : '-' }}{{ Math.abs(log.amount).toLocaleString() }}

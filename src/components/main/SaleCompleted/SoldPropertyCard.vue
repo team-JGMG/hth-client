@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import BaseTypography from '@/components/common/Typography/BaseTypography.vue' // BaseTypography 경로 확인
+import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 
 defineProps({
   property: {

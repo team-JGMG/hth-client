@@ -1,4 +1,3 @@
-<!--DividendModal.vue -->
 <script setup>
 import BaseModal from '@/components/common/Modal/BaseModal.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
@@ -7,7 +6,7 @@ defineProps({
   isOpen: { type: Boolean, default: false },
   loading: { type: Boolean, default: false },
   buildingName: { type: String, default: '' },
-  groups: { type: Array, default: () => [] }, // [{year, items:[{dateMd, amount}]}]
+  groups: { type: Array, default: () => [] },
 })
 const emit = defineEmits(['close'])
 </script>

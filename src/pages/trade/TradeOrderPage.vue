@@ -79,15 +79,14 @@ const fetchFundingDetail = async (id) => {
   try {
     const res = await getFundingById(id)
     tradeItem.value = res.data?.data || {}
-  } catch (e) {
-    console.error('상세 정보 로딩 실패:', e)
+  } catch {
+    //
   }
 }
 
 function buildSeriesByCurrentPrice(buyOrders = [], sellOrders = []) {
   const map = new Map()
 
-  // Process buy orders
   buyOrders.forEach((o) => {
     if (o?.price == null) return
     const priceNum = Number(o.price)
@@ -98,7 +97,6 @@ function buildSeriesByCurrentPrice(buyOrders = [], sellOrders = []) {
     map.set(k, { ...prev, buy: (prev.buy || 0) + qty })
   })
 
-  // Process sell orders
   sellOrders.forEach((o) => {
     if (o?.price == null) return
     const priceNum = Number(o.price)
@@ -109,7 +107,6 @@ function buildSeriesByCurrentPrice(buyOrders = [], sellOrders = []) {
     map.set(k, { ...prev, sell: (prev.sell || 0) + qty })
   })
 
-  // 가격 내림차순 (큰 값이 위)
   const sortedKeys = [...map.keys()].sort((a, b) => Number(b) - Number(a))
 
   const prices = []
@@ -148,8 +145,8 @@ async function fetchOrderBookData() {
       sellVolumes,
       timestamp: Date.now(),
     }
-  } catch (e) {
-    console.error('❌ REST API 호가 데이터 로딩 실패:', e)
+  } catch {
+    //
   }
 }
 

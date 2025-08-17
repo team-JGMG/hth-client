@@ -1,9 +1,7 @@
-<!-- myPage.vue -->
 <template>
   <BlankLayout>
     <DetailHeader>마이 페이지</DetailHeader>
 
-    <!-- 포인트 프로필 섹션을 헤더에 겹치도록 조정 -->
     <div class="bg-black rounded-2xl p-6 text-white mt-0">
       <LoggedInPointSection :showManageCard="false">
         <button class="w-fit" @click="goToEditProfile" aria-label="정보 수정">
@@ -12,13 +10,8 @@
       </LoggedInPointSection>
     </div>
 
-    <!-- 하단 영역은 프로필 섹션의 높이만큼 패딩 추가 -->
     <BaseTab :tabs="tabs" v-model="currentTab" class="mt-5" />
-
-    <!-- 하위 탭 컴포넌트 표시 -->
     <router-view />
-
-    <!-- 항상 하단에 고정되는 로그아웃 섹션 -->
     <LogoutSection />
   </BlankLayout>
 </template>
@@ -31,7 +24,6 @@ import { onMounted } from 'vue'
 import DetailHeader from '@/layouts/DetailHeader.vue'
 import BaseTab from '@/components/common/Tab/BaseTab.vue'
 import LogoutSection from '@/components/account/LogoutSection.vue'
-// import CompletedButton from '@/components/common/Button/CompletedButton.vue'
 import LoggedInPointSection from '@/components/main/PointSection/LoggedInStatus/LoggedInPointSection.vue'
 import BlankLayout from '@/layouts/BlankLayout.vue'
 const userStore = useUserStore()
@@ -39,7 +31,6 @@ onMounted(async () => {
   if (userStore.getIsLoggedIn?.value) {
     await userStore.loadUserInfo()
   }
-  // 마운트 직후 스크롤 최상단
   window.scrollTo({ top: 0, left: 0 })
 })
 const tabs = [

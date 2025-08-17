@@ -36,7 +36,6 @@ const onBackdropClick = (e) => {
       class="fixed inset-0 z-[9999] bg-black bg-opacity-50 flex items-center justify-center"
     >
       <div @click.stop class="max-w-[327px] w-full bg-white rounded-xl px-6 py-7 relative">
-        <!-- 닫기 버튼 -->
         <button
           type="button"
           aria-label="닫기"
@@ -59,12 +58,9 @@ const onBackdropClick = (e) => {
           </span>
         </button>
 
-        <!-- 제목 -->
         <BaseTypography size="lg" weight="bold" class="text-left mb-3">
           {{ title }}
         </BaseTypography>
-
-        <!-- 본문 -->
 
         <div class="text-center">
           <BaseTypography size="sm" color="gray-1" class="leading-relaxed mb-6 break-keep">
@@ -72,7 +68,6 @@ const onBackdropClick = (e) => {
           </BaseTypography>
         </div>
 
-        <!-- 버튼 -->
         <BaseButton
           type="button"
           aria-label="제출"

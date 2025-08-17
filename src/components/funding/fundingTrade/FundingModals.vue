@@ -1,5 +1,4 @@
 <template>
-  <!-- 확인 모달 -->
   <BaseModal :isOpen="showConfirm" @close="$emit('closeConfirm')">
     <template #default>
       <div class="p-4 pb-0">
@@ -27,13 +26,11 @@
     </template>
   </BaseModal>
 
-  <!-- 완료 모달 -->
   <CompletedModal :is-open="showComplete" @close="$emit('closeComplete')" @submit="goToMyPage">
     펀딩이 완료되었습니다.
     <template #submitText>닫기</template>
   </CompletedModal>
 
-  <!-- 충전 모달 -->
   <BaseModal :isOpen="showCharge" @close="$emit('closeCharge')" @submit="$emit('chargeSubmit')">
     <PointChargeModal
       :model-value="chargeAmount"

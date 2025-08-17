@@ -1,8 +1,7 @@
-<!-- src/components/auth/InputField.vue -->
 <script setup>
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 
-defineOptions({ inheritAttrs: false }) // 중요: attrs를 직접 바인딩하기 위함
+defineOptions({ inheritAttrs: false })
 
 const props = defineProps({
   label: String,

@@ -1,11 +1,9 @@
-// BankSelectModal.vue
 <script setup>
 import { ref } from 'vue'
 
 const emit = defineEmits(['close', 'select'])
 
 const selectedBank = ref(null)
-// 백에는 은행코드 영문 대문자 두글자만 보내야함.
 const banks = [
   {
     code: 'KB',
@@ -63,7 +61,6 @@ function selectBank(bank) {
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
     <div class="bg-white rounded-xl px-6 py-8 w-[360px] relative shadow-lg">
-      <!-- 닫기 버튼 -->
       <button
         class="absolute top-4 right-4 text-gray-400 hover:text-black text-xl"
         @click="emit('close')"
@@ -73,7 +70,6 @@ function selectBank(bank) {
 
       <div class="h-6 mb-6"></div>
 
-      <!-- 은행 목록 -->
       <div class="grid grid-cols-3 gap-3 mb-4">
         <div
           v-for="bank in banks"

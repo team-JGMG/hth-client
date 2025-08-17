@@ -1,6 +1,5 @@
 <template>
   <div class="relative w-full h-[250px] overflow-hidden">
-    <!-- 이미지 슬라이드 -->
     <transition-group :name="slideDirection" tag="div" class="relative w-full h-full">
       <img
         v-for="(img, index) in images"
@@ -12,7 +11,6 @@
       />
     </transition-group>
 
-    <!-- 클릭 영역: 왼쪽/오른쪽 -->
     <div
       class="absolute left-0 top-0 w-1/2 h-full cursor-pointer z-10 select-none touch-manipulation"
       @click="prevImage"
@@ -22,7 +20,6 @@
       @click="nextImage"
     ></div>
 
-    <!-- 인디케이터 (이미지 위 하단) -->
     <div class="absolute bottom-3 left-1/2 transform -translate-x-1/2 z-20">
       <StepIndicator :current-step="currentImageIndex + 1" :total-steps="images.length" />
     </div>

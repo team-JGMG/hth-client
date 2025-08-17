@@ -121,7 +121,7 @@ const loadError = ref(false)
 
 onMounted(async () => {
   try {
-    await fetchNext() // 1페이지 로딩
+    await fetchNext()
   } catch {
     loadError.value = true
   } finally {

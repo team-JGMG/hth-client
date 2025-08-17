@@ -1,11 +1,9 @@
-<!-- RegisterStep4Detail.vue -->
 <template>
   <div class="w-full max-w-md mx-auto px-4 pb-8">
     <BaseTypography class="mb-6" size="xl" weight="bold">
       매물 상세 정보를 입력해주세요.
     </BaseTypography>
 
-    <!-- 매물 유형 -->
     <div class="mb-12 relative">
       <BaseTypography class="mb-2">매물 유형</BaseTypography>
       <InputSelect
@@ -24,7 +22,6 @@
       </BaseTypography>
     </div>
 
-    <!-- 해당 층 수 -->
     <div class="mb-8 relative">
       <BaseTypography class="mb-2">해당 층 수</BaseTypography>
       <div class="flex items-center w-full gap-3">
@@ -48,10 +45,8 @@
       </BaseTypography>
     </div>
 
-    <!-- 방 수 & 욕실 수 -->
     <div class="mb-10 relative">
       <div class="flex items-center w-full gap-4">
-        <!-- 방 수 -->
         <div class="flex items-center gap-2 w-1/2">
           <span class="material-symbols-outlined -translate-y-2"> bedroom_child </span>
           <span class="text-base text-black whitespace-nowrap -translate-y-2">방 수</span>
@@ -65,7 +60,6 @@
           <span class="text-base text-black whitespace-nowrap -translate-y-2"> 개</span>
         </div>
 
-        <!-- 욕실 수 -->
         <div class="flex items-center gap-2 w-1/2">
           <span class="material-symbols-outlined -translate-y-2"> bathroom </span>
           <span class="text-base text-black whitespace-nowrap -translate-y-2">욕실 수</span>
@@ -96,7 +90,6 @@
       </BaseTypography>
     </div>
 
-    <!-- 해시태그 선택 -->
     <div class="mb-12 relative">
       <BaseTypography class="mb-2" size="base" weight="medium">해시태그 선택</BaseTypography>
       <div class="flex flex-wrap gap-2">
@@ -130,7 +123,6 @@
       </BaseTypography>
     </div>
 
-    <!-- 세부 정보 -->
     <div class="mb-12 relative">
       <BaseTypography class="mb-2" size="base" weight="medium">세부 정보 입력</BaseTypography>
       <textarea
@@ -140,7 +132,6 @@
       />
     </div>
 
-    <!-- 매물 사진 첨부 (최대 3장) -->
     <div class="mb-12 relative">
       <label class="text-base font-medium block mb-2">매물 사진 첨부 (최대 3장)</label>
 
@@ -169,7 +160,6 @@
         <span class="material-symbols-outlined text-gray-500">attach_file</span>
       </label>
 
-      <!-- 선택된 파일 목록 뱃지 + 개별 삭제 -->
       <div v-if="store.photoFiles.length" class="mt-2 flex flex-wrap gap-2">
         <span
           v-for="(f, i) in store.photoFiles"
@@ -193,7 +183,6 @@
         {{ fileError }}
       </BaseTypography>
 
-      <!-- 필수 여부 안내 (최소 1장 필요) -->
       <BaseTypography
         v-if="touched.image && !store.photoFiles[0]"
         color="red-1"
@@ -204,7 +193,6 @@
       </BaseTypography>
     </div>
 
-    <!-- 다음 버튼 -->
     <div class="pb-12">
       <CompletedButton
         :color="isStepValid ? 'black' : 'gray-300'"
@@ -267,7 +255,6 @@ const toggleTag = (tag) => {
   touched.value.options = true
 }
 
-/* ▼ 사진 업로드: 최대 3장 로직 */
 const fileLabel = computed(() => {
   const len = store.photoFiles?.length || 0
   if (len === 0) return '파일 선택'
@@ -290,7 +277,7 @@ const handleFiles = (e) => {
   store.photoFiles = [...current, ...toAdd]
   if (excess > 0)
     fileError.value = `* 최대 3장까지 첨부할 수 있습니다. 초과된 ${excess}개 파일은 제외됐습니다.`
-  e.target.value = '' // 동일 파일 재선택 허용
+  e.target.value = ''
 }
 
 const removeFile = (idx) => {
@@ -298,9 +285,6 @@ const removeFile = (idx) => {
   store.photoFiles.splice(idx, 1)
   fileError.value = ''
 }
-/* ▲ 사진 업로드 */
-
-/* 공통 숫자 체크 & 에러 */
 const isNumber = (value) => /^[0-9]+$/.test(value)
 const getErrorMessage = (value) => {
   if (value === '') return '* 필수 항목입니다.'
@@ -308,7 +292,6 @@ const getErrorMessage = (value) => {
   return ''
 }
 
-/* 유효성 (사진은 최소 1장 필수) */
 const isStepValid = computed(() => {
   const d = store.propertyDetail
   return (

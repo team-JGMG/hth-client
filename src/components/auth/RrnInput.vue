@@ -1,4 +1,3 @@
-//RrnInput.vue
 <script setup>
 import { ref, computed, watch } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
@@ -14,7 +13,6 @@ const props = defineProps({
 
 const emit = defineEmits(['update:rrnFront', 'update:rrnBack'])
 
-// 뒷자리 입력 상태는 내부에서 유지
 const rrnBackRaw = ref(props.rrnBack || '')
 
 watch(
@@ -26,7 +24,6 @@ watch(
   },
 )
 
-// 표시용 마스킹 문자열 (첫 글자만 보이고 나머지는 • 처리)
 const displayValue = computed(() => {
   if (!rrnBackRaw.value) return ''
   return rrnBackRaw.value
@@ -35,14 +32,12 @@ const displayValue = computed(() => {
     .join('')
 })
 
-// 입력 핸들러: 숫자만 필터링하고 최대 7자리 유지
 const handleMaskedInput = (e) => {
   const rawInput = e.target.value.replace(/\D/g, '').slice(0, 7)
   rrnBackRaw.value = rawInput
   emit('update:rrnBack', rrnBackRaw.value)
 }
 
-// 유효성 검사
 const isFrontValid = computed(() => /^\d{6}$/.test(props.rrnFront))
 const isBackValid = computed(() => /^\d{7}$/.test(rrnBackRaw.value))
 const isInvalid = computed(() => {
@@ -58,7 +53,6 @@ const isInvalid = computed(() => {
     <BaseTypography class="block text-base font-medium mb-2">주민등록번호</BaseTypography>
 
     <div class="flex items-center gap-2">
-      <!-- 앞자리 -->
       <div class="flex-1">
         <input
           type="text"
@@ -75,20 +69,15 @@ const isInvalid = computed(() => {
         />
       </div>
 
-      <!-- 구분자 -->
-      <!-- <span class="material-symbols-outlined text-xs">remove</span> -->
       <p class="text-base">-</p>
 
-      <!-- 뒷자리 (마스킹된 값과 실제 입력 분리) -->
       <div class="flex-1 relative">
-        <!-- 마스킹 표시 -->
         <div
           class="absolute w-full inset-0 px-1 py-2 text-base tracking-widest pointer-events-none text-black"
         >
           {{ displayValue }}
         </div>
 
-        <!-- 실제 입력 필드 -->
         <input
           type="text"
           inputmode="numeric"
@@ -115,4 +104,3 @@ const isInvalid = computed(() => {
     </BaseTypography>
   </div>
 </template>
-//백에 보낼떄는 앞,뒤자리 합쳐서 보내야함.

@@ -1,7 +1,6 @@
 <template>
   <BaseTypography size="base" weight="bold" class="mb-3">투자 포인트</BaseTypography>
   <div class="rounded-xl">
-    <!-- 포인트 박스 리스트 -->
     <div
       v-for="tag in item.tags"
       :key="tag.id"

@@ -1,4 +1,3 @@
-<!--LoadingSpinner.vue -->
 <template>
   <img
     src="@/assets/images/character/loading.png"

@@ -1,21 +1,12 @@
-<!-- 탭 사용 예시 :
-const fundingStatusTabs = [
-  { label: '전체', value: 'all' },
-  { label: '모집 중', value: 'inProgress' },
-  { label: '펀딩 완료', value: 'completedFunding' },
-  { label: '매각 완료', value: 'completedSale' },
-]
-const currentFundingStatus = ref('inProgress')
-const isModalOpen = ref(false) -->
 <template>
   <div class="flex bg-gray-100 rounded-lg p-1 space-x-1">
     <button
       v-for="(tab, index) in tabs"
       :key="index"
       :class="[
-        'flex-1 py-1 px-2 rounded-md text-sm font-medium text-gray-600', // py-2 -> py-1, px-3 -> px-2로 패딩 축소
+        'flex-1 py-1 px-2 rounded-md text-sm font-medium text-gray-600',
         'hover:bg-white focus:outline-none transition-all duration-200 ease-in-out whitespace-nowrap',
-        { 'bg-white text-gray-900': tab.value === modelValue }, // 'shadow' 클래스 제거
+        { 'bg-white text-gray-900': tab.value === modelValue },
         'flex items-center justify-center',
       ]"
       @click="selectTab(tab.value)"
