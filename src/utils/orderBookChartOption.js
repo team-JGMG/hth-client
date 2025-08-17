@@ -83,9 +83,9 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
         xAxisIndex: 0,
         yAxisIndex: 0,
         data: s, // ✅ 부모 정렬 기준과 동일 인덱스
-        barWidth: 25,
+        barWidth: 30,
         barCategoryGap: '60%',
-        itemStyle: { color: '#fbd5d5', borderRadius: [12, 0, 0, 12] },
+        itemStyle: { color: '#fbd5d5', borderRadius: [14, 4, 4, 14] },
         label: {
           show: true,
           position: 'insideRight',
@@ -100,9 +100,9 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
         xAxisIndex: 1,
         yAxisIndex: 1,
         data: b, // ✅ 부모 정렬 기준과 동일 인덱스
-        barWidth: 25,
+        barWidth: 30,
         barCategoryGap: '40%',
-        itemStyle: { color: '#cce5ff', borderRadius: [0, 12, 12, 0] },
+        itemStyle: { color: '#cce5ff', borderRadius: [4, 14, 14, 4] },
         label: {
           show: true,
           position: 'insideLeft',
