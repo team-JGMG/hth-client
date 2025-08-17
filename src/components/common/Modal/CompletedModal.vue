@@ -33,7 +33,7 @@ const props = defineProps({
 const emit = defineEmits(['close', 'submit'])
 
 const handleSubmit = () => {
-  emit('submit') // 부모에서 라우팅 등 처리
+  emit('submit')
   if (props.closeOnSubmit) {
     emit('close')
   }

@@ -28,7 +28,7 @@ export default [
   },
 
   {
-    path: '/funding/detail/:id?', // ? : optional ID
+    path: '/funding/detail/:id?',
     name: 'funding-detail',
     component: FundingDetailPage,
   },

@@ -1,9 +1,5 @@
-// 포인트/결제 api
-// src/api/payment.js
-
 import api from '@/libs/axios'
 
-// merchant_uid 발급
 export const requestChargeMerchantUid = async (amount) => {
   const res = await api.post('/api/auth/points/charge', null, {
     params: { amount: Number(amount) },
@@ -12,7 +8,6 @@ export const requestChargeMerchantUid = async (amount) => {
   return res.data.data
 }
 
-// 결제 검증
 export const verifyPayment = async ({ impUid, amount, merchantUid }) => {
   const res = await api.post(
     '/api/auth/points/verify',
@@ -22,7 +17,6 @@ export const verifyPayment = async ({ impUid, amount, merchantUid }) => {
   return res.data
 }
 
-// 현재 포인트 보유량 조회
 export const getPointBalance = async () => {
   const res = await api.get('/api/auth/points/balance', {
     withCredentials: true,
@@ -30,7 +24,6 @@ export const getPointBalance = async () => {
   return res.data.data
 }
 
-// 포인트 환급 요청
 export const requestPointRefund = async ({ amount }) => {
   const res = await api.post(
     '/api/auth/points/refund',
@@ -42,7 +35,6 @@ export const requestPointRefund = async ({ amount }) => {
   )
   return res.data.data
 }
-// 포인트 입출금 내역 조회 (테스트용 엔드포인트 사용)
 export const getPointTransactions = async ({
   page = 0,
   size = 100,
@@ -51,7 +43,6 @@ export const getPointTransactions = async ({
   try {
     const params = { page, size, sort }
 
-    // ⚠️ 여기 경로가 핵심
     const res = await api.get('/api/auth/points/transactions', { params })
     if (!Array.isArray(res?.data?.data)) {
       throw new Error(res?.data?.message || '포인트 내역 응답 형식 오류')

@@ -1,4 +1,3 @@
-//BankAccountInput.vue
 <script setup>
 import { ref, computed } from 'vue'
 import BankSelectModal from '@/components/auth/BankSelectModal.vue'
@@ -18,7 +17,6 @@ const isInvalid = computed(() => {
   return val !== '' && !/^\d{10,14}$/.test(val)
 })
 
-// 이미지 경로를 URL로 명시 (정적 import 방식)
 const bankLogos = {
   KAKAOBANK: new URL('@/assets/images/KakaoIcon.png', import.meta.url).href,
   KB: new URL('@/assets/images/KbIcon.png', import.meta.url).href,
@@ -34,11 +32,8 @@ const bankLogos = {
 
 <template>
   <div>
-    <!-- <label class="block text-sm font-medium mb-1">계좌 번호 (- 없이 입력)</label> -->
-
     <BaseTypography class="mb-2">계좌 번호 (- 없이 입력)</BaseTypography>
     <div class="flex items-center gap-2">
-      <!-- 클릭 시 모달 -->
       <img
         :src="bankLogos[props.bankCode] || bankLogos.DEFAULT"
         alt="은행 로고"

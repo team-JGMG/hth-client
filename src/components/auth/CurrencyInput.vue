@@ -1,4 +1,3 @@
-<!-- src/components/form/CurrencyInput.vue -->
 <script setup>
 import { ref, watch, onMounted, nextTick } from 'vue'
 
@@ -14,12 +13,10 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'focus', 'blur'])
 
 const el = ref(null)
-const display = ref('') // 화면에 표시되는 값(콤마 포함)
+const display = ref('')
 
-// --- Helpers ---
-const unformat = (v) => (v || '').toString().replace(/[^\d]/g, '') // 숫자만
+const unformat = (v) => (v || '').toString().replace(/[^\d]/g, '')
 const normalize = (digits) => {
-  // 선행 0 제거 (단, 빈 문자열/0은 '0'으로 보지 않고 '' 유지)
   if (!digits) return ''
   const n = digits.replace(/^0+/, '')
   return n === '' ? '0' : n
@@ -30,7 +27,6 @@ const format = (digits) => {
 }
 
 const setCaretByDigits = (input, digitsTarget) => {
-  // digitsTarget(좌측에 있는 '숫자' 갯수)을 기준으로 캐럿 위치 복원
   const val = input.value
   let seen = 0
   let pos = 0
@@ -50,16 +46,13 @@ const countDigitsLeft = (text, caret) => {
   return c
 }
 
-// --- Core formatting / emitting ---
 const applyAndEmit = (raw, caretDigits = null) => {
   const digits = normalize(unformat(raw))
   const pretty = format(digits)
   display.value = pretty
 
-  // 부모로는 '콤마 없는' 숫자 전달 (빈 입력은 빈 문자열로)
   emit('update:modelValue', digits === '0' && raw === '' ? '' : digits)
 
-  // 캐럿 복원
   nextTick(() => {
     if (el.value && caretDigits != null) {
       setCaretByDigits(el.value, caretDigits)
@@ -67,7 +60,6 @@ const applyAndEmit = (raw, caretDigits = null) => {
   })
 }
 
-// --- Lifecycle / watchers ---
 onMounted(() => {
   const initDigits = normalize(unformat(props.modelValue ?? ''))
   display.value = format(initDigits)
@@ -76,14 +68,12 @@ onMounted(() => {
 watch(
   () => props.modelValue,
   (nv) => {
-    // 외부에서 값이 바뀌는 경우에도 동기화(수정 화면 초기값 등)
     const digits = normalize(unformat(nv ?? ''))
     const pretty = format(digits)
     if (pretty !== display.value) display.value = pretty
   },
 )
 
-// --- DOM event handlers ---
 const handleInput = (e) => {
   const input = e.target
   const caretDigitsBefore = countDigitsLeft(input.value, input.selectionStart)
@@ -91,8 +81,6 @@ const handleInput = (e) => {
 }
 
 const handleKeyDown = (e) => {
-  // 음수/소수점/문자 입력 차단
-  // 단, Backspace/Delete/화살표/탭 등은 허용
   const allowedKeys = [
     'Backspace',
     'Delete',
@@ -106,7 +94,6 @@ const handleKeyDown = (e) => {
   ]
   if (allowedKeys.includes(e.key)) return
 
-  // 숫자만 허용
   if (!/^\d$/.test(e.key)) {
     e.preventDefault()
   }
@@ -117,16 +104,13 @@ const handlePaste = async (e) => {
   const text = (e.clipboardData || window.clipboardData).getData('text') || ''
   const digits = unformat(text)
   const input = e.target
-  // 현재 커서 앞의 숫자 개수
   const caretDigitsBefore = countDigitsLeft(input.value, input.selectionStart)
-  // 입력값에 붙여넣은 숫자를 반영(자연스럽게 붙인 효과를 위해, 기존 숫자열에 병합하는 대신 전체 재계산)
   const nextRaw = format(normalize(unformat(display.value + digits)))
   applyAndEmit(nextRaw, caretDigitsBefore + digits.length)
 }
 
 const handleFocus = () => emit('focus')
 const handleBlur = () => {
-  // 블러 시 최종 정규화(선행 0 처리)
   const digits = normalize(unformat(display.value))
   display.value = format(digits)
   emit('blur')

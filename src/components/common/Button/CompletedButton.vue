@@ -27,9 +27,9 @@ import BaseTypography from '../Typography/BaseTypography.vue'
 
 const props = defineProps({
   type: { type: String, default: 'button' },
-  color: { type: String, default: 'black' }, // 버튼 배경색
-  textColor: { type: String, default: 'white' }, // 버튼 내부 텍스트 색상
-  activeColor: { type: String, default: 'gray-500' }, // 클릭 시 배경색
+  color: { type: String, default: 'black' },
+  textColor: { type: String, default: 'white' },
+  activeColor: { type: String, default: 'gray-500' },
   disabled: { type: Boolean, default: false },
   customClass: { type: [String, Array, Object], default: '' },
   typographyTag: { type: String, default: 'span' },

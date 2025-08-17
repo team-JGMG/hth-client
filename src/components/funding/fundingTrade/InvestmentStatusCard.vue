@@ -2,7 +2,6 @@
   <div class="bg-gray-50 rounded-xl border border-gray-300 p-4">
     <BaseTypography size="lg" weight="bold" class="mb-3">투자 가능 현황</BaseTypography>
 
-    <!-- 현재 보유 주 -->
     <div class="flex justify-between text-sm mb-2">
       <BaseTypography size="sm" class="font-semibold">현재 보유 주</BaseTypography>
       <BaseTypography size="sm" weight="medium" class="text-right">
@@ -12,7 +11,6 @@
       </BaseTypography>
     </div>
 
-    <!-- 보유 포인트 -->
     <div class="flex justify-between items-center mb-3">
       <div class="flex items-center space-x-1">
         <span class="material-symbols-outlined"> local_atm</span>
@@ -33,13 +31,11 @@
       </div>
     </div>
 
-    <!-- 수량 및 금액 변화 표시 -->
     <div class="flex justify-end items-center gap-8 text-sm mt-2 font-bold">
       <BaseTypography class="!text-blue-600">+{{ formatNumber(quantity || 0) }}주</BaseTypography>
       <BaseTypography class="!text-red-500">-{{ formatNumber(totalPrice) }}원</BaseTypography>
     </div>
 
-    <!-- 예측 정보 -->
     <div class="border-t pt-3 mt-3 text-base">
       <div class="flex justify-between mb-2">
         <BaseTypography size="base" weight="medium" class="!text-gray-600">

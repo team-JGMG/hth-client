@@ -1,34 +1,28 @@
 import { getNotifications, markAllRead, markNotificationRead } from '@/api/notification'
 
-// src/stores/notification.js
 import { defineStore } from 'pinia'
 
-// 응답에서 리스트만 안정적으로 추출 + 페이지네이션 대응(content 지원)
 function extractList(res) {
   let payload = res
   if (res && typeof res === 'object' && 'data' in res) payload = res.data
   if (payload && typeof payload === 'object' && 'data' in payload) payload = payload.data
-  // 페이지 객체일 경우 content를 우선 사용
   if (payload && typeof payload === 'object' && Array.isArray(payload.content))
     return payload.content
   return Array.isArray(payload) ? payload : []
 }
 
-// 날짜 정렬용
 function toTime(v) {
   if (!v) return 0
   const t = new Date(v).getTime()
   return Number.isFinite(t) ? t : 0
 }
 
-// 서버 응답 스키마 → 프론트 공통 스키마로 정규화
 function normalize(item) {
   return {
     notificationId: item.notificationId ?? item.id,
     title: item.title ?? '',
     body: item.body ?? '',
     createdAt: item.createdAt ?? item.created_at ?? null,
-    // 핵심: read/isRead 모두 대응
     isRead: 'isRead' in item ? !!item.isRead : !!item.read,
   }
 }
@@ -55,7 +49,6 @@ export const useNotificationStore = defineStore('notification', {
       this.loading = true
       this.error = null
       try {
-        // 필요 시 readStatus: 'unread'로 호출 (백엔드 요청사항 반영)
         const res = await getNotifications(opts)
         const list = extractList(res).map(normalize)
         this.items = list.sort((a, b) => toTime(b.createdAt) - toTime(a.createdAt))
@@ -67,7 +60,6 @@ export const useNotificationStore = defineStore('notification', {
     },
 
     async readOne(id) {
-      // 낙관적 업데이트 + 실패 롤백
       const t = this.items.find((i) => i.notificationId === id)
       const prev = t ? t.isRead : null
       if (t) t.isRead = true
@@ -88,7 +80,6 @@ export const useNotificationStore = defineStore('notification', {
       }
     },
 
-    // 서버 재동기화(디바운스)
     refreshSoon: (() => {
       let timer = null
       return function (opts) {

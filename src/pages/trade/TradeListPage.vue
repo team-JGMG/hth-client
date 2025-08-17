@@ -34,7 +34,6 @@ const scrollContainerRef = ref(null)
 const bottomRef = ref(null)
 let observer = null
 
-// 딜레이 넣기
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const fetchTradeItems = async () => {
@@ -43,14 +42,13 @@ const fetchTradeItems = async () => {
   isLoading.value = true
   try {
     const res = await getEndedFundings(page.value, size)
-    await new Promise((r) => setTimeout(r, 300)) // 딜레이 추가
+    await new Promise((r) => setTimeout(r, 300))
     await delay(20)
     tradeItems.value.push(...res.data.data.content)
     hasNextPage.value = !res.data.data.last
     page.value += 1
-    console.log('🧾 전체 누적 데이터 (tradeItems):', tradeItems.value)
-  } catch (err) {
-    console.error('거래중인 건물 불러오기 실패:', err)
+  } catch {
+    //
   } finally {
     isLoading.value = false
   }
@@ -62,10 +60,7 @@ const setupObserver = async () => {
 
   observer = new IntersectionObserver(
     ([entry]) => {
-      console.log('👁️ 옵저버 감지됨:', entry.isIntersecting)
-      console.log('🧪 isLoading:', isLoading.value, 'hasNextPage:', hasNextPage.value)
       if (entry.isIntersecting && hasNextPage.value && !isLoading.value) {
-        console.log('🔥 조건 만족 → fetchTradeItems 실행')
         fetchTradeItems()
       }
     },

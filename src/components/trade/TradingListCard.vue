@@ -22,7 +22,6 @@
               {{ item.title }}
             </BaseTypography>
 
-            <!-- 태그 -->
             <div v-if="getTagsPreview(item.tags).length" class="mt-1 flex flex-wrap gap-1">
               <span
                 v-for="(tag, i) in getTagsPreview(item.tags)"
@@ -36,7 +35,6 @@
           </div>
         </div>
 
-        <!-- RIGHT: 화살표 -->
         <div
           class="w-8 h-8 flex justify-end items-center text-black rounded-full transition-colors"
           aria-hidden="true"
@@ -99,7 +97,6 @@ const itemsWithImages = computed(() => {
   }))
 })
 
-// 태그 추가
 function getTagsPreview(tags) {
   const arr = Array.isArray(tags) ? tags : []
   return arr.map((t) => (typeof t === 'string' ? t.trim() : '')).filter(Boolean)

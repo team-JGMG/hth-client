@@ -3,7 +3,6 @@
     <label v-if="label" class="block text-sm font-medium text-gray-700 mb-2">{{ label }}</label>
 
     <div class="relative" @click="toggleDropdown">
-      <!-- Select Button -->
       <div
         :class="[
           'w-full px-4 py-3.5 pr-12 text-sm bg-white border rounded-lg cursor-pointer transition-all duration-200 ease-in-out',
@@ -14,7 +13,6 @@
         {{ modelValue || placeholder }}
       </div>
 
-      <!-- Arrow Icon -->
       <div
         :class="[
           'absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none transition-all duration-200 ease-in-out text-gray-500',
@@ -32,7 +30,6 @@
       </div>
     </div>
 
-    <!-- Custom Dropdown -->
     <transition
       enter-active-class="transition duration-150 ease-out"
       enter-from-class="transform scale-95 opacity-0"

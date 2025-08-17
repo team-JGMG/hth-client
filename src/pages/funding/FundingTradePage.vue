@@ -1,14 +1,12 @@
 <template>
   <BlankLayout>
     <div class="flex-1 overflow-y-auto pb-28">
-      <!-- 헤더 -->
       <DetailHeader>
         <BaseTypography tag="h2" size="2xl" weight="semibold" class="text-2xl">
           {{ item.title || '매물 제목 없음' }}
         </BaseTypography>
       </DetailHeader>
 
-      <!-- 펀딩 입력 섹션 -->
       <FundingInputSection
         v-model:quantity="quantity"
         :item="item"
@@ -16,7 +14,6 @@
         @charge="handleCharge"
       />
 
-      <!-- 투자 현황 카드 -->
       <InvestmentStatusCard
         :item="item"
         :quantity="quantity"
@@ -25,7 +22,6 @@
       />
     </div>
 
-    <!-- 액션 버튼들 -->
     <FundingActions
       :is-logged-in="isLoggedIn"
       :is-valid="isStepValid"
@@ -35,7 +31,6 @@
     />
   </BlankLayout>
 
-  <!-- 모달들 -->
   <FundingModals
     :show-confirm="showConfirmModal"
     :show-complete="showCompleteModal"
@@ -69,7 +64,6 @@ import BlankLayout from '@/layouts/BlankLayout.vue'
 import DetailHeader from '@/layouts/DetailHeader.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 
-// 분리된 컴포넌트들
 import FundingInputSection from '@/components/funding/fundingTrade/FundingInputSection.vue'
 import InvestmentStatusCard from '@/components/funding/fundingTrade/InvestmentStatusCard.vue'
 import FundingActions from '@/components/funding/fundingTrade/FundingActions.vue'
@@ -102,7 +96,6 @@ const item = ref({
 const quantity = ref(0)
 
 const validationState = computed(() => {
-  // 간단한 유효성 검사
   return { isError: false }
 })
 
@@ -186,8 +179,8 @@ const refreshPointBalance = async () => {
     const balance = normalize(raw)
     authStore.setUserPoint(balance)
     item.value.userPoints = balance
-  } catch (e) {
-    console.error('포인트 갱신 실패:', e)
+  } catch {
+    //
   }
 }
 

@@ -75,8 +75,8 @@ const fetchChartData = async () => {
     option.value = {
       backgroundColor: 'transparent',
       grid: [
-        { left: 40, right: 40, top: 40, height: '70%' }, // 가격 차트 높이 조금 키움
-        { left: 50, right: 40, top: '78%', height: '15%' }, // 거래량 차트 바로 아래 배치
+        { left: 40, right: 40, top: 40, height: '70%' },
+        { left: 50, right: 40, top: '78%', height: '15%' },
       ],
       tooltip: {
         trigger: 'axis',

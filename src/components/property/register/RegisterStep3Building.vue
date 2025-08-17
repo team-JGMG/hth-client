@@ -1,11 +1,9 @@
-<!-- RegisterStep3Building.vue -->
 <template>
   <div class="w-full max-w-md mx-auto px-4 pb-8">
     <BaseTypography class="mb-6" size="xl" weight="bold">
       매물의 건축물 대장 정보를 입력해주세요.
     </BaseTypography>
 
-    <!-- 용도 지역 -->
     <div class="mb-12 relative">
       <BaseTypography class="mb-1">용도 지역</BaseTypography>
       <InputSelect
@@ -25,7 +23,6 @@
       </BaseTypography>
     </div>
 
-    <!-- 대지 면적 -->
     <div class="mb-12">
       <BaseTypography class="mb-1">대지 면적</BaseTypography>
       <div class="relative">
@@ -55,7 +52,6 @@
           </div>
           <span class="text-base text-black -translate-y-2">㎡</span>
         </div>
-        <!-- 에러 메시지 -->
         <BaseTypography
           v-if="
             (touched.landSize && getErrorMessage(store.propertyBuilding.landSize)) ||
@@ -74,7 +70,6 @@
       </div>
     </div>
 
-    <!-- 연면적 -->
     <div class="mb-12">
       <BaseTypography class="mb-1">연면적</BaseTypography>
       <div class="relative">
@@ -104,7 +99,6 @@
           </div>
           <span class="text-base text-black -translate-y-2">㎡</span>
         </div>
-        <!-- 에러 메시지 -->
         <BaseTypography
           v-if="
             (touched.landTotalArea && getErrorMessage(store.propertyBuilding.landTotalArea)) ||
@@ -123,7 +117,6 @@
       </div>
     </div>
 
-    <!-- 건물 규모 -->
     <div class="mb-12 relative">
       <BaseTypography class="mb-2">건물 규모</BaseTypography>
       <div class="flex items-center gap-1">
@@ -146,7 +139,6 @@
         />
         <span class="text-base text-black -translate-y-2">층</span>
       </div>
-      <!-- 에러 메시지 -->
       <BaseTypography
         v-if="
           (touched.floorUnder && getErrorMessage(store.propertyBuilding.floorUnder)) ||
@@ -164,7 +156,6 @@
       </BaseTypography>
     </div>
 
-    <!-- 준공일 (달력 입력) -->
     <div class="mb-12 relative">
       <BaseTypography class="mb-2">준공일</BaseTypography>
 
@@ -177,7 +168,6 @@
           @focus="onBuiltDateFocus"
           readonly
         />
-        <!-- 달력 아이콘 -->
         <span
           class="material-symbols-outlined absolute right-2 top-2 text-gray-400 cursor-pointer"
           @click="onBuiltDateFocus"
@@ -186,7 +176,6 @@
         </span>
       </div>
 
-      <!-- 달력 컴포넌트 -->
       <div v-if="isDatePickerOpen" class="absolute z-50 mt-2 shadow-lg bg-white border rounded">
         <VDatePicker
           v-model="store.propertyBuilding.builtDate"
@@ -205,7 +194,6 @@
       </BaseTypography>
     </div>
 
-    <!-- 공시지가 -->
     <div class="mb-12 relative">
       <BaseTypography class="mb-2">공시지가</BaseTypography>
       <div class="flex items-center w-full gap-3">
@@ -219,7 +207,6 @@
         </div>
         <span class="text-base text-black -translate-y-1 relative">원/㎡</span>
       </div>
-      <!-- 에러 메시지 -->
       <BaseTypography
         v-if="touched.officialPrice && getErrorMessage(store.propertyBuilding.officialPrice)"
         color="red-1"
@@ -230,7 +217,6 @@
       </BaseTypography>
     </div>
 
-    <!-- 연면적 평단가 -->
     <div class="mb-12 relative">
       <BaseTypography class="mb-2">연면적 평단가 (평/공모금액 기준)</BaseTypography>
       <div class="flex items-center w-full gap-3">
@@ -244,7 +230,6 @@
         </div>
         <span class="text-base text-black -translate-y-2">원</span>
       </div>
-      <!-- 에러 메시지 -->
       <BaseTypography
         v-if="touched.marketPrice && getErrorMessage(store.propertyBuilding.marketPrice)"
         color="red-1"
@@ -255,7 +240,6 @@
       </BaseTypography>
     </div>
 
-    <!-- 다음 버튼 -->
     <div class="pb-12">
       <CompletedButton
         :color="isStepValid ? 'black' : 'gray-300'"

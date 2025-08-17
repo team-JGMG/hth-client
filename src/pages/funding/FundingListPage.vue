@@ -4,14 +4,12 @@
       <div class="shrink-0">
         <DetailHeader>매물 목록</DetailHeader>
 
-        <!-- 필터 탭 -->
         <div class="funding-list-page">
           <div class="filter-tabs-container mb-2 shrink-0">
             <BaseTab :tabs="fundingStatusTabs" v-model="currentFundingStatus" />
           </div>
         </div>
 
-        <!-- 정렬 필터 -->
         <div class="flex justify-end mb-3 pr-4">
           <select v-model="currentSortOption" class="border px-2 py-1 rounded text-xs">
             <option v-for="option in sortOptions" :key="option.value" :value="option.value">
@@ -21,7 +19,6 @@
         </div>
       </div>
 
-      <!-- 스크롤 영역 -->
       <div ref="scrollContainerRef" class="flex-1 overflow-y-auto pb-24 scrollbar-none">
         <div v-if="currentFundingStatus === 'inProgress'">
           <FundingListInProgress :items="fundingList" />
@@ -59,18 +56,15 @@ import BlankLayout from '@/layouts/BlankLayout.vue'
 import DetailHeader from '@/layouts/DetailHeader.vue'
 import { getFundingList } from '@/api/funding'
 
-// 라우터 설정
 const route = useRoute()
 const router = useRouter()
 
-// 탭 설정
 const fundingStatusTabs = [
   { label: '모집 중', value: 'inProgress' },
   { label: '펀딩 완료', value: 'completedFunding' },
   { label: '매각 완료', value: 'completedSale' },
 ]
 
-// route 경로로부터 상태 추출
 function getStatusFromPath(path) {
   if (path.includes('in-progress')) return 'inProgress'
   if (path.includes('completed-funding')) return 'completedFunding'
@@ -79,7 +73,6 @@ function getStatusFromPath(path) {
 }
 const currentFundingStatus = ref(getStatusFromPath(route.path))
 
-// 탭이 바뀌면 라우터 이동
 watch(currentFundingStatus, (newStatus) => {
   const pathMap = {
     inProgress: '/funding/list/in-progress',
@@ -89,7 +82,6 @@ watch(currentFundingStatus, (newStatus) => {
   router.push(pathMap[newStatus])
 })
 
-// 정렬 옵션
 const sortOptions = [
   { label: '등록일', value: 'createdAt' },
   { label: '남은 시간', value: 'remainingTime' },
@@ -97,7 +89,6 @@ const sortOptions = [
 ]
 const currentSortOption = ref('createdAt')
 
-// API 파라미터 매핑
 const categoryMap = {
   inProgress: 'funding',
   completedFunding: 'ended',
@@ -109,7 +100,6 @@ const sortMap = {
   fundingRate: 'rate',
 }
 
-// 상태 변수
 const fundingList = ref([])
 const page = ref(0)
 const size = 10
@@ -120,10 +110,8 @@ const scrollContainerRef = ref(null)
 const bottomRef = ref(null)
 let observer = null
 
-// 딜레이
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-// 펀딩 목록 불러오기
 const fetchFundingList = async () => {
   if (isLoading.value || !hasNextPage.value) return
 
@@ -141,14 +129,13 @@ const fetchFundingList = async () => {
     fundingList.value.push(...res.data.data.content)
     hasNextPage.value = !res.data.data.last
     page.value += 1
-  } catch (err) {
-    console.error('펀딩 목록 불러오기 실패:', err)
+  } catch {
+    //
   } finally {
     isLoading.value = false
   }
 }
 
-// 옵저버 연결
 const setupObserver = async () => {
   await nextTick()
   if (observer) observer.disconnect()

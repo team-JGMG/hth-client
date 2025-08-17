@@ -4,7 +4,6 @@
       매도자 정보를 확인해주세요.
     </BaseTypography>
 
-    <!-- 이름 -->
     <div class="mb-10 relative">
       <label class="text-base font-medium">이름</label>
       <div class="mt-1 text-base text-black border-b border-gray-300 p-2">
@@ -12,7 +11,6 @@
       </div>
     </div>
 
-    <!-- 전화번호 -->
     <div class="mb-12 relative">
       <label class="text-base font-medium">전화번호</label>
       <div class="mt-1 text-base text-black border-b border-gray-300 p-2">
@@ -20,7 +18,6 @@
       </div>
     </div>
 
-    <!-- 이메일 -->
     <div class="mb-12 relative">
       <label class="text-base font-medium">이메일</label>
       <div class="mt-1 text-base text-black border-b border-gray-300 p-2">
@@ -28,7 +25,6 @@
       </div>
     </div>
 
-    <!-- 약관 동의 -->
     <div class="mb-10 relative">
       <BaseTypography class="mb-2" weight="semibold">약관 동의</BaseTypography>
 
@@ -104,7 +100,6 @@
       </BaseTypography>
     </div>
 
-    <!-- 다음 버튼 -->
     <div class="pb-12">
       <CompletedButton
         :color="isStepValid ? 'black' : 'gray-300'"
@@ -150,7 +145,6 @@ onMounted(async () => {
   }
 })
 
-//약관 동의 관련
 const agreements = store.ownerInfo.agreements
 const toggle = (key) => {
   agreements[key] = !agreements[key]

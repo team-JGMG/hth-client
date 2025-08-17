@@ -2,7 +2,6 @@
   <div class="w-full max-w-md mx-auto px-4 pb-8">
     <BaseTypography class="text-xl font-bold mb-2">매물 관련 서류를 입력해주세요.</BaseTypography>
 
-    <!-- 안내 멘트 -->
     <BaseTypography class="mb-12" size="xs" color="gray-1">
       아래 서류들을 정확히 첨부해주세요. 미첨부 시 등록이 제한될 수 있습니다.
     </BaseTypography>
@@ -21,7 +20,6 @@
         <span class="material-symbols-outlined text-gray-500">attach_file</span>
       </label>
 
-      <!-- 유효성 안내문구 -->
       <BaseTypography
         v-if="submitTried && !documents[index]"
         color="red-1"
@@ -32,7 +30,6 @@
       </BaseTypography>
     </div>
 
-    <!-- 등록하기 버튼 -->
     <div class="pb-12">
       <CompletedButton
         :color="isStepValid ? 'black' : 'gray-300'"
@@ -46,7 +43,6 @@
       </CompletedButton>
     </div>
 
-    <!-- 확인 모달 -->
     <BaseModal :isOpen="showConfirmModal" @close="showConfirmModal = false">
       <template #default>
         <div class="p-4 pb-0">
@@ -78,7 +74,6 @@
       </template>
     </BaseModal>
 
-    <!-- 완료 모달 -->
     <CompletedModal
       :isOpen="showCompleteModal"
       @close="showCompleteModal = false"
@@ -109,7 +104,6 @@ const store = usePropertyRegisterStore()
 const router = useRouter()
 const toast = useToastStore()
 
-//문서 첨부 항목 정의
 const documentFields = [
   { label: '등기권리증', value: 'OWNERSHIP_CERTIFICATE' },
   { label: '매도용 인감증명서', value: 'SEAL_CERTIFICATE' },
@@ -120,7 +114,6 @@ const documentFields = [
   { label: '임대차계약서', value: 'LEASE_CONTRACT' },
 ]
 
-//각 첨부된 파일 저장
 const documents = ref(Array(documentFields.length).fill(null))
 const submitTried = ref(false)
 
@@ -129,7 +122,6 @@ const showCompleteModal = ref(false)
 
 const isStepValid = computed(() => documents.value.every((file) => !!file))
 
-//파일 업로드 핸들러
 const handleFileUpload = (event, index) => {
   const file = event.target.files[0]
   if (file) {
@@ -137,15 +129,13 @@ const handleFileUpload = (event, index) => {
   }
 }
 
-//등록하기 클릭 시 (확인 모달 열기)
 const handleSubmit = () => {
-  if (isSubmitting.value) return // 중복 클릭 차단
+  if (isSubmitting.value) return
   submitTried.value = true
   if (!isStepValid.value) return
   showConfirmModal.value = true
 }
 
-//최종 등록 요청
 const handleFinalSubmit = async () => {
   if (isSubmitting.value || !isStepValid.value) return
   isSubmitting.value = true

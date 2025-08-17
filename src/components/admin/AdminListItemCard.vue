@@ -4,21 +4,17 @@
     @click="goToDetail"
   >
     <div class="flex justify-between items-center">
-      <!-- 제목 -->
       <BaseTypography size="xl" weight="semibold" color="black">
         {{ title }}
       </BaseTypography>
 
-      <!-- 상세페이지 이동 버튼 -->
       <div>
         <span class="material-symbols-outlined text-2xl">chevron_right</span>
       </div>
     </div>
 
     <div class="flex justify-between gap-2 items-start md:items-center">
-      <!-- 왼쪽 텍스트 -->
       <div class="flex flex-col justify-between flex-1 w-0 mr-2">
-        <!-- 주소 (한 줄, ... 처리) -->
         <BaseTypography
           size="xs"
           weight="regular"
@@ -28,7 +24,6 @@
           {{ address }}
         </BaseTypography>
 
-        <!-- 희망 매각가 -->
         <div class="flex items-center mt-2">
           <BaseTypography size="xs" weight="regular" color="gray-2" class="min-w-[90px]">
             희망 매각가
@@ -38,7 +33,6 @@
           </BaseTypography>
         </div>
 
-        <!-- 희망 공모 기간 -->
         <div class="flex items-center mt-1">
           <BaseTypography size="xs" weight="regular" color="gray-2" class="min-w-[90px]">
             희망 공모 기간
@@ -49,7 +43,6 @@
         </div>
       </div>
 
-      <!-- 오른쪽 이미지 -->
       <img
         :src="image || fallbackImage"
         alt="매물 이미지"
@@ -57,7 +50,6 @@
       />
     </div>
 
-    <!-- 버튼 -->
     <div class="flex w-full gap-2 mt-2">
       <template v-if="category === 'pending'">
         <BaseButton
@@ -85,12 +77,6 @@
           <BaseTypography size="xs" weight="semibold" color="white"> 매물 승인됨 </BaseTypography>
         </BaseButton>
       </template>
-
-      <!-- <template v-else-if="status === 'rejected'">
-        <BaseButton variant="primary" class="w-full bg-red-400 hover:bg-red-400" disabled>
-          <BaseTypography size="xs" weight="semibold" color="white"> 매물 거절됨 </BaseTypography>
-        </BaseButton>
-      </template> -->
 
       <template v-else-if="category === 'failed'">
         <BaseButton variant="primary" class="w-full bg-gray-400 hover:bg-gray-400" disabled>

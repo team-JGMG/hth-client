@@ -30,7 +30,6 @@ const normalizedPoint = computed(() => {
   return null
 })
 
-// 마지막 정상값 저장
 const lastStablePoint = ref(null)
 watch(
   normalizedPoint,
@@ -42,7 +41,6 @@ watch(
   { immediate: true },
 )
 
-// 표시할 값: 현재값 없으면 마지막 값
 const formattedPoint = computed(() => {
   const n = normalizedPoint.value ?? lastStablePoint.value
   return n != null ? n.toLocaleString() + '원' : ''

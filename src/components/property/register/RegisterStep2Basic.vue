@@ -2,7 +2,6 @@
   <div class="w-full max-w-md mx-auto px-4 pb-8">
     <BaseTypography class="mb-6" size="xl" weight="bold">매물 정보를 입력해주세요.</BaseTypography>
 
-    <!-- 매물명 -->
     <div class="mb-12 relative">
       <InputField
         v-model="store.propertyBasic.title"
@@ -20,7 +19,6 @@
       </BaseTypography>
     </div>
 
-    <!-- 주소 -->
     <div class="flex items-end gap-2">
       <div class="flex-1">
         <InputField
@@ -38,7 +36,6 @@
       </BaseButton>
     </div>
 
-    <!-- 우편번호 레이어 -->
     <div v-show="show" class="relative w-full h-[430px] border mt-2 rounded overflow-hidden">
       <div id="daum-postcode" class="absolute top-0 left-0 w-full h-full"></div>
     </div>
@@ -63,7 +60,6 @@
     >
       * 주소 및 상세주소를 입력해주세요.
     </BaseTypography>
-    <!-- 매물 크기 -->
     <div class="mb-12 relative mt-12">
       <div class="flex items-center w-full gap-3">
         <div class="flex-1">
@@ -86,7 +82,6 @@
       </BaseTypography>
     </div>
 
-    <!-- 희망 매매가 -->
     <div class="mb-12 relative">
       <div class="flex items-center w-full gap-3">
         <div class="flex-1">
@@ -109,7 +104,6 @@
       </BaseTypography>
     </div>
 
-    <!-- 공고 기간 -->
     <div class="mb-10 relative">
       <div class="flex items-center w-full gap-3">
         <div class="flex-1">
@@ -132,7 +126,6 @@
       </BaseTypography>
     </div>
 
-    <!-- 다음 버튼 -->
     <div class="pb-12">
       <CompletedButton
         :color="isStepValid ? 'black' : 'gray-300'"
@@ -176,14 +169,12 @@ const touched = ref({
 
 const show = ref(false)
 
-// 닫기
 const closePostcode = () => {
   show.value = false
   const el = document.getElementById('daum-postcode')
   if (el) el.innerHTML = ''
 }
 
-// 열기(매번 새 인스턴스 생성)
 const openPostcode = async () => {
   show.value = true
   await nextTick()
@@ -214,7 +205,6 @@ const openPostcode = async () => {
 
 const toggleAddressSearch = () => (show.value ? closePostcode() : openPostcode())
 
-// ESC 키로 닫기
 const onKeydown = (e) => {
   if (e.key === 'Escape' && show.value) {
     closePostcode()
@@ -223,7 +213,6 @@ const onKeydown = (e) => {
 onMounted(() => window.addEventListener('keydown', onKeydown))
 onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 
-// ===== 유효성 검사 =====
 const titleValid = computed(() => (store.propertyBasic.title ?? '').toString().trim() !== '')
 const addressValid = computed(() => (store.propertyBasic.address ?? '').toString().trim() !== '')
 const detailAddressValid = computed(
@@ -248,7 +237,6 @@ const isStepValid = computed(
     periodValid.value,
 )
 
-// ===== 다음 단계 =====
 const handleNext = () => {
   Object.keys(touched.value).forEach((k) => (touched.value[k] = true))
   if (!isStepValid.value) return

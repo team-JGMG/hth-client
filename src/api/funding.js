@@ -31,7 +31,7 @@ export const refundFundingOrder = (fundingId, orderId, orderPrice) => {
   const params = {
     fundingId: Number.parseInt(fundingId, 10),
     orderId: Number.parseInt(orderId, 10),
-    orderPrice: Number(orderPrice), // 금액 소수 없음이면 parseInt로 바꿔도 됨
+    orderPrice: Number(orderPrice),
   }
 
   return api.post('/api/auth/funding-orders/refund', null, {
@@ -58,7 +58,7 @@ export const getFundingById = async (id) => {
 export const getFundingTradeHistory = async (fundingId) => {
   const yesterday = new Date()
   yesterday.setDate(yesterday.getDate() - 1)
-  const endDate = yesterday.toISOString().split('T')[0] // YYYY-MM-DD
+  const endDate = yesterday.toISOString().split('T')[0]
 
   const lastYear = new Date(yesterday)
   lastYear.setFullYear(lastYear.getFullYear() - 1)

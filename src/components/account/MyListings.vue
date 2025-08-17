@@ -1,4 +1,3 @@
-<!-- MyListings.vue -->
 <script setup>
 import { reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
@@ -43,7 +42,6 @@ const anyHasData = computed(() => Object.values(progress).some((p) => p.hasData)
   <div class="py-2"></div>
 
   <div class="relative py-3 min-h-[600px] flex flex-col items-center">
-    <!-- 상단 버튼 -->
     <div class="mb-6">
       <BaseButton
         @click="goToPropertyRegisterPage"
@@ -56,12 +54,11 @@ const anyHasData = computed(() => Object.values(progress).some((p) => p.hasData)
       </BaseButton>
     </div>
 
-    <!-- 그룹 섹션들: 항상 마운트 (각 그룹 내부에서 무한스크롤 진행) -->
     <div
       class="w-full space-y-6"
       :class="{
-        'opacity-0 pointer-events-none': !allInitDone, // 초기 로딩 동안만 보이지 않게
-        hidden: allInitDone && !anyHasData, // ✅ 전부 비었으면 완전히 숨김
+        'opacity-0 pointer-events-none': !allInitDone,
+        hidden: allInitDone && !anyHasData,
       }"
     >
       <ListingGroup
@@ -77,12 +74,10 @@ const anyHasData = computed(() => Object.values(progress).some((p) => p.hasData)
       />
     </div>
 
-    <!-- 전부 비었을 때: 안내만 노출 -->
     <div v-if="allInitDone && !anyHasData" class="w-full">
       <NoTradeItems />
     </div>
 
-    <!-- 전역 초기 로딩 오버레이 -->
     <div v-if="!allInitDone" class="absolute inset-0 flex justify-center items-start pt-20">
       <LoadingSpinner />
     </div>

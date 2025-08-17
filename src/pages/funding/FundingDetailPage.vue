@@ -17,8 +17,8 @@ const mapToViewModel = (d) => ({
   images: d.photos?.length ? d.photos : [{ photoUrl: '/src/assets/images/cardtestimage.png' }],
   title: d.title ?? '',
   address: d.address ?? '',
-  targetAmount: d.targetAmount ?? null, // 총 투자금
-  percent: d.fundingRate ?? null, // 달성률(%)
+  targetAmount: d.targetAmount ?? null,
+  percent: d.fundingRate ?? null,
   currentAmount: d.currentAmount ?? null,
   fundingEndDate: d.fundingEndDate ?? null,
 
@@ -53,19 +53,14 @@ const viewModel = computed(() => (data.value ? mapToViewModel(data.value) : null
 
 onMounted(async () => {
   const id = Number(route.params.id || route.params.fundingId)
-  console.log('[Detail] route id =', id)
 
   try {
     const res = await getFundingById(id)
-    console.log('[Detail] raw response', res.data)
     const payload = res.data?.data
     if (!payload) throw new Error('empty payload')
     data.value = payload
-    const vm = mapToViewModel(payload)
-
-    console.log('[Detail] mapped viewModel', vm)
-  } catch (e) {
-    console.error('[Detail] fetch error', e?.response?.status, e?.response?.data || e)
+    mapToViewModel(payload)
+  } catch {
     error.value = '상세 정보를 불러오지 못했습니다.'
   } finally {
     loading.value = false

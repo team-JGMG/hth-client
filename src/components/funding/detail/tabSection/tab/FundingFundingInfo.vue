@@ -1,7 +1,6 @@
 <template>
   <div>
     <div class="py-2"></div>
-    <!-- 세부 정보 -->
     <BaseTypography size="base" weight="bold" class="mb-2"> 세부 정보 </BaseTypography>
 
     <BaseCard v-if="item.description" class="h-auto flex flex-col mb-4">
@@ -9,7 +8,6 @@
         {{ item.description }}
       </BaseTypography>
     </BaseCard>
-    <!-- 유의사항 영역 -->
     <BaseTypography size="base" weight="bold" class="mb-2">유의사항</BaseTypography>
 
     <BaseTypography size="xs" color="red">※ 투자금은 손실 가능성이 있습니다.</BaseTypography>

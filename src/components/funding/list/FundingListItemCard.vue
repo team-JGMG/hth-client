@@ -1,7 +1,6 @@
 <template>
   <div @click="goToDetail" class="cursor-pointer">
     <div class="relative border rounded-xl overflow-hidden shadow-sm bg-white">
-      <!-- 상태 뱃지 -->
       <div
         class="absolute top-2 left-2 px-2 py-1 text-[10px] font-semibold rounded-md text-white"
         :class="getBadgeColor(status)"
@@ -15,7 +14,6 @@
         class="w-full h-[120px] object-cover"
       />
 
-      <!-- 매각 완료 오버레이 -->
       <div
         v-if="status === '매각 완료'"
         class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center z-0"
@@ -44,7 +42,6 @@
           {{ item.address }}
         </BaseTypography>
 
-        <!-- 태그 부분 -->
         <div v-if="normalizedTags.length" class="flex flex-wrap gap-0.5 mt-1 mb-2">
           <span
             v-for="(tag, i) in normalizedTags"
@@ -97,7 +94,6 @@ const props = defineProps({
   status: { type: String, required: true },
 })
 
-// 태그 추가
 const maxTagsToShow = 3
 const normalizedTags = computed(() => {
   const raw = Array.isArray(props.item.tags) ? props.item.tags : []
@@ -130,7 +126,6 @@ const goToDetail = () => {
   })
 }
 
-// 상태 뱃지 색상
 function getBadgeColor(status) {
   switch (status) {
     case '모집 중':

@@ -6,7 +6,6 @@
 
     <div class="relative cursor-pointer" @click="goFcmTest">
       <img src="@/assets/images/alert/alert.png" alt="알림" class="w-8 h-8 object-contain" />
-      <!-- 빨간 점 (통통 튀는 애니메이션, 더 붙임) -->
       <span
         v-if="nStore.unreadCount > 0"
         class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full border border-white animate-bounce"

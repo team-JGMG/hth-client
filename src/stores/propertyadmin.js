@@ -1,7 +1,7 @@
-// stores/propertyadmin.js
+import { fetchPropertyDetail, fetchPropertyList } from '@/api/admin'
+
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { fetchPropertyList, fetchPropertyDetail } from '@/api/admin'
 
 export const usePropertyAdmin = defineStore('propertyAdmin', () => {
   const propertyList = ref([])
@@ -21,12 +21,10 @@ export const usePropertyAdmin = defineStore('propertyAdmin', () => {
         hasNext.value = !responseData.last
         page.value += 1
       } else {
-        console.warn('Received malformed data or empty content, stopping pagination.')
         hasNext.value = false
       }
-    } catch (error) {
-      console.error('Failed to fetch property list:', error)
-      hasNext.value = false // Stop trying on error
+    } catch {
+      hasNext.value = false
     }
   }
 

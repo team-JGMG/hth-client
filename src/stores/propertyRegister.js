@@ -5,7 +5,7 @@ export const usePropertyRegisterStore = defineStore('propertyRegister', () => {
   const step = ref(1)
 
   const ownerInfo = ref({
-    userId: '', // 로그인한 사용자 ID
+    userId: '',
     agreements: {
       terms: false,
       privacy: false,
@@ -20,7 +20,7 @@ export const usePropertyRegisterStore = defineStore('propertyRegister', () => {
     detailAddress: '',
     size: '',
     price: '',
-    period: '', // 희망 공고 기간
+    period: '',
   })
 
   const propertyBuilding = ref({
