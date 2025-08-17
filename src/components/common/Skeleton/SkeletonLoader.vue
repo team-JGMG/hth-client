@@ -48,15 +48,15 @@
 }
 
 .point-section {
-  height: 150px; /* Adjust height based on PointSection */
+  height: 150px;
 }
 
 .funding-section,
 .trade-section {
-  height: 200px; /* Adjust height based on FundingListSection and TradeListSection */
+  height: 200px;
 }
 
 .property-section {
-  height: 250px; /* Adjust height based on PropertySection */
+  height: 250px;
 }
 </style>
