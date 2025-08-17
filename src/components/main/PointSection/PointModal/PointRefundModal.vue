@@ -38,13 +38,12 @@
 <script setup>
 import { onMounted, ref, computed } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
-import { fetchUserInfo } from '@/api/auth' // ✅ API 재사용
+import { fetchUserInfo } from '@/api/auth'
 
 const modelValue = defineModel()
 
 const accountInfo = ref(null)
 
-// 은행코드 → 이름 변환 맵
 const bankCodeMap = {
   '004': '국민은행',
   '088': '신한은행',
@@ -52,7 +51,7 @@ const bankCodeMap = {
   '020': '우리은행',
   '081': '하나은행',
   '011': '농협은행',
-  KB: '국민은행', // 백엔드가 문자열 코드일 경우도 대비
+  KB: '국민은행',
 }
 
 const bankName = computed(() => {
@@ -64,11 +63,8 @@ onMounted(async () => {
   try {
     const res = await fetchUserInfo()
     accountInfo.value = res.data
-    console.log('받은 유저 정보:', res.data)
-    console.log('accountNumber:', res.data.accountNumber)
-    console.log(res.data)
-  } catch (err) {
-    console.error('유저 정보 불러오기 실패:', err)
+  } catch {
+    //
   }
 })
 </script>

@@ -1,4 +1,3 @@
-<!-- src/components/account/MyInvestments.vue -->
 <script setup>
 import { ref, onMounted, nextTick, onBeforeUnmount, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -15,7 +14,6 @@ import { useToastStore } from '@/stores/toast'
 import LoadingSpinner from '@/components/common/Spinner/LoadingSpinner.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 
-/* ✅ 공통 무한 스크롤 컴포저블 */
 import { useInfiniteList } from '@/components/account/utils/useInfiniteList.js'
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms))
@@ -30,21 +28,17 @@ const auth = useAuthStore()
 const { userId: storeUserId } = storeToRefs(auth)
 const userId = computed(() => storeUserId.value ?? 3)
 
-/* 초기 로딩 */
 const initialLoading = ref(true)
 
-/* 환불 모달 */
 const isModalOpen = ref(false)
 const isCancelLoading = ref(false)
 const selectedOrder = ref(null)
 
-/* 배당 모달 */
 const isDividendModalOpen = ref(false)
 const isDividendLoading = ref(false)
 const selectedBuildingName = ref('')
 const selectedDividends = ref([])
 
-/* 포맷 */
 const formatPlusAmount = (n) => `+ ${Number(n ?? 0).toLocaleString('ko-KR')}`
 const formatDateMd = (d) => {
   if (!d) return ''
@@ -54,13 +48,9 @@ const formatDateMd = (d) => {
   return `${mm}.${dd}`
 }
 
-/* -------------------------------------------
- * ✅ 무한 스크롤: 펀딩(주문) 리스트 (useInfiniteList 사용)
- * ----------------------------------------- */
 const fundingList = useInfiniteList({
   pageSize: PAGE_SIZE,
   rootMargin: '0px 0px 400px 0px',
-  // 현재 상태 필터는 ['all']만 사용 중이므로 그대로 호출
   fetch: async ({ page, pageSize }) => {
     const res = await getUserFundingOrders('all', page, pageSize)
     await delay(10)
@@ -86,9 +76,6 @@ const fundingList = useInfiniteList({
   },
 })
 
-/* -------------------------------------------
- * ✅ 무한 스크롤: 보유 지분 리스트 (useInfiniteList 사용)
- * ----------------------------------------- */
 const sharesList = useInfiniteList({
   pageSize: PAGE_SIZE,
   rootMargin: '0px 0px 400px 0px',
@@ -108,14 +95,10 @@ const sharesList = useInfiniteList({
   }),
 })
 
-/* 리스트 별칭 (템플릿 가독성용) */
 const fundingItems = fundingList.items
 const ownedItems = sharesList.items
 
-/* 라우팅 */
 function goFundingDetail(id) {
-  console.log('[goFundingDetail] id =', id)
-
   const hasId =
     (typeof id === 'number' && !Number.isNaN(id)) || (typeof id === 'string' && id.trim() !== '')
 
@@ -123,7 +106,6 @@ function goFundingDetail(id) {
   router.push(path)
 }
 
-/* 환불 */
 const openCancelModal = (item) => {
   const payload = {
     fundingId: item.fundingId,
@@ -148,7 +130,6 @@ const confirmCancel = async () => {
     const { fundingId, orderId, orderPrice } = selectedOrder.value
     const res = await refundFundingOrder(fundingId, orderId, orderPrice)
     if (res?.data?.status === 'success') {
-      // ✅ 리스트에서 제거
       fundingItems.value = fundingItems.value.filter((x) => x.orderId !== orderId)
       toast.success({ title: '주문 취소 완료', body: '주문이 취소(환불)되었습니다.' })
     } else {
@@ -162,7 +143,6 @@ const confirmCancel = async () => {
   }
 }
 
-/* 배당 모달 */
 const openDividendModal = async (item) => {
   try {
     isDividendLoading.value = true
@@ -184,9 +164,7 @@ const openDividendModal = async (item) => {
   }
 }
 
-/* 초기 진입/리로드 */
 async function resetAndReload() {
-  // ✅ 공통 리셋
   fundingList.reset()
   sharesList.reset()
 
@@ -197,7 +175,6 @@ async function resetAndReload() {
   await nextTick()
   fundingList.setupObserver()
   sharesList.setupObserver()
-  // 최초 가시 여부 체크
   fundingList.kickstartIfVisible()
   sharesList.kickstartIfVisible()
 }
@@ -207,13 +184,11 @@ watch(userId, (id, prev) => {
   if (id && id !== prev) resetAndReload()
 })
 
-/* 언마운트: 옵저버 해제 */
 onBeforeUnmount(() => {
   fundingList.teardownObserver()
   sharesList.teardownObserver()
 })
 
-/* 배당 연도 그룹 */
 const groupedDividends = computed(() => {
   const list = (selectedDividends.value || [])
     .map((a) => ({
@@ -233,7 +208,6 @@ const groupedDividends = computed(() => {
     .map(([year, items]) => ({ year, items }))
 })
 
-/* 섹션 로딩 스피너 */
 const showFundingListSpinner = computed(
   () => !fundingItems.value.length && fundingList.isLoading.value && !initialLoading.value,
 )
@@ -241,7 +215,6 @@ const showSharesListSpinner = computed(
   () => !ownedItems.value.length && sharesList.isLoading.value && !initialLoading.value,
 )
 
-/* ✅ 템플릿 바인딩용 setter (Ref 객체에 엘리먼트를 넣기 위함) */
 const setFundingBottomRef = (el) => (fundingList.bottomRef.value = el)
 const setSharesBottomRef = (el) => (sharesList.bottomRef.value = el)
 </script>
@@ -254,7 +227,6 @@ const setSharesBottomRef = (el) => (sharesList.bottomRef.value = el)
 
     <NoInvestmentItems v-else-if="!fundingItems.length && !ownedItems.length" />
 
-    <!-- 펀딩 중인 매물 -->
     <div v-else-if="fundingItems.length" class="space-y-4 mb-6 relative pb-8">
       <BaseTypography class="text-lg !font-bold mb-2">펀딩 중인 매물</BaseTypography>
 
@@ -271,7 +243,6 @@ const setSharesBottomRef = (el) => (sharesList.bottomRef.value = el)
         @cancel="openCancelModal(item)"
       />
 
-      <!-- 👇 무한스크롤 센티널 -->
       <div :ref="setFundingBottomRef" class="h-[1px] w-full opacity-0 pointer-events-none" />
 
       <div
@@ -284,7 +255,6 @@ const setSharesBottomRef = (el) => (sharesList.bottomRef.value = el)
 
     <div class="py-10"></div>
 
-    <!-- 보유중인 매물 -->
     <div class="space-y-4 mb-6 relative pb-8" v-if="ownedItems.length">
       <BaseTypography class="text-lg !font-bold mb-2">보유중인 매물</BaseTypography>
 
@@ -300,7 +270,6 @@ const setSharesBottomRef = (el) => (sharesList.bottomRef.value = el)
         @open-dividend="openDividendModal(item)"
       />
 
-      <!-- 👇 무한스크롤 센티널 -->
       <div :ref="setSharesBottomRef" class="h-[1px] w-full opacity-0 pointer-events-none" />
 
       <div
@@ -312,7 +281,6 @@ const setSharesBottomRef = (el) => (sharesList.bottomRef.value = el)
     </div>
   </div>
 
-  <!-- 배당 모달 -->
   <DividendModal
     :is-open="isDividendModalOpen"
     :loading="isDividendLoading"
@@ -321,7 +289,6 @@ const setSharesBottomRef = (el) => (sharesList.bottomRef.value = el)
     @close="isDividendModalOpen = false"
   />
 
-  <!-- 환불 확인 모달 -->
   <CancelConfirmModal :isOpen="isModalOpen" @close="closeModal" @submit="confirmCancel" />
 </template>
 

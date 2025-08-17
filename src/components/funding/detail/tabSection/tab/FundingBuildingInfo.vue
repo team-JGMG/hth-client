@@ -1,5 +1,4 @@
 <template>
-  <!-- 건물 대장 정보 -->
   <BaseTypography size="base" weight="bold">건물 대장 정보</BaseTypography>
 
   <div class="border rounded-lg border-white overflow-hidden text-sm mb-3 p-4">
@@ -65,11 +64,9 @@ import { getAllocations } from '@/api/funding'
 
 const props = defineProps({ item: { type: Object, required: true } })
 
-// 만원/ 평 표시 포멧함수
 const manwon = (val) => (val === 0 ? '0만원' : formatPriceInManwon(val))
 const pyeong = (area) => (area === 0 ? '0.0평' : formatAreaToPyeong(area))
 
-/*화면에 보여줄 Key → Value 집합 */
 const infoList = computed(() => {
   const it = props.item ?? {}
   return {
@@ -97,12 +94,8 @@ const labels = {
   unitPricePerPyeong: '연면적 평단가',
 }
 
-/*키별 커스텀 포맷터 */
 const formatters = {
-  // 날짜
   approvalDate: (v) => (v !== null && v !== undefined ? formatDate(v) : '-'),
-
-  // 숫자 ㎡ (n.n평)
   buildingArea: (v) => (v !== null && v !== undefined ? `${format(v)} ㎡ (${pyeong(v)})` : '-'),
   landArea: (v) => (v !== null && v !== undefined ? `${format(v)} ㎡ (${pyeong(v)})` : '-'),
   totalFloorAreaBuilding: (v) =>
@@ -110,7 +103,6 @@ const formatters = {
   totalFloorAreaProperty: (v) =>
     v !== null && v !== undefined ? `${format(v)} ㎡ (${pyeong(v)})` : '-',
 
-  // 만원/ 평 표시
   officialLandPrice: (v) => (v !== null && v !== undefined ? manwon(v) : '-'),
   unitPricePerPyeong: (v) => (v !== null && v !== undefined ? manwon(v) : '-'),
 
@@ -125,7 +117,6 @@ const defaultFormatter = (v) => {
 
 const displayValue = (key, value) => (formatters[key] || defaultFormatter)(value)
 
-// 지상/지하 층수 포맷
 function makeScale(basement, ground) {
   const hasB = basement !== null && basement !== undefined
   const hasG = ground !== null && ground !== undefined
@@ -135,7 +126,6 @@ function makeScale(basement, ground) {
   return '-'
 }
 
-/* 배당금 관련 데이터 */
 const dividendData = ref({
   month: '-',
   referenceDate: '-',
@@ -143,7 +133,6 @@ const dividendData = ref({
   expectedDividendPerShare: null,
 })
 
-// 년월 포멧 함수
 function toKRMonth(dateStr) {
   if (!dateStr) return '-'
   const d = new Date(dateStr)
@@ -153,7 +142,6 @@ function toKRMonth(dateStr) {
   return `${y}년 ${m}월`
 }
 
-// 배당 기준일 계산 -> 지급일의 ‘전 달 말일’
 function getPrevMonthEnd(dateStr) {
   if (!dateStr) return '-'
   const d = new Date(dateStr)
@@ -177,8 +165,8 @@ async function loadAllocations(fid) {
     const res = await getAllocations(fid)
     const list = res.data?.data ?? []
     applyLatestAllocation(list[0])
-  } catch (e) {
-    console.error('[allocations] fetch error', e?.response?.status, e?.response?.data || e)
+  } catch {
+    //
   }
 }
 

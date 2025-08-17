@@ -14,7 +14,6 @@
   </div>
 </template>
 <script setup>
-import { useAuthStore } from '@/stores/authStore'
 import { useOnboardingStore } from '@/stores/onboarding'
 import { storeToRefs } from 'pinia'
 
@@ -26,12 +25,7 @@ import FundingListSection from '@/components/main/FundingListSection.vue'
 import PointSection from '@/components/main/PointSection/PointSection.vue'
 import TradeListSection from '@/components/main/TradeListSection.vue'
 
-const authStore = useAuthStore()
 const onboardingStore = useOnboardingStore()
 
-const { getIsLoggedIn } = storeToRefs(authStore)
 const { hasVisited } = storeToRefs(onboardingStore)
-
-console.log('로그인 상태:', getIsLoggedIn.value)
-console.log('온보딩 완료 여부:', hasVisited.value)
 </script>

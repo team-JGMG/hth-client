@@ -7,7 +7,6 @@
         </div>
       </div>
 
-      <!-- 탭 내용 부분 -->
       <div ref="scrollContainerRef" class="flex-1 overflow-y-auto pb-24 scrollbar-none">
         <AdminList
           :list="filteredList"
@@ -28,7 +27,6 @@
     </div>
 
     <BaseModal :isOpen="modal.open" @close="modal.open = false">
-      <!-- 본문 메시지 -->
       <template #default>
         <div class="p-4 pb-0">
           <BaseTypography class="text-center" size="xl" weight="bold">
@@ -37,7 +35,6 @@
         </div>
       </template>
 
-      <!-- 버튼 영역 -->
       <template #submit>
         <CompletedButton
           color="black"
@@ -68,7 +65,6 @@ import { approveProperty, rejectProperty } from '@/api/admin'
 const propertyadmin = usePropertyAdmin()
 const { resetList } = propertyadmin
 
-// 탭 관련
 const AdminTabs = [
   { label: '대기', value: 'pending' },
   { label: '승인 매물 조회', value: 'approved' },
@@ -77,10 +73,8 @@ const AdminTabs = [
 
 const currentAdminStatus = ref('pending')
 
-// 필터링된 리스트
 const filteredList = computed(() => propertyadmin.propertyList || [])
 
-// 무한 스크롤 관련
 const scrollContainerRef = ref(null)
 const bottomRef = ref(null)
 const isLoading = ref(false)
@@ -94,8 +88,8 @@ const fetchNextPage = async () => {
   try {
     await delay(300)
     await propertyadmin.getPropertyList(currentAdminStatus.value)
-  } catch (err) {
-    console.error('데이터 로딩 실패:', err)
+  } catch {
+    //
   } finally {
     isLoading.value = false
   }
@@ -120,7 +114,6 @@ const setupObserver = async () => {
   if (bottomRef.value) observer.observe(bottomRef.value)
 }
 
-// 초기 로딩 및 탭 전환
 onMounted(async () => {
   resetList()
   await fetchNextPage()
@@ -138,7 +131,6 @@ onBeforeUnmount(() => {
   if (observer) observer.disconnect()
 })
 
-// 모달 상태
 const modal = ref({
   open: false,
   message: '',

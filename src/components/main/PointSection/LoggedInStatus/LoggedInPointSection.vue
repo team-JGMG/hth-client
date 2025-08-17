@@ -67,23 +67,16 @@ const refundAmount = ref(0)
 const isLoading = ref(false)
 
 const refreshPointBalance = async () => {
-  console.log('🔄 refreshPointBalance 시작')
-
   if (!getIsLoggedIn.value || !authStore.userId) {
-    console.warn('❌ 로그인되지 않았거나 userId가 없습니다')
     return
   }
 
   isLoading.value = true
   try {
-    console.log('🌐 getPointBalance API 호출')
     const point = await getPointBalance()
-    console.log('📨 포인트 API 응답:', { point, type: typeof point })
 
     authStore.setUserPoint(point)
-    console.log('✅ 포인트 업데이트 완료, 현재값:', authStore.userPoints)
-  } catch (e) {
-    console.error('❌ 포인트 갱신 실패:', e)
+  } catch {
     toast.error({ title: '포인트 조회 실패', body: '포인트 정보를 불러올 수 없습니다.' })
   } finally {
     isLoading.value = false
@@ -91,13 +84,6 @@ const refreshPointBalance = async () => {
 }
 
 onMounted(async () => {
-  console.log('컴포넌트 마운트:', {
-    isLoggedIn: getIsLoggedIn.value,
-    userId: authStore.userId,
-    userInfo: authStore.userInfo,
-    userPoints: authStore.userPoints,
-  })
-
   await nextTick()
 
   if (getIsLoggedIn.value) {
@@ -108,7 +94,6 @@ onMounted(async () => {
 watch(
   getIsLoggedIn,
   async (loggedIn) => {
-    console.log('🔄 로그인 상태 변화:', loggedIn)
     if (loggedIn) {
       await nextTick()
       await refreshPointBalance()
@@ -190,7 +175,6 @@ const requestPay = async (amount) => {
       },
     )
   } catch (err) {
-    console.error(err)
     toast.error({
       title: '요청 오류',
       body: err?.response?.data?.message || err?.message || '결제 요청 오류',
@@ -214,7 +198,6 @@ const handleRefund = async () => {
     refundAmount.value = 0
     await refreshPointBalance()
   } catch (err) {
-    console.error(err)
     toast.error({
       title: '환급 실패',
       body: err?.response?.data?.message || err?.message || '환급 처리 중 오류',

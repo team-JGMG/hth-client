@@ -18,15 +18,14 @@ const fetchCurrentPrice = async () => {
   try {
     const res = await getOrderBookByFundingId(Number(props.fundingId))
     currentPrice.value = res?.data?.data?.currentPrice ?? 0
-  } catch (e) {
-    console.error('현재가 조회 실패:', e)
+  } catch {
     currentPrice.value = 0
   }
 }
 
 const toggleOpen = async () => {
   if (!isOpen.value) {
-    await fetchCurrentPrice() // 현재가 확보
+    await fetchCurrentPrice()
     isOpen.value = true
   } else {
     isOpen.value = false

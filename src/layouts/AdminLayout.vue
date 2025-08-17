@@ -18,7 +18,7 @@
 import CommonHeader from './CommonHeader.vue'
 import BaseButton from '@/components/common/Button/BaseButton.vue'
 import { useAuthStore } from '@/stores/authStore'
-import { logout as logoutRequest } from '@/api/auth' // 서버 로그아웃 API
+import { logout as logoutRequest } from '@/api/auth'
 import { useFcmStore } from '@/stores/fcm'
 import { useToastStore } from '@/stores/toast'
 
@@ -27,14 +27,12 @@ const authStore = useAuthStore()
 const toast = useToastStore()
 const handleLogout = async () => {
   try {
-    console.log('[로그아웃 시작]')
     await fcmStore.init()
     const deviceToken = fcmStore.token || null
 
-    await logoutRequest(deviceToken) // 서버에 로그아웃 요청 (쿠키 삭제 및 DB 정리)
-    authStore.logout() // 클라이언트에서 로컬스토리지 정리
+    await logoutRequest(deviceToken)
+    authStore.logout()
     toast.success('로그아웃 성공')
-    console.log('[로그아웃 완료]')
     window.location.href = '/auth/login'
   } catch {
     toast.error({

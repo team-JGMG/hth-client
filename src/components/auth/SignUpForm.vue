@@ -5,7 +5,6 @@
       추가 정보를 입력해주세요.
     </BaseTypography>
 
-    <!-- 이름 -->
     <div class="mb-12 relative">
       <InputField
         v-model="nickname"
@@ -25,7 +24,6 @@
       </BaseTypography>
     </div>
 
-    <!— 주민등록번호 —>
     <div class="mb-12 relative">
       <div class="flex items-center w-full gap-3">
         <div class="flex-1">
@@ -40,7 +38,6 @@
     </div>
 
     <div class="mb-12 relative">
-      <!-- 인풋은 가변(1fr), 버튼은 고정폭 -->
       <div class="flex items-center w-full gap-3">
         <div class="flex-1">
           <InputField
@@ -78,7 +75,6 @@
       </BaseTypography>
     </div>
 
-    <!-- 계좌번호 -->
     <div class="mb-12 relative">
       <div class="flex items-end gap-2">
         <div class="flex-[1.3]">
@@ -99,11 +95,9 @@
       </div>
     </div>
 
-    <!-- 약관 동의 -->
     <div class="mb-12 relative">
       <BaseTypography class="mb-2" weight="semibold">약관 동의</BaseTypography>
 
-      <!-- 전체 동의 -->
       <div class="flex items-center mb-3 cursor-pointer" @click="toggleAll">
         <span
           class="material-symbols-outlined text-lg rounded-full border-gray-400 w-5 h-5 flex items-center justify-center"
@@ -116,7 +110,6 @@
 
       <hr class="mb-3" />
 
-      <!-- 개별 약관 항목 -->
       <ul class="space-y-2 text-sm text-gray-800">
         <li class="flex items-center justify-between">
           <div class="flex items-center cursor-pointer" @click="toggleAgreement('terms')">
@@ -170,7 +163,6 @@
       </ul>
     </div>
 
-    <!-- 다음 버튼 -->
     <div class="mt-6 mb-20">
       <BaseButton
         :disabled="!isFormValid"
@@ -182,7 +174,6 @@
       </BaseButton>
     </div>
 
-    <!-- 모달 -->
     <BaseModal :isOpen="modalVisible" @close="closeModal" @submit="agreeAndClose">
       <template #default>
         <div class="flex justify-between items-center mb-4">
@@ -249,7 +240,7 @@ const agreements = ref({ terms: false, privacy: false, age: false })
 
 const isNicknameValid = computed(() => {
   const trimmed = nickname.value.trim()
-  return /^[가-힣a-zA-Z]{2,}$/.test(trimmed) // 한글 또는 영문 2글자 이상
+  return /^[가-힣a-zA-Z]{2,}$/.test(trimmed)
 })
 const isRrnValid = computed(() => /^\d{6}$/.test(rrnFront.value) && /^\d{7}$/.test(rrnBack.value))
 const isPhoneValid = computed(() => /^01[0-9]{8,9}$/.test(phone.value))
@@ -318,26 +309,24 @@ watch(
   },
   { deep: true },
 )
-watch(nickname, (val) => console.log('nickname 변경됨:', val))
+watch(nickname, (val) => toast.show('nickname 변경됨:', val))
 
-// 전화번호 인증
 const verifyPhone = () => {
   setTimeout(() => {
     isPhoneVerified.value = true
     toast.success({
       title: '인증확인',
-      body: '전화번호 인증이 완료되었습니다.', // 조금 더 구체적으로
+      body: '전화번호 인증이 완료되었습니다.',
     })
   }, 1000)
 }
 
-// 계좌번호 인증
 const verifyAccount = () => {
   setTimeout(() => {
     isAccountVerified.value = true
     toast.success({
       title: '인증확인',
-      body: '계좌번호 인증이 완료되었습니다.', // 조금 더 구체적으로
+      body: '계좌번호 인증이 완료되었습니다.',
     })
   }, 1000)
 }
@@ -369,7 +358,6 @@ const handleSubmit = async () => {
       ssn: rrnFront.value + rrnBack.value,
     }
 
-    console.log('userInfo 보내는 값:', userInfo)
     const { data } = await signUpWithPreAuth(userInfo)
 
     localStorage.setItem('accessToken', data.accessToken)

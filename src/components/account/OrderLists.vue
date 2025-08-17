@@ -1,17 +1,16 @@
-<!— OrderLists.vue —>
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import CancelConfirmModal from './CancelConfirmModal.vue'
 import LoadingSpinner from '../common/Spinner/LoadingSpinner.vue'
-
+import { useToastStore } from '@/stores/toast'
 import { getOrderHistory, cancelOrder } from '@/api/trade'
 import OrderListItem from './OrderListsTab/OrderListItem.vue'
 
-// 공통 무한 스크롤 훅
 import { useInfiniteList } from '@/components/account/utils/useInfiniteList.js'
 
-/* ===== 포맷 & 매핑 ===== */
+const toast = useToastStore()
+
 function toIso(dateStr) {
   return typeof dateStr === 'string' ? dateStr.replace(' ', 'T') : dateStr
 }
@@ -57,7 +56,6 @@ function isCancelledStatus(raw) {
   return u.includes('CANCEL') || u === 'CANCELED' || u === 'CANCELLED' || s === '취소'
 }
 
-/* ===== 리스트 상태(composable) ===== */
 const PAGE_SIZE = 5
 const isFirstLoad = ref(true)
 const loadError = ref(null)
@@ -68,7 +66,6 @@ const { items, isLoading, bottomRef, fetchNext, setupObserver, teardownObserver 
     fetch: async ({ page, pageSize }) => {
       try {
         const res = await getOrderHistory(page, pageSize)
-        // 유틸이 content/items/배열을 알아서 추출하므로 여기서는 원본만 반환
         return res?.data?.data ?? res?.data ?? []
       } catch (err) {
         loadError.value = err
@@ -84,10 +81,8 @@ const { items, isLoading, bottomRef, fetchNext, setupObserver, teardownObserver 
   },
 )
 
-// 별칭
 const orders = items
 
-/* ✅ id 기준 dedupe + 최신순 정렬 */
 const uniqueSortedOrders = computed(() => {
   const seen = new Set()
   const arr = []
@@ -101,7 +96,6 @@ const uniqueSortedOrders = computed(() => {
   return arr.sort((a, b) => parseDate(b.createdAt) - parseDate(a.createdAt))
 })
 
-/* ===== 모달 & 삭제 ===== */
 const isModalOpen = ref(false)
 const isSubmitting = ref(false)
 const selectedOrder = ref(null)
@@ -122,7 +116,7 @@ async function confirmDelete() {
   if (!selectedOrder.value || isSubmitting.value) return
   const target = selectedOrder.value
   const targetId = target.id
-  if (!targetId) return alert('주문 ID를 찾을 수 없습니다.')
+  if (!targetId) return toast.show('주문 ID를 찾을 수 없습니다.')
   isSubmitting.value = true
   try {
     await cancelOrder(targetId)
@@ -130,15 +124,13 @@ async function confirmDelete() {
     isModalOpen.value = false
     selectedOrder.value = null
   } catch (e) {
-    console.error('[confirmDelete] cancel failed:', e?.response?.status, e?.response?.data, e)
-    alert(e?.response?.data?.message || e?.message || '주문 취소에 실패했습니다.')
+    toast.show(e?.response?.data?.message || e?.message || '주문 취소에 실패했습니다.')
   } finally {
     resetSlide(target)
     isSubmitting.value = false
   }
 }
 
-/* ===== 터치 슬라이드 ===== */
 function getYear(dateStr) {
   return parseDate(dateStr).getFullYear()
 }
@@ -171,10 +163,9 @@ function handleTouchEnd(order) {
   }
 }
 
-/* ===== 생명주기: 첫 페치 이후 옵저버 장착(중복 방지) ===== */
 onMounted(async () => {
-  await fetchNext() // 첫 페이지
-  setupObserver() // 이후부터는 인터섹션으로만 페치
+  await fetchNext()
+  setupObserver()
   isFirstLoad.value = false
 })
 onBeforeUnmount(() => {

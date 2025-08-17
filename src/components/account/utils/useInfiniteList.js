@@ -1,5 +1,4 @@
-// components/account/utils/useInfiniteList.js
-import { ref, computed, nextTick } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import {
   extractContent,
   resolvePaginationState,
@@ -29,7 +28,9 @@ export function useInfiniteList(opts) {
     if (!observer || !el) return
     try {
       observer?.unobserve?.(el)
-    } catch {}
+    } catch {
+      //
+    }
     observer.observe(el)
   }
 
@@ -56,7 +57,7 @@ export function useInfiniteList(opts) {
   async function fetchNext() {
     if (isLoading.value || !hasNext.value) return
     isLoading.value = true
-    let mapped = [] // ✅ 미리 선언해 범위 보장
+    let mapped = []
 
     try {
       const raw = await fetcher({ page: page.value, pageSize })
@@ -85,9 +86,6 @@ export function useInfiniteList(opts) {
       page.value = nextPage
       optimisticTried.value = _optTried
       emptyHits.value = _emptyHits
-
-      // (원하면) 디버깅 로그는 여기서만!
-      // console.log('[useInfiniteList] mapped len =', mapped.length)
     } finally {
       isLoading.value = false
       await nextTick()

@@ -9,13 +9,11 @@ defineProps({
 const emit = defineEmits(['click', 'cancel'])
 
 function onCardClick() {
-  console.log('[FundingItemCard] card clicked')
   emit('click')
 }
 
 function onCancelClick(e) {
   e.stopPropagation()
-  console.log('[FundingItemCard] cancel clicked')
   emit('cancel')
 }
 </script>

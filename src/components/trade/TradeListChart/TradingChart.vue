@@ -206,8 +206,8 @@ const fetchChartData = async () => {
         },
       ],
     }
-  } catch (e) {
-    console.error('[fetchChartData] Error:', e)
+  } catch {
+    //
   }
 }
 

@@ -1,7 +1,5 @@
-<!-- UserProfileSection.vue -->
 <template>
   <div class="bg-black text-white p-4 rounded-lg shadow relative">
-    <!-- 유저 이름 & 포인트 라벨 -->
     <div class="flex justify-between items-start mb-4">
       <div>
         <BaseTypography class="text-xl font-bold">
@@ -20,7 +18,6 @@
       </div>
     </div>
 
-    <!-- 포인트 버튼들 -->
     <div class="flex space-x-3">
       <button
         class="flex-1 bg-green-400 text-black rounded-xl font-medium py-2"
@@ -40,7 +37,6 @@
       </button>
     </div>
 
-    <!-- 모달 연결 -->
     <PointChargeModal
       :isOpen="isChargeModalOpen"
       @close="isChargeModalOpen = false"
@@ -66,15 +62,11 @@ const userStore = useUserStore()
 const isChargeModalOpen = ref(false)
 const isWithdrawModalOpen = ref(false)
 
-const handleCharge = (amount) => {
-  console.log('💸 충전 금액:', amount)
-  // TODO: API 호출 및 store 업데이트 처리
+const handleCharge = () => {
   isChargeModalOpen.value = false
 }
 
-const handleWithdraw = (amount) => {
-  console.log('💰 환급 금액:', amount)
-  // TODO: API 호출 및 store 업데이트 처리
+const handleWithdraw = () => {
   isWithdrawModalOpen.value = false
 }
 </script>
