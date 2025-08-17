@@ -4,41 +4,51 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>반의반집</title>
 
+    <!-- LCP 후보 이미지 선로딩 -->
+    <link rel="preload" as="image" href="/src/assets/images/character/onboarding1.png" />
+
+    <!-- Google Fonts 최적화 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- 아이콘 폰트: onload 후 stylesheet로 전환 (렌더링 차단 방지) -->
     <link
       rel="preload"
       as="style"
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap"
       onload="this.onload=null;this.rel='stylesheet'"
     />
     <link
       rel="preload"
       as="style"
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded&display=swap"
       onload="this.onload=null;this.rel='stylesheet'"
     />
     <link
       rel="preload"
       as="style"
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp&display=swap"
       onload="this.onload=null;this.rel='stylesheet'"
     />
     <noscript>
       <link
         rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap"
       />
       <link
         rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded&display=swap"
       />
       <link
         rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp&display=swap"
       />
     </noscript>
 
+    <!-- Font Awesome (CSS는 defer 불가, 그대로 로드) -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
@@ -46,35 +56,41 @@
       referrerpolicy="no-referrer"
     />
 
-    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <!-- 외부 스크립트는 렌더링 차단 방지를 위해 defer -->
+    <script
+      defer
+      src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
+    ></script>
 
     <script
-      type="text/javascript"
+      defer
       src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4215b6b611faa29a4ce872b00b8f8e8b&libraries=services"
     ></script>
 
-    <script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+    <script defer src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
   </head>
 
   <body>
     <div id="app"></div>
     <div id="modal"></div>
+
+    <!-- Vite 모듈 스크립트: type="module"은 기본적으로 지연 실행됨 -->
     <script type="module" src="/src/main.js"></script>
+
+    <style>
+      .material-symbols-outlined,
+      .material-symbols-rounded,
+      .material-symbols-sharp {
+        opacity: 0;
+        visibility: hidden;
+      }
+      .icons-loaded .material-symbols-outlined,
+      .icons-loaded .material-symbols-rounded,
+      .material-symbols-sharp {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.2s ease-in;
+      }
+    </style>
   </body>
 </html>
-<style>
-  .material-symbols-outlined,
-  .material-symbols-rounded,
-  .material-symbols-sharp {
-    opacity: 0;
-    visibility: hidden;
-  }
-
-  .icons-loaded .material-symbols-outlined,
-  .icons-loaded .material-symbols-rounded,
-  .icons-loaded .material-symbols-sharp {
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.2s ease-in;
-  }
-</style>
