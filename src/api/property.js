@@ -48,7 +48,7 @@ export const registerPropertyWithFormData = async ({
   formData.append('documentTypes', documentTypesBlob)
 
   // 5. 요청 전송
-  return api.post('/api/auth/property', formData, {
+  return api.post('/api/auth/properties', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -61,7 +61,7 @@ export const fetchUserProperties = async () => {
     const statuses = ['pending', 'approved', 'rejected', 'sold']
     const allResults = await Promise.all(
       statuses.map((status) =>
-        api.get(`/api/auth/property/user`, {
+        api.get(`/api/auth/properties`, {
           params: {
             page: 0,
             size: 10,
@@ -82,14 +82,14 @@ export const fetchUserProperties = async () => {
 
 // 매각 완료된 매물 목록 조회 (메인용)
 export const getSoldProperties = async () => {
-  const response = await api.get('/api/property/sold')
+  const response = await api.get('/api/properties/sold')
   console.log('API Response:', response)
   return response.data
 }
 
 // 매물 ID 기반 실거래가 위치 정보 조회
 export const getPropertyMapData = async (propertyId) => {
-  const response = await api.get(`/api/property/map/${propertyId}`)
+  const response = await api.get(`/api/properties/map/${propertyId}`)
   return response.data
 }
 
@@ -97,25 +97,25 @@ export const getPropertyMapData = async (propertyId) => {
 // 404면 서버 배포 상태가 달라진 것이니 GET ?address=... 으로 폴백
 export const getCoordinatesByAddress = async (address) => {
   try {
-    const { data } = await api.post('/api/property/map/coordinate', JSON.stringify(address), {
+    const { data } = await api.post('/api/properties/map/coordinate', JSON.stringify(address), {
       headers: { 'Content-Type': 'application/json' },
     })
     return data // { latitude, longitude }
   } catch (e) {
     if (e?.response?.status === 404) {
-      const { data } = await api.get('/api/property/map/coordinate', { params: { address } })
+      const { data } = await api.get('/api/properties/map/coordinate', { params: { address } })
       return data
     }
     throw e
   }
 }
 export const getPropertyDetail = async (fundingId) => {
-  const { data } = await api.get(`/api/funding/${fundingId}`) // 실제 경로 다르면 수정
+  const { data } = await api.get(`/api/fundings/${fundingId}`) // 실제 경로 다르면 수정
   return data
 }
 
 export const fetchUserPropertiesByStatus = async ({ status, page = 0, size = 10 }) => {
-  const { data } = await api.get('/api/auth/property/user', {
+  const { data } = await api.get('/api/auth/users/me/properties', {
     params: { page, size, status },
   })
   return {
