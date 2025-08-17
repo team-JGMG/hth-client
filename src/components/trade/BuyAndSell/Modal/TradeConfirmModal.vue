@@ -8,7 +8,7 @@ import { useToastStore } from '@/stores/toast'
 import { getPointBalance } from '@/api/point'
 
 const props = defineProps({
-  type: String, // 'buy' or 'sell'
+  type: String,
   amount: Number,
   quantity: Number,
   isOpen: Boolean,
@@ -31,8 +31,8 @@ watch(
       try {
         const point = await getPointBalance(userStore.userId)
         currentPoint.value = point || 0
-      } catch (e) {
-        console.error('포인트 조회 실패:', e)
+      } catch {
+        //
       }
     }
   },
@@ -47,9 +47,8 @@ const handleConfirm = async () => {
       orderType: String(props.type).toUpperCase(),
     }
 
-    const response = await createOrder(payload, props.type)
+    await createOrder(payload, props.type)
 
-    console.log('✅ 주문 성공:', response.data)
     toast.success({
       title: '주문 완료',
       body: `${props.type === 'buy' ? '구매' : '판매'} 주문이 성공적으로 접수되었습니다.`,
@@ -58,7 +57,6 @@ const handleConfirm = async () => {
     emit('close')
     emit('trade-success')
   } catch (error) {
-    console.error('주문 실패:', error)
     toast.error({
       title: '주문 실패',
       body: error?.response?.data?.message || '주문 중 오류가 발생했습니다.',

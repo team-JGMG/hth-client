@@ -2,19 +2,16 @@
   <div class="w-full">
     <BaseTypography class="text-lg !font-bold mb-2">{{ title }}</BaseTypography>
 
-    <!-- 첫 페이지 로딩 -->
     <div v-if="initialLoading" class="flex justify-center py-6">
       <LoadingSpinner />
     </div>
 
-    <!-- 비었을 때 -->
     <div v-else-if="items.length === 0" class="py-2">
       <slot name="empty">
         <BaseTypography class="text-sm !text-gray-500">등록된 매물이 없습니다.</BaseTypography>
       </slot>
     </div>
 
-    <!-- 목록 -->
     <template v-else>
       <RouterLink
         v-for="item in items"
@@ -55,10 +52,8 @@
         </div>
       </RouterLink>
 
-      <!-- 👇 무한스크롤 센티널 (투자 탭과 동일 패턴) -->
       <div :ref="setBottomRef" class="h-[1px] w-full opacity-0 pointer-events-none" />
 
-      <!-- 추가 페이지 로딩 -->
       <div v-if="isLoading" class="flex justify-center py-4">
         <LoadingSpinner />
       </div>
@@ -93,7 +88,6 @@ const computedDefaultImg = computed(
 const getItemId = (item) =>
   item?.id ?? item?.propertyId ?? item?.fundingId ?? item?.funding?.id ?? item?.property?.id
 
-// MyInvestments와 동일: useInfiniteList + rootMargin 프리페치
 const fetcher = async ({ page, pageSize }) => {
   const res = await fetchUserPropertiesByStatus({ status: props.status, page, size: pageSize })
   const raw = res ?? {}
@@ -120,7 +114,6 @@ const {
   rootMargin: '0px 0px 400px 0px',
 })
 
-/* 템플릿 바인딩용 setter (MyInvestments와 동일) */
 const setBottomRef = (el) => (bottomRef.value = el)
 
 const initialLoading = ref(true)
@@ -129,18 +122,15 @@ const loadError = ref(false)
 onMounted(async () => {
   try {
     await fetchNext() // 1페이지 로딩
-  } catch (e) {
-    console.error(`❌ 첫 로딩 실패(${props.title}):`, e)
+  } catch {
     loadError.value = true
   } finally {
     await nextTick()
     setupObserver()
     ensureObserve()
 
-    // 👉 초기 화면에서 센티널이 보이면 다음 페이지 자동 로딩
     kickstartIfVisible()
 
-    // 👉 첫 페이지 완료 후 약간의 딜레이로 한 번 더 체크
     setTimeout(() => {
       kickstartIfVisible()
     }, 300)

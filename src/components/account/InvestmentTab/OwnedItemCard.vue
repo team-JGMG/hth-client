@@ -7,13 +7,11 @@ defineProps({ item: { type: Object, required: true } })
 const emit = defineEmits(['click', 'open-dividend'])
 
 function onCardClick() {
-  console.log('[OwnedItemCard] card clicked')
   emit('click')
 }
 
 function onDividendClick(e) {
   e.stopPropagation()
-  console.log('[OwnedItemCard] dividend button clicked')
   emit('open-dividend')
 }
 </script>

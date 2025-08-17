@@ -19,7 +19,6 @@
       <AdminDetailPropertyInfo :property="property" />
       <AdminDetailBuildingLedger :property="property" />
       <AdminDetailExtraInfo :property="property" />
-
     </div>
   </main>
 </template>
@@ -47,7 +46,6 @@ const error = ref(null)
 onMounted(async () => {
   try {
     const res = await fetchPropertyDetail(propertyId)
-    console.log('✅ 응답 결과:', res)
 
     const raw = res.data
 
@@ -64,9 +62,8 @@ onMounted(async () => {
       ...raw,
       images: raw.photos,
     }
-  } catch (err) {
+  } catch {
     error.value = '상세 정보 불러오기 실패'
-    console.error(err)
   } finally {
     loading.value = false
   }

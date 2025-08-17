@@ -23,7 +23,6 @@
         v-if="propertyStore.soldProperties.length > 0"
         class="flex gap-4 overflow-x-auto no-scrollbar px-2"
       >
-        <!-- 최대 5개까지 카드 표시 -->
         <div
           v-for="property in propertyStore.soldProperties.slice(0, 5)"
           :key="property.id ?? property.propertyId"
@@ -37,7 +36,6 @@
           <SoldPropertyCard :property="property" />
         </div>
 
-        <!-- 더보기 카드 -->
         <BaseTypography
           color="gray-1"
           size="sm"
@@ -72,10 +70,8 @@ const toggleInfoPopover = () => {
   showInfoPopover.value = !showInfoPopover.value
 }
 
-// ✅ 여기서 item(=property) 받아서 fundingId로 이동 (네 카드 컴포넌트와 동일 패턴)
 const goToFundingDetail = (item) => {
   const id = item?.fundingId
-  if (import.meta.env.DEV) console.log('[UI] goToFundingDetail', { id, item })
   if (!id) return
   router.push({ name: 'funding-detail', params: { id } })
 }
@@ -91,11 +87,10 @@ const handleClickOutside = (event) => {
   }
 }
 
-// 응답 any-shape → 통일 포맷으로 변환 (fundingId 반드시 포함)
 const normalizeSoldItems = (rawArr) => {
   return rawArr.map((item) => ({
     id: item.propertyId ?? item.property_id ?? item.property?.id ?? item.id ?? null,
-    fundingId: item.fundingId ?? item.funding_id ?? item.funding?.id ?? null, // ✅ 중요
+    fundingId: item.fundingId ?? item.funding_id ?? item.funding?.id ?? null,
     title: item.title ?? item.propertyTitle ?? item.name ?? item.property?.title ?? '',
     yield_rate:
       item.cumulativeReturn ?? item.yield_rate ?? item.cumulative_return ?? item.roi ?? null,
@@ -121,10 +116,8 @@ const fetchSoldProperties = async () => {
           ? response
           : []
     const parsedData = normalizeSoldItems(raw)
-    if (import.meta.env.DEV) console.log('[UI] parsed soldProperties:', parsedData)
     propertyStore.setSoldProperties(parsedData)
-  } catch (error) {
-    console.error('매각 완료 매물 가져오기 실패:', error)
+  } catch {
     propertyStore.setSoldProperties([])
   }
 }

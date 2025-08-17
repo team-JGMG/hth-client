@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- 제목 + 주소 -->
     <div class="pt-5">
       <BaseTypography size="xl" weight="bold" class="mb-1">{{ item.title }}</BaseTypography>
       <BaseTypography size="xs" color="gray-1" class="flex items-center text-gray-500">
@@ -17,14 +16,12 @@
       </BaseTypography>
     </div>
 
-    <!-- 해시태그 -->
     <BaseTypography size="xs" color="gray-2" class="mt-2 flex flex-wrap gap-2">
       <span v-for="tag in item.tags" :key="tag.id" class="bg-gray-100 px-2 py-1 rounded-full">
         #{{ tag.name }}
       </span>
     </BaseTypography>
 
-    <!-- 총 투자 금액 -->
     <div class="mt-4 flex items-baseline gap-1 mb-4">
       <BaseTypography size="lg" weight="bold"> 총 투자 금액: </BaseTypography>
       <BaseTypography size="lg" weight="bold">
@@ -32,7 +29,6 @@
       </BaseTypography>
     </div>
 
-    <!-- 펀딩 진행 박스 -->
     <BaseCard class="h-auto flex flex-col mb-2">
       <div class="bg-white rounded-xl">
         <BaseTypography size="base" weight="bold" class="mb-2">펀딩 진행 현황</BaseTypography>
@@ -68,7 +64,6 @@
       </div>
     </BaseCard>
 
-    <!-- 지정가 거래 정보 -->
     <BaseCard class="h-auto flex flex-col">
       <div class="bg-white rounded-xl">
         <BaseTypography size="base" weight="bold" class="mb-2">지정가 거래 정보</BaseTypography>
@@ -97,28 +92,14 @@ const props = defineProps({
   },
 })
 
-watch(
-  () => props.item,
-  (nv) => {
-    console.log('[Overview] fields', {
-      title: nv?.title,
-      currentAmount: nv?.currentAmount,
-      targetAmount: nv?.price ?? nv?.targetAmount,
-      fundingRate: nv?.percent ?? nv?.fundingRate,
-      fundingEndDate: nv?.fundingEndDate,
-    })
-  },
-  { immediate: true },
-)
+watch(() => props.item, { immediate: true })
 
 const blinkColor = ref('red')
 let blinkInterval = null
 
 onMounted(() => {
-  // daysLeft가 음수면 0으로 처리
   const remainingDays = Math.max(0, props.item.daysLeft)
 
-  // 펀딩 마감 D-7 이하이면 색상 깜빡임 시작
   if (remainingDays <= 7) {
     blinkInterval = setInterval(() => {
       blinkColor.value = blinkColor.value === 'red' ? 'orange' : 'red'

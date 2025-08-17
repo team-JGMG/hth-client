@@ -17,7 +17,6 @@ const authStore = useAuthStore()
 const notificationStore = useNotificationStore()
 
 onMounted(async () => {
-  console.log('[APP] bootstrap')
   await authStore.loadUserInfo()
 
   if (authStore.getIsLoggedIn) {
@@ -26,11 +25,9 @@ onMounted(async () => {
       const { getPointBalance } = await import('@/api/point')
       const point = await getPointBalance(authStore.userId)
       authStore.setUserPoint(point)
-    } catch (e) {
-      console.warn('[Point] 포인트 조회 실패:', e)
+    } catch {
+      //
     }
-  } else {
-    console.log('[APP] not logged in')
   }
 })
 </script>
