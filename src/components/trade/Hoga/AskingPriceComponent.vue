@@ -7,7 +7,7 @@
       </div>
     </div>
 
-    <div ref="chartRef" class="w-full min-h-[600px]" />
+    <div ref="chartRef" class="w-full" />
 
     <div class="text-center">
       <div class="text-base text-blue-700 font-semibold">
@@ -40,6 +40,10 @@ const { parsedData } = toRefs(props)
 const chartRef = ref(null)
 let chartInstance = null
 
+const ROW_HEIGHT = 26
+const DESIRED_GAP_PX = 10
+const TOP_BOTTOM_PAD = 40
+
 onMounted(() => {
   chartInstance = echarts.init(chartRef.value)
   if (parsedData.value) {
@@ -59,24 +63,38 @@ function handleResize() {
 }
 
 function updateChart(parsed) {
-  if (!chartInstance || !parsed) {
-    return
-  }
+  if (!chartInstance || !parsed) return
 
   try {
-    const idx = parsed.prices.findIndex((p) => p === parsed.currentPrice)
+    const idx = parsed.prices?.findIndex?.((p) => Number(p) === Number(parsed.currentPrice)) ?? -1
     emit('centerIndex', idx, parsed.prices)
 
-    const option = generateOrderBookChartOption(parsed)
+    const rows = Array.isArray(parsed.prices) ? parsed.prices.length : 0
+    const targetHeight = Math.max(200, TOP_BOTTOM_PAD + ROW_HEIGHT * rows)
+    chartRef.value.style.height = `${targetHeight}px`
+
+    const barWidth = Math.max(4, ROW_HEIGHT - DESIRED_GAP_PX)
+
+    const option = generateOrderBookChartOption(parsed, {
+      barWidth,
+      sellGap: '60%',
+      buyGap: '40%',
+    })
 
     chartInstance.clear()
     chartInstance.setOption(option, true)
     chartInstance.resize()
   } catch {
     try {
-      chartInstance.dispose()
+      chartInstance?.dispose()
       chartInstance = echarts.init(chartRef.value)
-      chartInstance.setOption(generateOrderBookChartOption(parsed))
+      chartInstance.setOption(
+        generateOrderBookChartOption(parsed, {
+          barWidth: Math.max(4, ROW_HEIGHT - DESIRED_GAP_PX),
+          sellGap: '60%',
+          buyGap: '40%',
+        }),
+      )
     } catch {
       //
     }
@@ -90,11 +108,7 @@ watch(
       updateChart(newVal)
     }
   },
-  {
-    immediate: true,
-    deep: true,
-    flush: 'sync',
-  },
+  { immediate: true, deep: true, flush: 'sync' },
 )
 
 watch(
