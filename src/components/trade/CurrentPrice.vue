@@ -3,17 +3,25 @@
     <BaseTypography size="2xl" weight="bold" class="mb-3">
       {{ (currentPrice ?? 0).toLocaleString() }}원
     </BaseTypography>
-    <BaseTypography>(2.39%)</BaseTypography>
+    <BaseTypography> ({{ percentageChange.toFixed(2) }}%) </BaseTypography>
   </div>
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import BaseTypography from '../common/Typography/BaseTypography.vue'
 
-defineProps({
+const props = defineProps({
   currentPrice: {
     type: Number,
     default: 0,
   },
+})
+
+const basePrice = 5000
+
+const percentageChange = computed(() => {
+  if (!basePrice) return 0
+  return ((props.currentPrice - basePrice) / basePrice) * 100
 })
 </script>
