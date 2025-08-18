@@ -25,81 +25,6 @@
       </div>
     </div>
 
-    <!-- <div class="mb-10 relative">
-      <BaseTypography class="mb-2" weight="semibold">약관 동의</BaseTypography>
-
-      <div class="flex items-center mb-3 cursor-pointer" @click="toggleAll">
-        <span
-          class="material-symbols-outlined text-lg rounded-full w-5 h-5 flex items-center justify-center"
-          :class="allChecked ? 'bg-black text-white' : 'bg-gray-300 text-white'"
-        >
-          check
-        </span>
-        <span class="ml-2 text-sm">전체 동의합니다.</span>
-      </div>
-
-      <hr class="mb-3" />
-
-      <ul class="space-y-1 text-sm text-gray-800">
-        <li class="flex items-center justify-between cursor-pointer" @click="toggle('terms')">
-          <div class="flex items-center">
-            <span
-              class="material-symbols-outlined text-lg rounded-full w-5 h-5 flex items-center justify-center"
-              :class="agreements.terms ? 'bg-black text-white' : 'bg-gray-300 text-white'"
-            >
-              check
-            </span>
-            <span class="ml-2">이용약관에 동의 합니다. (필수)</span>
-          </div>
-          <span
-            class="material-symbols-outlined text-xs cursor-pointer"
-            @click="openModal('terms')"
-            style="font-size: 14px"
-          >
-            arrow_forward_ios
-          </span>
-        </li>
-        <li class="flex items-center justify-between cursor-pointer" @click="toggle('privacy')">
-          <div class="flex items-center">
-            <span
-              class="material-symbols-outlined text-lg rounded-full w-5 h-5 flex items-center justify-center"
-              :class="agreements.privacy ? 'bg-black text-white' : 'bg-gray-300 text-white'"
-            >
-              check
-            </span>
-            <span class="ml-2">개인정보 수집 및 이용에 동의합니다. (필수)</span>
-          </div>
-          <span
-            class="material-symbols-outlined text-xs cursor-pointer"
-            @click="openModal('terms')"
-            style="font-size: 14px"
-          >
-            arrow_forward_ios
-          </span>
-        </li>
-        <li class="flex items-center justify-between cursor-pointer" @click="toggle('age')">
-          <div class="flex items-center">
-            <span
-              class="material-symbols-outlined text-lg rounded-full w-5 h-5 flex items-center justify-center"
-              :class="agreements.age ? 'bg-black text-white' : 'bg-gray-300 text-white'"
-            >
-              check
-            </span>
-            <span class="ml-2">만 14세 이상입니다. (필수)</span>
-          </div>
-        </li>
-      </ul>
-
-      <BaseTypography
-        v-if="isPartiallyChecked"
-        color="red-1"
-        size="xs"
-        class="absolute mt-2 left-0 top-full"
-      >
-        * 모든 약관에 동의해주세요.
-      </BaseTypography>
-    </div> -->
-
     <TermsAgreement
       v-model:agreements="agreements"
       :modalText="propertyModalText"
@@ -137,12 +62,10 @@ const toast = useToastStore()
 const authStore = useAuthStore()
 const store = usePropertyRegisterStore()
 
-// v-model:agreements 바인딩용 프락시
 const agreements = computed({
   get: () => store.ownerInfo.agreements,
   set: (val) => (store.ownerInfo.agreements = val),
 })
-// const agreements = store.ownerInfo.agreements
 
 const propertyModalText = {
   terms: `제 1 조 (목적)
@@ -181,9 +104,7 @@ const propertyModalText = {
 `,
 }
 
-// 유효성: 모두 체크되었는가
 const allChecked = computed(() => Object.values(agreements.value || {}).every(Boolean))
-// const allChecked = computed(() => agreements.terms && agreements.privacy && agreements.age)
 
 const isStepValid = computed(() => allChecked.value)
 
@@ -203,21 +124,6 @@ onMounted(async () => {
     })
   }
 })
-
-// const toggle = (key) => {
-//   agreements[key] = !agreements[key]
-// }
-// const toggleAll = () => {
-//   const next = !(agreements.terms && agreements.privacy && agreements.age)
-//   agreements.terms = next
-//   agreements.privacy = next
-//   agreements.age = next
-// }
-
-// const isPartiallyChecked = computed(() => {
-//   const count = [agreements.terms, agreements.privacy, agreements.age].filter(Boolean).length
-//   return count > 0 && count < 3
-// })
 
 const handleNext = () => {
   if (isStepValid.value) {

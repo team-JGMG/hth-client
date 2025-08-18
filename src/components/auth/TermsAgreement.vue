@@ -2,7 +2,6 @@
   <div class="mb-12 relative">
     <BaseTypography class="mb-2" weight="semibold">{{ title }}</BaseTypography>
 
-    <!-- 전체 동의 -->
     <div class="flex items-center mb-3 cursor-pointer" @click="toggleAll">
       <span
         class="material-symbols-outlined text-lg rounded-full w-5 h-5 flex items-center justify-center"
@@ -15,7 +14,6 @@
 
     <hr class="mb-3" />
 
-    <!-- 개별 항목 -->
     <ul class="space-y-2 text-sm text-gray-800">
       <li v-for="item in items" :key="item.key" class="flex items-center justify-between">
         <div class="flex items-center cursor-pointer" @click="toggle(item.key)">
@@ -28,7 +26,6 @@
           <span class="ml-2">{{ item.label }}</span>
         </div>
 
-        <!-- 약관 전문 보기 (선택) -->
         <span
           v-if="showModal && item.modalKey"
           class="material-symbols-outlined text-xs cursor-pointer"
@@ -40,7 +37,6 @@
       </li>
     </ul>
 
-    <!-- 부분 동의 알람 -->
     <BaseTypography
       v-if="errorOnPartial && isPartiallyChecked"
       color="red-1"
@@ -50,7 +46,6 @@
       {{ errorText }}
     </BaseTypography>
 
-    <!-- 모달 (선택) -->
     <BaseModal v-if="showModal" :isOpen="modalVisible" @close="closeModal" @submit="agreeAndClose">
       <template #default>
         <div class="flex justify-between items-center mb-4">
@@ -75,10 +70,8 @@ import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import BaseModal from '@/components/common/Modal/BaseModal.vue'
 
 const props = defineProps({
-  // v-model:agreements
   agreements: { type: Object, required: true },
 
-  // 항목 구성 (라벨/키/모달 연결키)
   items: {
     type: Array,
     default: () => [
@@ -98,14 +91,12 @@ const props = defineProps({
     ],
   },
 
-  // 모달 사용 여부 & 모달 텍스트
   showModal: { type: Boolean, default: true },
   modalText: {
     type: Object,
     default: () => ({ terms: '', privacy: '' }),
   },
 
-  // 타이틀/에러표시 옵션
   title: { type: String, default: '약관 동의' },
   errorOnPartial: { type: Boolean, default: false },
   errorText: { type: String, default: '* 모든 약관에 동의해주세요.' },
@@ -113,7 +104,6 @@ const props = defineProps({
 
 const emit = defineEmits(['update:agreements', 'change', 'valid-change'])
 
-// v-model 프락시
 const agreementsLocal = computed({
   get: () => props.agreements,
   set: (next) => emit('update:agreements', next),
@@ -131,7 +121,6 @@ const isPartiallyChecked = computed(() => {
   return count > 0 && count < vals.length
 })
 
-// 모달 상태
 const modalVisible = ref(false)
 const activeModal = ref('')
 
@@ -165,7 +154,6 @@ function agreeAndClose() {
   closeModal()
 }
 
-// 부모가 유효성 상태를 알고 싶을 때를 대비한 이벤트
 watch([allChecked, isPartiallyChecked], () => {
   emit('change', { allChecked: allChecked.value, isPartiallyChecked: isPartiallyChecked.value })
   emit('valid-change', allChecked.value)
