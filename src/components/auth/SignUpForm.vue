@@ -309,7 +309,6 @@ watch(
   },
   { deep: true },
 )
-watch(nickname, (val) => toast.show('nickname 변경됨:', val))
 
 const verifyPhone = () => {
   setTimeout(() => {

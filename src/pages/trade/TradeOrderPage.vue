@@ -1,7 +1,7 @@
 <template>
   <BlankLayout>
     <div class="flex flex-col h-[calc(100vh-3rem)]">
-      <div class="shrink-0">
+      <div class="shrink-0 break-keep">
         <DetailHeader>{{ tradeItem.title }}</DetailHeader>
         <div class="bg-white pt-0">
           <CurrentPrice :currentPrice="parsedData?.currentPrice" />
