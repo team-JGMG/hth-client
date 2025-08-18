@@ -68,8 +68,11 @@ import { getFundingById } from '@/api/funding'
 import TradingChartContainer from '@/components/trade/TradeListChart/TradingChartContainer.vue'
 import { useOrderBookSocket } from '@/hooks/useOrderBookSocket'
 import { getOrderBookByFundingId } from '@/api/orderbook'
+import { parseOrderbookData } from '@/utils/ParseOrderBookData'
+import { useFcmStore } from '@/stores/fcm'
 
 const route = useRoute()
+const fcmStore = useFcmStore()
 const tradeId = ref(Number(route.params.id))
 const tradeItem = ref({})
 const tradeHistoryChart = ref(null)
@@ -84,67 +87,17 @@ const fetchFundingDetail = async (id) => {
   }
 }
 
-function buildSeriesByCurrentPrice(buyOrders = [], sellOrders = []) {
-  const map = new Map()
-
-  buyOrders.forEach((o) => {
-    if (o?.price == null) return
-    const priceNum = Number(o.price)
-    const qty = Number(o.quantity) || 0
-    const k = String(priceNum)
-    if (!map.has(k)) map.set(k, { buy: 0, sell: 0 })
-    const prev = map.get(k)
-    map.set(k, { ...prev, buy: (prev.buy || 0) + qty })
-  })
-
-  sellOrders.forEach((o) => {
-    if (o?.price == null) return
-    const priceNum = Number(o.price)
-    const qty = Number(o.quantity) || 0
-    const k = String(priceNum)
-    if (!map.has(k)) map.set(k, { buy: 0, sell: 0 })
-    const prev = map.get(k)
-    map.set(k, { ...prev, sell: (prev.sell || 0) + qty })
-  })
-
-  const sortedKeys = [...map.keys()].sort((a, b) => Number(b) - Number(a))
-
-  const prices = []
-  const buyVolumes = []
-  const sellVolumes = []
-
-  for (const k of sortedKeys) {
-    prices.push(Number(k))
-    const v = map.get(k)
-    buyVolumes.push(v.buy)
-    sellVolumes.push(v.sell)
-  }
-
-  return { prices, buyVolumes, sellVolumes }
-}
-
 async function fetchOrderBookData() {
   try {
     const res = await getOrderBookByFundingId(tradeId.value)
     const payload = res?.data?.data ?? res?.data
-    if (!payload || !Array.isArray(payload.buyOrders) || !Array.isArray(payload.sellOrders)) {
+    if (!payload) {
       return
     }
 
-    const { prices, buyVolumes, sellVolumes } = buildSeriesByCurrentPrice(
-      payload.buyOrders,
-      payload.sellOrders,
-    )
+    const newParsedData = parseOrderbookData(payload, parsedData.value?.currentPrice)
 
-    parsedData.value = {
-      currentPrice: payload.currentPrice,
-      upperLimitPrice: payload.upperLimitPrice,
-      lowerLimitPrice: payload.lowerLimitPrice,
-      prices,
-      buyVolumes,
-      sellVolumes,
-      timestamp: Date.now(),
-    }
+    parsedData.value = { ...newParsedData, timestamp: Date.now() }
   } catch {
     //
   }
@@ -177,6 +130,13 @@ onBeforeUnmount(() => {
   window.removeEventListener('focus', handleWindowFocus)
   document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
+
+watch(
+  () => fcmStore.lastTradeExecutionTimestamp,
+  () => {
+    fetchOrderBookData()
+  },
+)
 
 watch(
   () => route.params.id,

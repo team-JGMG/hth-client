@@ -8,6 +8,7 @@ export function useOrderBookSocket(fundingId, onUpdate) {
   const orderBookData = ref(null)
   const isConnected = ref(false)
   const lastMessageTime = ref(null)
+  const lastCurrentPrice = ref(0)
 
   let stompClient = null
   let subscription = null
@@ -37,7 +38,8 @@ export function useOrderBookSocket(fundingId, onUpdate) {
           subscription = stompClient.subscribe(topic, (message) => {
             try {
               const rawData = JSON.parse(message.body)
-              const parsedData = parseOrderbookData(rawData)
+              const parsedData = parseOrderbookData(rawData, lastCurrentPrice.value)
+              lastCurrentPrice.value = parsedData.currentPrice
 
               orderBookData.value = rawData
               lastMessageTime.value = new Date().toLocaleTimeString()
