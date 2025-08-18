@@ -36,6 +36,7 @@ const props = defineProps({
 
 const router = useRouter()
 const route = useRoute()
+console.log('Current route:', route)
 const authStore = useAuthStore()
 
 const isLoggedIn = computed(() => authStore.getIsLoggedIn ?? authStore.isLoggedIn)
@@ -52,11 +53,19 @@ const safeItem = computed(() => ({
     : [{ photoUrl: '/src/assets/images/cardtestimage.png' }],
 }))
 
-const stageFromRoute = computed(() => route.query.stage)
+// const stageFromRoute = computed(() => route.query.stage)
 const stage = computed(() => {
-  if (stageFromRoute.value) return String(stageFromRoute.value)
+  const stageFromQuery = route.query.stage
+  if (stageFromQuery) {
+    return stageFromQuery
+  }
+
   const i = safeItem.value
-  if (i.isSold || i.saleCompleted) return 'completedSale'
+  if (!i) return 'inProgress'
+
+  if (i.isSold || i.saleCompleted) {
+    return 'completedSale'
+  }
   if (i.status === 'ENDED' || i.fundingStatus === 'ended' || i.daysLeft <= 0 || i.percent >= 100) {
     return 'completedFunding'
   }
@@ -64,7 +73,7 @@ const stage = computed(() => {
 })
 
 const ctaText = computed(() => {
-  if (stage.value === 'completedSale') return '매각완료'
+  if (stage.value === 'completedSale') return '만료'
   if (stage.value === 'completedFunding')
     return isLoggedIn.value ? '거래하기' : '로그인 후 거래하기'
   return isLoggedIn.value ? '펀딩하기' : '로그인 후 펀딩하기'
@@ -72,7 +81,9 @@ const ctaText = computed(() => {
 
 const ctaDisabled = computed(() => {
   if (stage.value === 'completedSale') return true
-  return !isLoggedIn.value
+  if (stage.value === 'completedFunding') return false
+  if (!isLoggedIn.value) return true
+  return false
 })
 
 function handleCTA() {
