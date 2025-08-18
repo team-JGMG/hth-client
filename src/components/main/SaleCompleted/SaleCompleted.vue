@@ -73,7 +73,7 @@ const toggleInfoPopover = () => {
 const goToFundingDetail = (item) => {
   const id = item?.fundingId
   if (!id) return
-  router.push({ name: 'funding-detail', params: { id } })
+  router.push({ name: 'funding-detail', params: { id }, query: { stage: 'completedSale' } })
 }
 
 const handleClickOutside = (event) => {
