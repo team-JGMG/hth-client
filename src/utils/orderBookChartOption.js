@@ -1,6 +1,6 @@
 import { labelStyles } from '@/components/constants/chartStyles'
 
-export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, currentPrice }) => {
+export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes }) => {
   const isDescending =
     Array.isArray(prices) && prices.length > 1
       ? Number(prices[0]) >= Number(prices[prices.length - 1])
@@ -15,9 +15,6 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
     b.reverse()
     s.reverse()
   }
-
-  const currentPriceNum = Number(currentPrice)
-  const currentPriceIndex = p.findIndex((v) => Number(v) === currentPriceNum)
 
   const maxVolume = Math.max(...b, ...s, 0)
 
@@ -61,10 +58,9 @@ export const generateOrderBookChartOption = ({ prices, buyVolumes, sellVolumes, 
                 align: 'center',
                 margin: 12,
                 formatter: (value, index) => {
-                  if (index === currentPriceIndex) return `{highlight|${value}}`
-                  else if (b[index] > 0) return `{blue|${value}}`
+                  if (b[index] > 0) return `{blue|${value}}`
                   else if (s[index] > 0) return `{red|${value}}`
-                  else return value
+                  else return '' // 현재가(검정) 제거
                 },
                 rich: labelStyles,
               }
