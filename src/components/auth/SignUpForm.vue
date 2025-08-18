@@ -95,7 +95,7 @@
       </div>
     </div>
 
-    <div class="mb-12 relative">
+    <!-- <div class="mb-12 relative">
       <BaseTypography class="mb-2" weight="semibold">약관 동의</BaseTypography>
 
       <div class="flex items-center mb-3 cursor-pointer" @click="toggleAll">
@@ -161,7 +161,16 @@
           </div>
         </li>
       </ul>
-    </div>
+    </div> -->
+
+    <!-- 약관 동의 -->
+    <TermsAgreement
+      v-model:agreements="agreements"
+      :modalText="modalText"
+      :showModal="true"
+      :errorOnPartial="true"
+      title="약관 동의"
+    />
 
     <div class="mt-6 mb-20">
       <BaseButton
@@ -174,7 +183,7 @@
       </BaseButton>
     </div>
 
-    <BaseModal :isOpen="modalVisible" @close="closeModal" @submit="agreeAndClose">
+    <!-- <BaseModal :isOpen="modalVisible" @close="closeModal" @submit="agreeAndClose">
       <template #default>
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-bold">
@@ -197,7 +206,7 @@
       <template #submit>
         <BaseTypography class="!text-white font-medium text-base">동의하기</BaseTypography>
       </template>
-    </BaseModal>
+    </BaseModal> -->
   </div>
 </template>
 
@@ -209,19 +218,20 @@ import BankAccountInput from '@/components/auth/BankAccountInput.vue'
 import RrnInput from '@/components/auth/RrnInput.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import BaseButton from '@/components/common/Button/BaseButton.vue'
-import BaseModal from '@/components/common/Modal/BaseModal.vue'
+// import BaseModal from '@/components/common/Modal/BaseModal.vue'
 import { signUpWithPreAuth } from '@/api/auth'
 import { useAuthStore } from '@/stores/authStore'
 import { useToastStore } from '@/stores/toast'
+import TermsAgreement from '@/components/auth/TermsAgreement.vue'
 
 const toast = useToastStore()
 const authStore = useAuthStore()
-const agreeAndClose = () => {
-  if (activeModal.value) {
-    agreements.value[activeModal.value] = true
-  }
-  closeModal()
-}
+// const agreeAndClose = () => {
+//   if (activeModal.value) {
+//     agreements.value[activeModal.value] = true
+//   }
+//   closeModal()
+// }
 const router = useRouter()
 
 const onPhoneInput = (e) => {
@@ -246,9 +256,21 @@ const isRrnValid = computed(() => /^\d{6}$/.test(rrnFront.value) && /^\d{7}$/.te
 const isPhoneValid = computed(() => /^01[0-9]{8,9}$/.test(phone.value))
 const isAccountValid = computed(() => /^\d{6,20}$/.test(accountNumber.value.trim()))
 
-const allChecked = computed(
-  () => agreements.value.terms && agreements.value.privacy && agreements.value.age,
-)
+// const allChecked = computed(
+//   () => agreements.value.terms && agreements.value.privacy && agreements.value.age,
+// )
+// 해당 컴포넌트로 대체했으므로 여기서는 "모두 체크 되었는가"만 계산해 쓰면 됨
+const allChecked = computed(() => Object.values(agreements.value).every(Boolean))
+
+// const isFormValid = computed(
+//   () =>
+//     isNicknameValid.value &&
+//     isRrnValid.value &&
+//     isPhoneValid.value &&
+//     isAccountValid.value &&
+//     allChecked.value,
+// )
+// 기존 isFormValid에 allChecked 반영 (다른 유효성들과 함께)
 const isFormValid = computed(
   () =>
     isNicknameValid.value &&
@@ -297,10 +319,10 @@ const modalText = {
 `,
 }
 
-const openModal = (key) => {
-  activeModal.value = key
-  modalVisible.value = true
-}
+// const openModal = (key) => {
+//   activeModal.value = key
+//   modalVisible.value = true
+// }
 
 watch(
   agreements,
@@ -329,23 +351,23 @@ const verifyAccount = () => {
     })
   }, 1000)
 }
-const modalVisible = ref(false)
-const activeModal = ref('')
+// const modalVisible = ref(false)
+// const activeModal = ref('')
 
-const closeModal = () => {
-  modalVisible.value = false
-}
+// const closeModal = () => {
+//   modalVisible.value = false
+// }
 
-const toggleAll = () => {
-  const next = !(agreements.value.terms && agreements.value.privacy && agreements.value.age)
-  agreements.value.terms = next
-  agreements.value.privacy = next
-  agreements.value.age = next
-}
+// const toggleAll = () => {
+//   const next = !(agreements.value.terms && agreements.value.privacy && agreements.value.age)
+//   agreements.value.terms = next
+//   agreements.value.privacy = next
+//   agreements.value.age = next
+// }
 
-const toggleAgreement = (key) => {
-  agreements.value[key] = !agreements.value[key]
-}
+// const toggleAgreement = (key) => {
+//   agreements.value[key] = !agreements.value[key]
+// }
 
 const handleSubmit = async () => {
   try {
