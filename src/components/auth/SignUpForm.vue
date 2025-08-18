@@ -1,4 +1,3 @@
-회원가입의 알람 추가 //signUpForm.vue
 <template>
   <div class="w-full max-w-md mx-auto px-4">
     <BaseTypography class="mb-6" size="xl" weight="bold">
@@ -95,75 +94,6 @@
       </div>
     </div>
 
-    <!-- <div class="mb-12 relative">
-      <BaseTypography class="mb-2" weight="semibold">약관 동의</BaseTypography>
-
-      <div class="flex items-center mb-3 cursor-pointer" @click="toggleAll">
-        <span
-          class="material-symbols-outlined text-lg rounded-full border-gray-400 w-5 h-5 flex items-center justify-center"
-          :class="allChecked ? 'bg-black text-white' : 'bg-gray-300 text-white'"
-        >
-          check
-        </span>
-        <span class="ml-2 text-sm">전체 동의합니다.</span>
-      </div>
-
-      <hr class="mb-3" />
-
-      <ul class="space-y-2 text-sm text-gray-800">
-        <li class="flex items-center justify-between">
-          <div class="flex items-center cursor-pointer" @click="toggleAgreement('terms')">
-            <span
-              class="material-symbols-outlined text-lg rounded-full border-gray-400 w-5 h-5 flex items-center justify-center"
-              :class="agreements.terms ? 'bg-black text-white' : 'bg-gray-300 text-white'"
-            >
-              check
-            </span>
-            <span class="ml-2">이용약관에 동의합니다. (필수)</span>
-          </div>
-          <span
-            class="material-symbols-outlined text-xs cursor-pointer"
-            @click="openModal('terms')"
-            style="font-size: 14px"
-          >
-            arrow_forward_ios
-          </span>
-        </li>
-
-        <li class="flex items-center justify-between">
-          <div class="flex items-center cursor-pointer" @click="toggleAgreement('privacy')">
-            <span
-              class="material-symbols-outlined text-lg rounded-full border-gray-400 w-5 h-5 flex items-center justify-center"
-              :class="agreements.privacy ? 'bg-black text-white' : 'bg-gray-300 text-white'"
-            >
-              check
-            </span>
-            <span class="ml-2">개인정보 수집 및 이용에 동의합니다. (필수)</span>
-          </div>
-          <span
-            class="material-symbols-outlined text-xs cursor-pointer"
-            @click="openModal('privacy')"
-            style="font-size: 14px"
-          >
-            arrow_forward_ios
-          </span>
-        </li>
-
-        <li class="flex items-center justify-between">
-          <div class="flex items-center cursor-pointer" @click="toggleAgreement('age')">
-            <span
-              class="material-symbols-outlined text-lg rounded-full border-gray-400 w-5 h-5 flex items-center justify-center"
-              :class="agreements.age ? 'bg-black text-white' : 'bg-gray-300 text-white'"
-            >
-              check
-            </span>
-            <span class="ml-2">만 14세 이상입니다. (필수)</span>
-          </div>
-        </li>
-      </ul>
-    </div> -->
-
-    <!-- 약관 동의 -->
     <TermsAgreement
       v-model:agreements="agreements"
       :modalText="modalText"
@@ -182,31 +112,6 @@
         다음
       </BaseButton>
     </div>
-
-    <!-- <BaseModal :isOpen="modalVisible" @close="closeModal" @submit="agreeAndClose">
-      <template #default>
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-bold">
-            {{
-              activeModal === 'terms'
-                ? '이용약관'
-                : activeModal === 'privacy'
-                  ? '개인정보 처리방침'
-                  : '만 14세 이상 확인'
-            }}
-          </h3>
-        </div>
-        <BaseTypography size="sm" color="gray-1" class="whitespace-pre-wrap">
-          {{ modalText[activeModal] }}
-        </BaseTypography>
-
-        <div class="py-3"></div>
-      </template>
-
-      <template #submit>
-        <BaseTypography class="!text-white font-medium text-base">동의하기</BaseTypography>
-      </template>
-    </BaseModal> -->
   </div>
 </template>
 
@@ -218,7 +123,6 @@ import BankAccountInput from '@/components/auth/BankAccountInput.vue'
 import RrnInput from '@/components/auth/RrnInput.vue'
 import BaseTypography from '@/components/common/Typography/BaseTypography.vue'
 import BaseButton from '@/components/common/Button/BaseButton.vue'
-// import BaseModal from '@/components/common/Modal/BaseModal.vue'
 import { signUpWithPreAuth } from '@/api/auth'
 import { useAuthStore } from '@/stores/authStore'
 import { useToastStore } from '@/stores/toast'
@@ -226,12 +130,6 @@ import TermsAgreement from '@/components/auth/TermsAgreement.vue'
 
 const toast = useToastStore()
 const authStore = useAuthStore()
-// const agreeAndClose = () => {
-//   if (activeModal.value) {
-//     agreements.value[activeModal.value] = true
-//   }
-//   closeModal()
-// }
 const router = useRouter()
 
 const onPhoneInput = (e) => {
@@ -256,21 +154,8 @@ const isRrnValid = computed(() => /^\d{6}$/.test(rrnFront.value) && /^\d{7}$/.te
 const isPhoneValid = computed(() => /^01[0-9]{8,9}$/.test(phone.value))
 const isAccountValid = computed(() => /^\d{6,20}$/.test(accountNumber.value.trim()))
 
-// const allChecked = computed(
-//   () => agreements.value.terms && agreements.value.privacy && agreements.value.age,
-// )
-// 해당 컴포넌트로 대체했으므로 여기서는 "모두 체크 되었는가"만 계산해 쓰면 됨
 const allChecked = computed(() => Object.values(agreements.value).every(Boolean))
 
-// const isFormValid = computed(
-//   () =>
-//     isNicknameValid.value &&
-//     isRrnValid.value &&
-//     isPhoneValid.value &&
-//     isAccountValid.value &&
-//     allChecked.value,
-// )
-// 기존 isFormValid에 allChecked 반영 (다른 유효성들과 함께)
 const isFormValid = computed(
   () =>
     isNicknameValid.value &&
@@ -319,11 +204,6 @@ const modalText = {
 `,
 }
 
-// const openModal = (key) => {
-//   activeModal.value = key
-//   modalVisible.value = true
-// }
-
 watch(
   agreements,
   (newVal) => {
@@ -351,23 +231,6 @@ const verifyAccount = () => {
     })
   }, 1000)
 }
-// const modalVisible = ref(false)
-// const activeModal = ref('')
-
-// const closeModal = () => {
-//   modalVisible.value = false
-// }
-
-// const toggleAll = () => {
-//   const next = !(agreements.value.terms && agreements.value.privacy && agreements.value.age)
-//   agreements.value.terms = next
-//   agreements.value.privacy = next
-//   agreements.value.age = next
-// }
-
-// const toggleAgreement = (key) => {
-//   agreements.value[key] = !agreements.value[key]
-// }
 
 const handleSubmit = async () => {
   try {
