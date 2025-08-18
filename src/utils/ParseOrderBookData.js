@@ -1,14 +1,8 @@
-export function parseOrderbookData(orderBookResponse) {
-  const {
-    currentPrice,
-    upperLimitPrice,
-    lowerLimitPrice,
-    buyOrders = [],
-    sellOrders = [],
-  } = orderBookResponse
+export function parseOrderbookData(orderBookResponse, existingCurrentPrice = 0) {
+  const { upperLimitPrice, lowerLimitPrice, buyOrders = [], sellOrders = [] } = orderBookResponse
 
   const toNum = (v) => (typeof v === 'number' ? v : Number(v))
-  const cp = toNum(currentPrice)
+  const cp = toNum(orderBookResponse.currentPrice ?? existingCurrentPrice)
 
   const buyList = buyOrders
     .map(({ price, quantity }) => ({ price: toNum(price), buy: toNum(quantity), sell: 0 }))

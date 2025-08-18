@@ -9,12 +9,12 @@ export const getNotifications = async (params = {}) => {
 }
 
 export const markNotificationRead = async (notificationId) => {
-  const res = await api.put(`/api/auth/notifications/${notificationId}/read`)
+  const res = await api.patch(`/api/auth/notifications/${notificationId}`)
   return res.data
 }
 
 export const markAllRead = async () => {
-  const res = await api.put('/api/auth/notifications/read-all')
+  const res = await api.patch('/api/auth/notifications/read-all')
   return res.data
 }
 
