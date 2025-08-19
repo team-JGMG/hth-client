@@ -8,10 +8,10 @@
     <div class="flex justify-end items-end w-full mb-4">
       <div class="flex items-end border-b border-gray-300">
         <input
-          type="number"
+          type="text"
           placeholder="금액을 입력해주세요."
           class="w-60 p-2 focus:outline-none placeholder:text-gray-400"
-          v-model.number="localAmount"
+          v-model="formattedAmount"
         />
       </div>
       <BaseTypography size="base" class="ml-2 mb-2">원</BaseTypography>
@@ -36,5 +36,15 @@ const emit = defineEmits(['update:modelValue'])
 const localAmount = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value),
+})
+
+const formattedAmount = computed({
+  get: () => {
+    return localAmount.value?.toLocaleString() || ''
+  },
+  set: (value) => {
+    const num = parseInt(value.replace(/,/g, ''), 10)
+    localAmount.value = isNaN(num) ? 0 : num
+  },
 })
 </script>
