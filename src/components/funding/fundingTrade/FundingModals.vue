@@ -1,7 +1,7 @@
 <template>
   <BaseModal :isOpen="showConfirm" @close="$emit('closeConfirm')">
     <template #default>
-      <div class="p-4 pb-0">
+      <div class="p-4">
         <BaseTypography class="mb-4" size="xl" weight="bold">
           선택하신 수량으로 펀딩을 진행하시겠습니까?
         </BaseTypography>

@@ -2,7 +2,7 @@
   <BlankLayout>
     <div class="flex flex-col h-[calc(100vh-3rem)]">
       <div class="shrink-0">
-        <DetailHeader>매물 목록</DetailHeader>
+        <DetailHeader>펀딩 목록</DetailHeader>
 
         <div class="funding-list-page">
           <div class="filter-tabs-container mb-2 shrink-0">

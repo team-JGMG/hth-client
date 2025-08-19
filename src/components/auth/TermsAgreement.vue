@@ -51,9 +51,11 @@
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-bold">{{ modalTitle }}</h3>
         </div>
-        <BaseTypography size="sm" color="gray-1" class="whitespace-pre-wrap">
-          {{ activeModalText }}
-        </BaseTypography>
+        <div class="overflow-y-auto h-96 scrollbar-none">
+          <BaseTypography size="sm" color="gray-1" class="whitespace-pre-wrap">
+            {{ activeModalText }}
+          </BaseTypography>
+        </div>
         <div class="py-3"></div>
       </template>
 
