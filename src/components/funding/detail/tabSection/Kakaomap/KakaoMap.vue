@@ -98,20 +98,34 @@ const loadMap = async () => {
     const markerImage = new window.kakao.maps.MarkerImage(markerImageSrc, markerSize)
     new window.kakao.maps.Marker({ map: mapInstance, position: center, image: markerImage })
 
+    const formatDealAmount = (amount) => {
+      if (amount === null || amount === undefined) {
+        return '-'
+      }
+      const amountInManwon = Number(String(amount).replace(/,/g, ''))
+      if (!Number.isFinite(amountInManwon)) {
+        return '-'
+      }
+      const amountInEok = amountInManwon / 10000
+      return `${amountInEok.toFixed(1)}억`
+    }
+
     if (Array.isArray(mapData)) {
       mapData.forEach((data) => {
         if (!Number.isFinite(Number(data.latitude)) || !Number.isFinite(Number(data.longitude)))
           return
         const position = new window.kakao.maps.LatLng(Number(data.latitude), Number(data.longitude))
+
+        const formattedDealAmount = formatDealAmount(data.dealAmount)
         const content = `
           <div style="
             display:inline-block;border-radius:6px;overflow:hidden;
-            box-shadow:0 1px 4px rgba(0,0,0,0.2);font-family:sans-serif;text-align:center;white-space:nowrap;">
-            <div style="background:#000;color:#fff;font-weight:bold;font-size:12px;padding:4px 8px;">
-              ${data.dealAmount ?? '-'}
+            box-shadow:0 1px 4px rgba(30,30,30,0.2);font-family:sans-serif;text-align:center;white-space:nowrap;">
+            <div style="background:#1e1e1e;color:#fff;font-weight:bold;font-size:12px;padding:4px 8px;">
+              ${formattedDealAmount}
             </div>
             <div style="background:#fff;color:#000;font-size:10px;padding:2px 8px;">
-              ${data.dealYearMonth ?? ''}년
+              ${data.dealYearMonth ?? ''}
             </div>
           </div>
         `
