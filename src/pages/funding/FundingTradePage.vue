@@ -57,8 +57,9 @@ import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
 import { getFundingOrderLimit, createFundingOrder } from '@/api/fundingtrade'
 import { getFundingById } from '@/api/funding'
-import { requestChargeMerchantUid, verifyPayment, getPointBalance } from '@/api/point'
+import { getPointBalance } from '@/api/point'
 import { useToastStore } from '@/stores/toast'
+import { usePortone } from '@/hooks/usePortone'
 
 import BlankLayout from '@/layouts/BlankLayout.vue'
 import DetailHeader from '@/layouts/DetailHeader.vue'
@@ -81,6 +82,7 @@ const fundingId = Number(route.params.id)
 const toast = useToastStore()
 const authStore = useAuthStore()
 const { getIsLoggedIn, userId } = storeToRefs(authStore)
+const { processPayment } = usePortone()
 
 const isLoggedIn = computed(() => authStore.getIsLoggedIn ?? authStore.isLoggedIn)
 
@@ -185,73 +187,13 @@ const refreshPointBalance = async () => {
 }
 
 const onChargeSubmit = async () => {
-  const amt = Number(chargeAmount.value)
-  if (!Number.isFinite(amt) || amt <= 0) {
-    toast.warn('충전할 금액을 입력해주세요.')
-    return
-  }
-  await requestPay(amt)
-}
-
-const requestPay = async (amount) => {
-  if (!getIsLoggedIn.value) return toast.warn('로그인이 필요합니다.')
-  const amt = Number(amount)
-  if (!Number.isFinite(amt) || amt <= 0) return toast.warn('충전할 금액을 입력해주세요.')
-
   try {
-    const merchant_uid = await requestChargeMerchantUid(amt)
-    if (!merchant_uid) return toast.error('결제 식별자(merchant_uid) 발급 실패')
-
-    const { IMP } = window
-    if (!IMP) return toast.error('PortOne 스크립트가 로드되지 않았습니다.')
-
-    IMP.init(import.meta.env.VITE_PORTONE_IMP_KEY)
-    IMP.request_pay(
-      {
-        pg: 'kakaypay.TC0ONETIME',
-        pay_method: 'card',
-        name: '반의 반 집 포인트 충전',
-        amount: amt,
-        merchant_uid,
-        buyer_email: authStore.userInfo?.email || 'guest@example.com',
-        buyer_name: authStore.userInfo?.name || '비회원',
-        buyer_tel: '010-0000-0000',
-        buyer_addr: '서울특별시',
-        buyer_postcode: '00000',
-        m_redirect_url: `${window.location.origin}/payment-complete`,
-      },
-      async (rsp) => {
-        if (!rsp?.success) {
-          toast.error({
-            title: '결제 실패',
-            body: rsp?.error_msg || '사용자 취소 또는 오류',
-          })
-          return
-        }
-        try {
-          await verifyPayment({
-            impUid: rsp.imp_uid,
-            amount: rsp.paid_amount,
-            merchantUid: merchant_uid,
-          })
-          toast.success('포인트 충전이 완료되었습니다.')
-          isChargeModalOpen.value = false
-          chargeAmount.value = 0
-          await refreshPointBalance()
-        } catch (err) {
-          toast.error({
-            title: '서버 검증 실패',
-            body:
-              err?.response?.data?.message || err?.message || '결제 검증 중 오류가 발생했습니다.',
-          })
-        }
-      },
-    )
-  } catch (err) {
-    toast.error({
-      title: '결제 요청 오류',
-      body: err?.response?.data?.message || err?.message || '결제 요청 중 오류가 발생했습니다.',
-    })
+    await processPayment(chargeAmount.value)
+    isChargeModalOpen.value = false
+    chargeAmount.value = 0
+    await refreshPointBalance()
+  } catch (error) {
+    console.error('Payment process failed:', error)
   }
 }
 
