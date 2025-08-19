@@ -62,38 +62,31 @@ function avgPrice(order) {
       @touchend="touchEndHandler(order)"
     >
       <div class="flex flex-col justify-center items-end min-w-[50px] h-full">
-        <BaseTypography class="text-gray-500 text-xs text-right">
+        <BaseTypography color="gray-1" weight="medium" size="xs" class="text-right">
           {{ formatToMMDD(order.createdAt) }}
         </BaseTypography>
-        <BaseTypography class="text-xs text-gray-500 text-right">
+        <BaseTypography color="gray-1" weight="medium" size="xs" class="text-right">
           {{ formatToHHMM(order.createdAt) }}
         </BaseTypography>
       </div>
 
       <div class="flex-1 flex flex-col justify-center h-full overflow-hidden">
         <div class="h-[20px] overflow-hidden">
-          <BaseTypography class="!font-bold text-sm truncate whitespace-nowrap">
+          <BaseTypography size="sm" weight="bold" class="truncate whitespace-nowrap">
             {{ order.itemName }}
           </BaseTypography>
         </div>
         <div class="h-[18px] overflow-hidden flex gap-1 items-center">
-          <BaseTypography
-            class="text-xs !font-semibold"
-            :color="order.status === '매수' ? 'red' : 'blue'"
-          >
+          <BaseTypography size="xs" weight="bold" :color="order.status === '매수' ? 'red' : 'blue'">
             {{ order.status }}
           </BaseTypography>
-          <BaseTypography class="text-xs !font-semibold">
-            {{ nfmt(avgPrice(order)) }}원
-          </BaseTypography>
+          <BaseTypography size="xs" weight="base"> {{ nfmt(avgPrice(order)) }}원 </BaseTypography>
         </div>
       </div>
 
-      <div class="text-sm !font-black text-right min-w-[70px]">
-        <BaseTypography class="text-xs text-gray-500">
-          주문량 {{ nfmt(order.shares) }}주
-        </BaseTypography>
-        <BaseTypography class="text-xs !font-bold mt-1" :color="'red'">
+      <div class="text-right min-w-[70px]">
+        <BaseTypography size="xs" weight="base"> 주문량 {{ nfmt(order.shares) }}주 </BaseTypography>
+        <BaseTypography size="xs" weight="bold" class="mt-1" :color="'red'">
           미체결량 {{ nfmt(order.pendingShares) }}주
         </BaseTypography>
       </div>

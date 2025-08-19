@@ -224,7 +224,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="py-3"></div>
-  <div ref="listContainer" class="p-4 min-h-[600px] space-y-0">
+  <div ref="listContainer" class="p-0 min-h-[600px] space-y-0">
     <div v-if="loadError && isFirstLoad" class="py-10 text-center text-red-500">
       거래 내역을 불러오지 못했습니다.
     </div>
@@ -241,7 +241,7 @@ onBeforeUnmount(() => {
         v-for="(order, index) in uniqueSortedOrders"
         :key="order.id ?? `${order.createdAt}-${order.itemName}-${index}`"
       >
-        <BaseTypography v-if="isNewYear(index)" class="text-sm text-gray-500">
+        <BaseTypography v-if="isNewYear(index)" size="bold" weight="bold" class="mb-3 px-1 mt-4">
           {{ getYear(order.createdAt) }}년
         </BaseTypography>
 

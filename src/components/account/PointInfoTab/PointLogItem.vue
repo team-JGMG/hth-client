@@ -30,24 +30,28 @@ function formatHHMM(dt) {
 <template>
   <div
     :class="[
-      'flex items-center justify-between rounded-md px-3 h-[72px] overflow-hidden',
+      'flex items-center justify-between rounded-md px-2 h-[72px] overflow-hidden',
       index % 2 === 0 ? 'bg-gray-100' : 'bg-white',
     ]"
   >
     <div class="flex flex-col items-end min-w-[50px]">
-      <BaseTypography class="text-gray-500 text-xs text-right">
+      <BaseTypography color="gray-1" weight="medium" size="xs" class="text-right">
         {{ formatMMDD(log.date) }}
       </BaseTypography>
-      <BaseTypography class="text-xs text-gray-500 text-right">
+      <BaseTypography color="gray-1" weight="medium" size="xs" class="text-right">
         {{ formatHHMM(log.date) }}
       </BaseTypography>
     </div>
 
-    <BaseTypography class="!font-bold text-sm truncate whitespace-nowrap flex-1 mx-3 text-left">
+    <BaseTypography
+      weight="bold"
+      size="sm"
+      class="truncate ml-4 whitespace-nowrap flex-1 mx-3 text-left"
+    >
       {{ log.title }}
     </BaseTypography>
 
-    <BaseTypography class="text-sm !font-black min-w-[72px] text-right">
+    <BaseTypography weight="bold" size="sm" class="min-w-[72px] mr-4 text-right">
       <span :class="log.amount > 0 ? 'text-blue-600' : 'text-red-600'">
         {{ log.amount > 0 ? '+' : '-' }}{{ Math.abs(log.amount).toLocaleString() }}
       </span>
