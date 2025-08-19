@@ -144,7 +144,7 @@ const requestPay = async (amount) => {
         buyer_tel: '010-0000-0000',
         buyer_addr: '서울특별시',
         buyer_postcode: '00000',
-        m_redirect_url: `${window.location.origin}/payment-complete`,
+        m_redirect_url: `${window.location.origin}/payment-complete?imp_uid={imp_uid}&merchant_uid=${merchant_uid}&paid_amount={paid_amount}`,
       },
       async (rsp) => {
         if (!rsp?.success) {
