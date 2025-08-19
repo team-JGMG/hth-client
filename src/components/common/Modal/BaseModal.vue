@@ -5,7 +5,7 @@
       @click="onBackdropClick"
       class="fixed inset-0 z-[9999] bg-black bg-opacity-40 flex items-center justify-center"
     >
-      <div @click.stop class="max-w-96 relative bg-white rounded-lg p-5 box-border">
+      <div @click.stop class="w-80 relative bg-white rounded-lg p-5 box-border">
         <button
           type="button"
           aria-label="닫기"
@@ -29,7 +29,7 @@
         </button>
         <slot />
         <button
-          class="flex w-72 h-12 bg-black text-white rounded-lg flex items-center justify-center mx-auto mt-8"
+          class="flex w-full h-12 bg-black text-white rounded-lg items-center justify-center mx-auto mt-8"
           type="button"
           aria-label="제출"
           @click="emit('submit')"
