@@ -60,7 +60,7 @@ const handleTradeCompleted = () => {
           size="xl"
           weight="bold"
           class="cursor-pointer mr-4 ml-3"
-          :color="activeMode === 'buy' ? 'red' : 'white'"
+          :color="activeMode === 'buy' ? 'blue' : 'white'"
           @click.stop="setActiveMode('buy')"
         >
           구매할래요
@@ -70,7 +70,7 @@ const handleTradeCompleted = () => {
           size="xl"
           weight="bold"
           class="cursor-pointer"
-          :color="activeMode === 'sell' ? 'blue' : 'white'"
+          :color="activeMode === 'sell' ? 'red' : 'white'"
           @click.stop="setActiveMode('sell')"
         >
           판매할래요

@@ -152,5 +152,5 @@ const openConfirmModal = () => {
 }
 
 const buttonText = computed(() => (props.type === 'buy' ? '구매하기' : '판매하기'))
-const buttonColor = computed(() => (props.type === 'buy' ? 'red-600' : 'blue-600'))
+const buttonColor = computed(() => (props.type === 'buy' ? 'blue-600' : 'red-600'))
 </script>
