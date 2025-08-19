@@ -20,7 +20,13 @@ const userStore = useAuthStore()
 const toast = useToastStore()
 
 const currentPoint = ref(0)
-const expectedBalance = computed(() => currentPoint.value - total.value)
+const expectedBalance = computed(() => {
+  if (props.type === 'buy') {
+    return currentPoint.value - total.value
+  } else {
+    return currentPoint.value + total.value
+  }
+})
 
 const emit = defineEmits(['close', 'completed', 'trade-success'])
 
@@ -77,9 +83,9 @@ const handleConfirm = async () => {
         수량: {{ quantity }}주 <br />
         총 금액: {{ total.toLocaleString() }}원 <br />
         예상 잔여 포인트:
-        <span :class="expectedBalance < 0 ? 'text-red-500' : ''">
+        <span :class="props.type === 'buy' && expectedBalance < 0 ? 'text-red-500' : ''">
           {{ expectedBalance.toLocaleString() }}원
-          <span v-if="expectedBalance < 0"> (잔액 부족)</span>
+          <span v-if="props.type === 'buy' && expectedBalance < 0"> (잔액 부족)</span>
         </span>
       </BaseTypography>
     </div>
