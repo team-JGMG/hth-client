@@ -19,7 +19,7 @@
 
     <div class="mt-6 flex items-center justify-between space-x-4">
       <BaseTypography size="base" class="mb-2">결제 수단</BaseTypography>
-      <img src="@/assets/images/bankIcon/kakaopay.svg" alt="카카오페이" class="w-20 h-auto" />
+      <img src="@/assets/images/bankIcon/kakaopay.svg" alt="카카오페이" class="w-16 h-auto" />
     </div>
   </div>
 </template>

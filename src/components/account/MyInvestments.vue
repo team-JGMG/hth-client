@@ -220,7 +220,7 @@ const setSharesBottomRef = (el) => (sharesList.bottomRef.value = el)
 </script>
 
 <template>
-  <div class="p-4 min-h-[600px]">
+  <div class="min-h-[600px]">
     <div v-if="initialLoading" class="flex justify-center items-center py-16">
       <LoadingSpinner />
     </div>

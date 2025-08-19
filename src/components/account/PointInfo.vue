@@ -161,7 +161,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="p-4 min-h-[600px] space-y-6">
+  <div class="py-4 min-h-[600px]">
     <div v-if="!groupedLogs.length && !isLoading" class="py-10 text-center text-gray-400">
       <BaseTypography class="!text-gray-400">포인트 내역이 없습니다.</BaseTypography>
     </div>

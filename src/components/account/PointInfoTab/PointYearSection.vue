@@ -10,7 +10,7 @@ defineProps({
 
 <template>
   <div class="space-y-2">
-    <BaseTypography class="text-sm text-gray-500">{{ year }}년</BaseTypography>
+    <BaseTypography size="bold" weight="bold" class="mb-3 px-1 mt-4">{{ year }}년</BaseTypography>
 
     <PointLogItem v-for="(log, idx) in logs" :key="log.id ?? idx" :log="log" :index="idx" />
   </div>
